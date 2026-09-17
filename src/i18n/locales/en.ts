@@ -44,6 +44,17 @@ export const en: Dict = {
     great: "Great job!",
     strokeProgress: "Line {{current}} of {{total}}",
     offTrack: "Follow the line",
+    listen: "Listen",
+  },
+  preview: {
+    title: "Content Preview",
+    hint: "Check the shape of every letter, number, and shape.",
+  },
+  categories: {
+    upper: "Uppercase",
+    lower: "Lowercase",
+    digits: "Numbers",
+    shapes: "Shapes",
   },
   mastery: {
     new: "New",
@@ -70,6 +81,7 @@ export const en: Dict = {
     haptics: "Vibration",
     audio: "Sound",
     switchProfile: "Switch Child",
+    preview: "Content Preview",
   },
   settings: {
     errors: {

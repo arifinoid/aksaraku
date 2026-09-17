@@ -147,7 +147,7 @@ Referensi: `plans/features.md` (fitur), `plans/architecture.md` (arsitektur), `p
 
 - [x] M0 Fondasi
 - [x] M1 Tracing Engine
-- [ ] M2 Konten Aksara
+- [x] M2 Konten Aksara
 - [ ] M3 Mini Games
 - [ ] M4 Gamifikasi
 - [ ] M5 Parent Dashboard

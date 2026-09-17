@@ -11,6 +11,7 @@ import {
 } from "../../domain";
 import { TracingCanvas } from "../../game";
 import { newId } from "../../platform/ids";
+import { speakPhoneme } from "../../platform/speech";
 import { runTask } from "../../platform/task";
 import { recordAttempt, saveAttempt } from "../../storage";
 import { Button, Screen } from "../../ui";
@@ -61,6 +62,10 @@ export function TracingScreen({
             }),
           );
           void runTask(recordAttempt(profile.id, item.id, result.accuracy, now));
+          window.setTimeout(
+            () => speakPhoneme(item.phoneme, item.locale, settings.audioEnabled),
+            650,
+          );
           break;
         }
         case "StrokeCompleted":
@@ -75,7 +80,7 @@ export function TracingScreen({
           break;
       }
     },
-    [item.id, profile.id, totalStrokes],
+    [item.id, item.locale, item.phoneme, profile.id, settings.audioEnabled, totalStrokes],
   );
 
   const retry = useCallback(() => {
@@ -89,7 +94,19 @@ export function TracingScreen({
   const currentLine = Math.min(strokeIndex + 1, totalStrokes);
 
   return (
-    <Screen title={item.glyph} onBack={onBack}>
+    <Screen
+      title={item.glyph}
+      onBack={onBack}
+      actions={
+        <Button
+          label={t("play.listen")}
+          icon="🔊"
+          variant="secondary"
+          size="sm"
+          onClick={() => speakPhoneme(item.phoneme, item.locale, true)}
+        />
+      }
+    >
       <TracingCanvas
         item={item}
         resetKey={resetKey}

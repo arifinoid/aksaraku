@@ -1,11 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { findGlyphItem, GLYPH_ITEMS } from "../../data";
+import {
+  categoryLabelKey,
+  findGlyphItem,
+  GLYPH_CATEGORIES,
+  itemsByKind,
+} from "../../data";
 import {
   masteryLevel,
   type AppSettings,
   type MasteryScore,
   type ModuleItem,
+  type ModuleKind,
   type Profile,
 } from "../../domain";
 import { unlockAudio } from "../../game";
@@ -21,14 +27,9 @@ export interface PlayScreenProps {
   readonly onBack: () => void;
 }
 
-const nextItem = (currentId: string): ModuleItem => {
-  const index = GLYPH_ITEMS.findIndex((item) => item.id === currentId);
-  const nextIndex = index < 0 ? 0 : (index + 1) % GLYPH_ITEMS.length;
-  return GLYPH_ITEMS[nextIndex]!;
-};
-
 export function PlayScreen({ profile, settings, onBack }: PlayScreenProps) {
   const { t } = useTranslation();
+  const [kind, setKind] = useState<ModuleKind>("letter-upper");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mastery, setMastery] = useState<readonly MasteryScore[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -52,9 +53,13 @@ export function PlayScreen({ profile, settings, onBack }: PlayScreenProps) {
     return map;
   }, [mastery]);
 
+  const items = useMemo(() => itemsByKind(kind), [kind]);
+
   const selected = selectedId ? findGlyphItem(selectedId) : undefined;
 
   if (selected) {
+    const index = items.findIndex((entry) => entry.id === selected.id);
+    const next = items[(index + 1) % items.length] ?? items[0]!;
     return (
       <TracingScreen
         key={selected.id}
@@ -65,16 +70,30 @@ export function PlayScreen({ profile, settings, onBack }: PlayScreenProps) {
           setSelectedId(null);
           setRefreshKey((value) => value + 1);
         }}
-        onNext={() => setSelectedId(nextItem(selected.id).id)}
+        onNext={() => setSelectedId(next.id)}
       />
     );
   }
 
   return (
     <Screen title={t("play.title")} onBack={onBack}>
-      <p className="play__hint">{t("play.pick")}</p>
+      <div className="play__tabs">
+        {GLYPH_CATEGORIES.map((category) => (
+          <button
+            key={category.kind}
+            type="button"
+            className={`play__tab${
+              category.kind === kind ? " play__tab--active" : ""
+            }`}
+            onClick={() => setKind(category.kind)}
+          >
+            {t(categoryLabelKey(category.kind))}
+          </button>
+        ))}
+      </div>
+
       <div className="play__grid">
-        {GLYPH_ITEMS.map((item) => {
+        {items.map((item) => {
           const entry = levels.get(item.id);
           const level = masteryLevel(entry?.score, entry?.attempts ?? 0);
           return (

@@ -42,6 +42,17 @@ export const id = {
     great: "Hebat!",
     strokeProgress: "Garis {{current}} dari {{total}}",
     offTrack: "Ikuti garisnya ya",
+    listen: "Dengar",
+  },
+  preview: {
+    title: "Pratinjau Konten",
+    hint: "Periksa bentuk semua huruf, angka, dan bentuk.",
+  },
+  categories: {
+    upper: "Huruf Besar",
+    lower: "Huruf Kecil",
+    digits: "Angka",
+    shapes: "Bentuk",
   },
   mastery: {
     new: "Baru",
@@ -68,6 +79,7 @@ export const id = {
     haptics: "Getaran",
     audio: "Suara",
     switchProfile: "Ganti Anak",
+    preview: "Pratinjau Konten",
   },
   settings: {
     errors: {

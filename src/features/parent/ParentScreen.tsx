@@ -13,6 +13,7 @@ export interface ParentScreenProps {
   readonly onToggleAudio: (enabled: boolean) => void;
   readonly onClose: () => void;
   readonly onSwitchProfile: () => void;
+  readonly onPreview: () => void;
 }
 
 export function ParentScreen({
@@ -22,6 +23,7 @@ export function ParentScreen({
   onToggleAudio,
   onClose,
   onSwitchProfile,
+  onPreview,
 }: ParentScreenProps) {
   const { t } = useTranslation();
   const [unlocked, setUnlocked] = useState(false);
@@ -73,6 +75,13 @@ export function ParentScreen({
           onChange={onToggleAudio}
         />
       </section>
+
+      <Button
+        label={t("parent.preview")}
+        variant="secondary"
+        icon="🔍"
+        onClick={onPreview}
+      />
 
       <Button
         label={t("parent.switchProfile")}

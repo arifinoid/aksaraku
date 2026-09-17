@@ -13,6 +13,7 @@ import { HomeScreen } from "./features/home/HomeScreen";
 import { ParentScreen } from "./features/parent/ParentScreen";
 import { PlayScreen } from "./features/play/PlayScreen";
 import { ProfileScreen } from "./features/profiles/ProfileScreen";
+import { GlyphPreviewScreen } from "./features/preview/GlyphPreviewScreen";
 import { changeLocale } from "./i18n";
 import { runTask } from "./platform/task";
 import {
@@ -153,6 +154,10 @@ export function App() {
       );
     }
 
+    if (route.name === "preview") {
+      return <GlyphPreviewScreen onBack={() => setRoute({ name: "parent" })} />;
+    }
+
     if (route.name === "parent") {
       return (
         <ParentScreen
@@ -162,6 +167,7 @@ export function App() {
           onToggleAudio={handleToggleAudio}
           onClose={() => setRoute(current ? { name: "home" } : { name: "profiles" })}
           onSwitchProfile={goToProfiles}
+          onPreview={() => setRoute({ name: "preview" })}
         />
       );
     }

@@ -44,6 +44,17 @@ export const ar: Dict = {
     great: "أحسنت!",
     strokeProgress: "الخط {{current}} من {{total}}",
     offTrack: "اتبع الخط",
+    listen: "استمع",
+  },
+  preview: {
+    title: "معاينة المحتوى",
+    hint: "تحقق من شكل كل حرف ورقم وشكل.",
+  },
+  categories: {
+    upper: "حروف كبيرة",
+    lower: "حروف صغيرة",
+    digits: "أرقام",
+    shapes: "أشكال",
   },
   mastery: {
     new: "جديد",
@@ -70,6 +81,7 @@ export const ar: Dict = {
     haptics: "الاهتزاز",
     audio: "الصوت",
     switchProfile: "تغيير الطفل",
+    preview: "معاينة المحتوى",
   },
   settings: {
     errors: {

@@ -26,6 +26,7 @@ export interface UseChoiceGameOptions {
   readonly optionCount: number;
   readonly profileId: ProfileId;
   readonly resetKey?: string | number;
+  readonly onProgress?: () => void | Promise<void>;
 }
 
 export interface ChoiceGame {
@@ -48,6 +49,7 @@ export function useChoiceGame({
   optionCount,
   profileId,
   resetKey,
+  onProgress,
 }: UseChoiceGameOptions): ChoiceGame {
   const [session, setSession] = useState<ChoiceSession>(() =>
     createChoiceSession(candidates, roundCount, optionCount, Math.random),
@@ -103,8 +105,9 @@ export function useChoiceGame({
       for (const entry of entries) {
         await runTask(recordAttempt(profileId, entry.itemId, entry.accuracy, now));
       }
+      await onProgress?.();
     })();
-  }, [finished, profileId, session.attempts]);
+  }, [finished, onProgress, profileId, session.attempts]);
 
   const choose = useCallback((optionId: string) => {
     if (lockedRef.current) return;

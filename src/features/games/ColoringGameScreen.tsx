@@ -1,5 +1,6 @@
 import { useState, type PointerEvent as ReactPointerEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { useRewards } from "../../app/RewardsContext";
 import { COLOR_PALETTE, STICKER_SET } from "../../data";
 import {
   addSticker,
@@ -42,6 +43,7 @@ export function ColoringGameScreen({
   onBack,
 }: ColoringGameScreenProps) {
   const { t } = useTranslation();
+  const { refresh } = useRewards();
   const [state, setState] = useState(() => createColoringState(item.id));
   const [color, setColor] = useState(COLOR_PALETTE[0]!);
   const [sticker, setSticker] = useState<string | null>(null);
@@ -70,7 +72,10 @@ export function ColoringGameScreen({
   };
 
   const finish = () => {
-    void runTask(recordAttempt(profile.id, item.id, score, Date.now()));
+    void (async () => {
+      await runTask(recordAttempt(profile.id, item.id, score, Date.now()));
+      await refresh();
+    })();
     setSummary(true);
     playSuccess(settings.audioEnabled);
   };

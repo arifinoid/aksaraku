@@ -49,17 +49,13 @@ export function HomeScreen({
           label={t("home.rewards")}
           icon="🏆"
           tone="accent"
-          hint={t("common.soon")}
-          disabled
-          onClick={() => undefined}
+          onClick={() => onNavigate({ name: "collection" })}
         />
         <Tile
           label={t("home.avatar")}
           icon={avatarEmoji(profile.avatarId)}
           tone="success"
-          hint={t("common.soon")}
-          disabled
-          onClick={() => undefined}
+          onClick={() => onNavigate({ name: "avatar" })}
         />
       </div>
       <Button

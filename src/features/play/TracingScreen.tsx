@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useRewards } from "../../app/RewardsContext";
 import {
   scoreSession,
   type AppSettings,
@@ -35,6 +36,7 @@ export function TracingScreen({
   onColor,
 }: TracingScreenProps) {
   const { t } = useTranslation();
+  const { refresh } = useRewards();
   const [coverage, setCoverage] = useState(0);
   const [strokeIndex, setStrokeIndex] = useState(0);
   const [score, setScore] = useState<TraceScore | null>(null);
@@ -63,7 +65,12 @@ export function TracingScreen({
               completedAt: now,
             }),
           );
-          void runTask(recordAttempt(profile.id, item.id, result.accuracy, now));
+          void (async () => {
+            await runTask(
+              recordAttempt(profile.id, item.id, result.accuracy, now),
+            );
+            await refresh();
+          })();
           window.setTimeout(
             () => speakPhoneme(item.phoneme, item.locale, settings.audioEnabled),
             650,
@@ -82,7 +89,15 @@ export function TracingScreen({
           break;
       }
     },
-    [item.id, item.locale, item.phoneme, profile.id, settings.audioEnabled, totalStrokes],
+    [
+      item.id,
+      item.locale,
+      item.phoneme,
+      profile.id,
+      refresh,
+      settings.audioEnabled,
+      totalStrokes,
+    ],
   );
 
   const retry = useCallback(() => {

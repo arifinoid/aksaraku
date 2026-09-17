@@ -121,6 +121,7 @@ Referensi: `plans/features.md` (fitur), `plans/architecture.md` (arsitektur), `p
 ### Stack
 
 - Bun + React 19 + TypeScript strict (sudah ada di repo).
+  React dipin ke `19.2.8` karena `@react-three/fiber@9` mensyaratkan `react >=19 <19.3`.
 - Domain logic: `fp-ts` (Either/TaskEither) + `ts-pattern` (state machine).
 - Tracing: PixiJS (canvas 2D, presisi) - BUKAN 3D.
 - Scene 3D (avatar/reward): `@react-three/fiber` + `three`.
@@ -142,6 +143,15 @@ Referensi: `plans/features.md` (fitur), `plans/architecture.md` (arsitektur), `p
 - Kunci tombol back/keluar saat game berjalan (no-accidental-click).
 - Jangan tambah dependency baru tanpa alasan; ikuti larangan di section atas
   (no express/vite/ws/pg/better-sqlite3).
+- Dexie: IndexedDB TIDAK bisa mengubah primary key store yang sudah ada. Kalau
+  butuh PK baru, hapus store lama (`nama: null`) lalu buat store baru dengan nama
+  berbeda di versi yang sama. Skema dideklarasikan di `DB_VERSIONS`
+  (`src/storage/db.ts`) dan dijaga test `src/storage/db.test.ts`.
+- Build produksi HARUS lewat env var `NODE_ENV=production` (bukan
+  `--define:process.env.NODE_ENV`, yang diabaikan Bun). Salah setelan membuat
+  React dev build ikut terkirim (+207 KB & warning bocor ke user).
+- Service Worker hanya didaftarkan saat `NODE_ENV === "production"`; `sw.js`
+  memakai network-first untuk navigasi supaya deploy baru tidak tertahan cache.
 
 ### Status fase
 
@@ -149,7 +159,7 @@ Referensi: `plans/features.md` (fitur), `plans/architecture.md` (arsitektur), `p
 - [x] M1 Tracing Engine
 - [x] M2 Konten Aksara
 - [x] M3 Mini Games
-- [ ] M4 Gamifikasi
+- [x] M4 Gamifikasi
 - [ ] M5 Parent Dashboard
 - [ ] M6 Aksesibilitas & rilis
 - [ ] M7 Multi-bahasa penuh

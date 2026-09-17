@@ -74,6 +74,34 @@ export const en: Dict = {
     title: "Content Preview",
     hint: "Check the shape of every letter, number, and shape.",
   },
+  rewards: {
+    title: "Reward Collection",
+    kind: {
+      sticker: "Stickers",
+      trophy: "Trophies",
+      character: "Characters",
+    },
+    unlocked: "You earned a new reward!",
+    yeay: "Yay!",
+    locked: "Locked",
+    done: "Done",
+    requirement: {
+      itemsAttempted: "Try {{count}} activities",
+      itemsMastered: "Master {{count}} letters or numbers",
+      starsEarned: "Earn {{count}} stars",
+      totalAttempts: "Play {{count}} times",
+      kindMastered: "Master {{count}} in one category",
+    },
+  },
+  avatar: {
+    title: "My Character",
+    slot: {
+      color: "Color",
+      ears: "Ears",
+      eyes: "Eyes",
+      accessory: "Accessory",
+    },
+  },
   categories: {
     upper: "Uppercase",
     lower: "Lowercase",
@@ -115,5 +143,8 @@ export const en: Dict = {
   },
   error: {
     storage: "Could not save data. Please try again.",
+    retry: "Try Again",
+    reset: "Reset Data",
+    resetHint: "Deletes all profiles and progress on this device.",
   },
 };

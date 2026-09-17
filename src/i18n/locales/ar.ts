@@ -74,6 +74,34 @@ export const ar: Dict = {
     title: "معاينة المحتوى",
     hint: "تحقق من شكل كل حرف ورقم وشكل.",
   },
+  rewards: {
+    title: "مجموعة المكافآت",
+    kind: {
+      sticker: "ملصقات",
+      trophy: "كؤوس",
+      character: "شخصيات",
+    },
+    unlocked: "حصلت على مكافأة جديدة!",
+    yeay: "رائع!",
+    locked: "مقفل",
+    done: "تم",
+    requirement: {
+      itemsAttempted: "جرّب {{count}} أنشطة",
+      itemsMastered: "أتقن {{count}} حرفاً أو رقماً",
+      starsEarned: "اجمع {{count}} نجوم",
+      totalAttempts: "العب {{count}} مرات",
+      kindMastered: "أتقن {{count}} في فئة واحدة",
+    },
+  },
+  avatar: {
+    title: "شخصيتي",
+    slot: {
+      color: "اللون",
+      ears: "الأذنان",
+      eyes: "العينان",
+      accessory: "الإكسسوار",
+    },
+  },
   categories: {
     upper: "حروف كبيرة",
     lower: "حروف صغيرة",
@@ -115,5 +143,8 @@ export const ar: Dict = {
   },
   error: {
     storage: "تعذّر حفظ البيانات. حاول مرة أخرى.",
+    retry: "حاول مرة أخرى",
+    reset: "إعادة تعيين البيانات",
+    resetHint: "يحذف جميع الملفات والتقدّم على هذا الجهاز.",
   },
 };

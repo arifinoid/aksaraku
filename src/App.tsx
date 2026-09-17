@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./app/routes";
+import { RewardsProvider } from "./app/RewardsContext";
 import {
   setAudio,
   setHaptics,
@@ -11,6 +12,9 @@ import {
 } from "./domain";
 import { HomeScreen } from "./features/home/HomeScreen";
 import { GamesScreen } from "./features/games/GamesScreen";
+import { AvatarScreen } from "./features/avatar/AvatarScreen";
+import { CollectionScreen } from "./features/rewards/CollectionScreen";
+import { RewardCelebration } from "./features/rewards/RewardCelebration";
 import { ParentScreen } from "./features/parent/ParentScreen";
 import { PlayScreen } from "./features/play/PlayScreen";
 import { ProfileScreen } from "./features/profiles/ProfileScreen";
@@ -20,16 +24,21 @@ import { runTask } from "./platform/task";
 import {
   listProfiles,
   loadSettings,
+  resetDatabase,
   saveProfile,
   saveSettings,
 } from "./storage";
-import { Screen } from "./ui";
+import { Button, Screen } from "./ui";
 
 type Status = "loading" | "ready" | "error";
+
+const needsReset = (message: string): boolean =>
+  /upgrade|primary key|databaseclosed|invalidstate|version/i.test(message);
 
 export function App() {
   const { t } = useTranslation();
   const [status, setStatus] = useState<Status>("loading");
+  const [dbError, setDbError] = useState("");
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [profiles, setProfiles] = useState<readonly Profile[]>([]);
   const [current, setCurrent] = useState<Profile | null>(null);
@@ -42,6 +51,7 @@ export function App() {
       const loadedSettings = await runTask(loadSettings());
       if (!active) return;
       if (loadedSettings._tag === "Left") {
+        setDbError(loadedSettings.left.message);
         setStatus("error");
         return;
       }
@@ -51,6 +61,7 @@ export function App() {
       const loadedProfiles = await runTask(listProfiles());
       if (!active) return;
       if (loadedProfiles._tag === "Left") {
+        setDbError(loadedProfiles.left.message);
         setStatus("error");
         return;
       }
@@ -115,6 +126,16 @@ export function App() {
 
   const goToProfiles = useCallback(() => setRoute({ name: "profiles" }), []);
 
+  const handleReload = useCallback(() => {
+    window.location.reload();
+  }, []);
+
+  const handleReset = useCallback(() => {
+    void resetDatabase()
+      .then(() => window.location.reload())
+      .catch(() => window.location.reload());
+  }, []);
+
   if (status === "loading") {
     return (
       <main className="app-shell app-shell--center">
@@ -128,6 +149,17 @@ export function App() {
       <main className="app-shell app-shell--center">
         <Screen center>
           <p role="alert">{t("error.storage")}</p>
+          <Button label={t("error.retry")} onClick={handleReload} />
+          {needsReset(dbError) ? (
+            <>
+              <Button
+                variant="ghost"
+                label={t("error.reset")}
+                onClick={handleReset}
+              />
+              <p>{t("error.resetHint")}</p>
+            </>
+          ) : null}
         </Screen>
       </main>
     );
@@ -165,6 +197,19 @@ export function App() {
       );
     }
 
+    if (route.name === "collection" && current) {
+      return <CollectionScreen onBack={() => setRoute({ name: "home" })} />;
+    }
+
+    if (route.name === "avatar" && current) {
+      return (
+        <AvatarScreen
+          profile={current}
+          onBack={() => setRoute({ name: "home" })}
+        />
+      );
+    }
+
     if (route.name === "preview") {
       return <GlyphPreviewScreen onBack={() => setRoute({ name: "parent" })} />;
     }
@@ -192,7 +237,16 @@ export function App() {
     );
   };
 
-  return <main className="app-shell">{renderRoute()}</main>;
+  if (!current) {
+    return <main className="app-shell">{renderRoute()}</main>;
+  }
+
+  return (
+    <RewardsProvider profileId={current.id}>
+      <main className="app-shell">{renderRoute()}</main>
+      <RewardCelebration audioEnabled={settings.audioEnabled} />
+    </RewardsProvider>
+  );
 }
 
 export default App;

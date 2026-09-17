@@ -72,6 +72,34 @@ export const id = {
     title: "Pratinjau Konten",
     hint: "Periksa bentuk semua huruf, angka, dan bentuk.",
   },
+  rewards: {
+    title: "Koleksi Hadiah",
+    kind: {
+      sticker: "Stiker",
+      trophy: "Piala",
+      character: "Karakter",
+    },
+    unlocked: "Kamu dapat hadiah baru!",
+    yeay: "Yeay!",
+    locked: "Terkunci",
+    done: "Selesai",
+    requirement: {
+      itemsAttempted: "Coba {{count}} aktivitas",
+      itemsMastered: "Kuasai {{count}} huruf atau angka",
+      starsEarned: "Kumpulkan {{count}} bintang",
+      totalAttempts: "Mainkan {{count}} kali",
+      kindMastered: "Kuasai {{count}} di satu kategori",
+    },
+  },
+  avatar: {
+    title: "Karakterku",
+    slot: {
+      color: "Warna",
+      ears: "Telinga",
+      eyes: "Mata",
+      accessory: "Aksesori",
+    },
+  },
   categories: {
     upper: "Huruf Besar",
     lower: "Huruf Kecil",
@@ -113,5 +141,8 @@ export const id = {
   },
   error: {
     storage: "Gagal menyimpan data. Coba lagi ya.",
+    retry: "Coba Lagi",
+    reset: "Atur Ulang Data",
+    resetHint: "Menghapus semua profil dan kemajuan di perangkat ini.",
   },
 } as const;

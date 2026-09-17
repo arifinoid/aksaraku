@@ -1,5 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import { useRewards } from "../../app/RewardsContext";
 import { balloonCandidates, starsForAccuracy, type AppSettings, type Profile } from "../../domain";
 import { findGlyphItem, GLYPH_ITEMS } from "../../data";
 import { playOffTrack, playPop, playStrokeComplete } from "../../game";
@@ -24,6 +25,7 @@ export function BalloonGameScreen({
   onBack,
 }: BalloonGameScreenProps) {
   const { t } = useTranslation();
+  const { refresh } = useRewards();
   const canSpeak = supportsSpeech();
 
   const candidates = useMemo(() => balloonCandidates(GLYPH_ITEMS), []);
@@ -33,6 +35,7 @@ export function BalloonGameScreen({
     roundCount: ROUNDS,
     optionCount: OPTIONS,
     profileId: profile.id,
+    onProgress: refresh,
   });
 
   const promptItemId = game.round?.promptItemId;

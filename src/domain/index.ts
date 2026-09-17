@@ -5,3 +5,5 @@ export * from "./parentalGate";
 export * from "./progress";
 export * from "./tracing";
 export * from "./games";
+export * from "./rewards";
+export * from "./avatar";

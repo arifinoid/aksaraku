@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useRewards } from "../../app/RewardsContext";
 import { GLYPH_ITEMS, objectEmojiByItemId } from "../../data";
 import {
   caseMatchCandidates,
@@ -31,6 +32,7 @@ export function MatchingGameScreen({
   onBack,
 }: MatchingGameScreenProps) {
   const { t } = useTranslation();
+  const { refresh } = useRewards();
   const [mode, setMode] = useState<MatchingMode>("case");
 
   const candidates = useMemo(
@@ -47,6 +49,7 @@ export function MatchingGameScreen({
     optionCount: OPTIONS,
     profileId: profile.id,
     resetKey: mode,
+    onProgress: refresh,
   });
 
   useEffect(() => {

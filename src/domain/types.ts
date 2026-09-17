@@ -72,13 +72,8 @@ export interface MasteryScore {
 export type RewardKind = "sticker" | "trophy" | "character";
 
 export interface Reward {
+  readonly profileId: ProfileId;
   readonly id: RewardId;
   readonly kind: RewardKind;
   readonly unlockedAt: number;
-}
-
-export interface Avatar {
-  readonly id: AvatarId;
-  readonly parts: Readonly<Record<string, string>>;
-  readonly unlockedParts: readonly string[];
 }

@@ -1,0 +1,230 @@
+.games__hub {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.games__modes {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.games__prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--c-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-pop);
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.games__prompt-label {
+  font-size: clamp(3rem, 14vw, 5rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.games__prompt-text {
+  font-weight: 800;
+  color: var(--c-muted);
+  text-align: center;
+}
+
+.games__options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: var(--space-3);
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.option-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  border: 4px solid var(--c-bg-2);
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-soft);
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+  touch-action: manipulation;
+}
+
+.option-card:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.option-card--correct {
+  border-color: var(--c-success);
+  background: #e8fbf1;
+}
+
+.option-card--wrong {
+  border-color: var(--c-danger);
+  animation: shake 0.4s ease;
+}
+
+.option-card--hint {
+  animation: pulse 1s ease infinite;
+}
+
+.balloon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: var(--space-4);
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.balloon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 4;
+  border: none;
+  border-radius: 50% 50% 45% 45%;
+  color: #fff;
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  animation: float 3s ease-in-out infinite;
+  touch-action: manipulation;
+}
+
+.balloon--0 { background: #ff7a45; }
+.balloon--1 { background: #4cc9f0; }
+.balloon--2 { background: #9b5de5; }
+.balloon--3 { background: #57cc99; }
+
+.balloon--pop {
+  animation: pop 0.35s ease forwards;
+}
+
+.balloon--shake {
+  animation: shake 0.4s ease;
+}
+
+.balloon--hint {
+  animation: pulse 1s ease infinite;
+}
+
+.balloon__label {
+  pointer-events: none;
+}
+
+.balloon__string {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  width: 2px;
+  height: 22px;
+  background: var(--c-muted);
+  transform: translateX(-50%);
+}
+
+.coloring__stage {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  background: var(--c-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-pop);
+  touch-action: none;
+}
+
+.coloring__svg {
+  width: 100%;
+  height: 100%;
+}
+
+.coloring__stroke {
+  cursor: pointer;
+}
+
+.coloring__stroke-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.coloring__sticker {
+  font-size: 10px;
+  user-select: none;
+}
+
+.coloring__palette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.swatch {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 4px solid transparent;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  touch-action: manipulation;
+}
+
+.swatch--active {
+  border-color: var(--c-ink);
+  transform: scale(1.08);
+}
+
+.swatch--sticker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--c-bg-2);
+  font-size: 1.6rem;
+}
+
+.games__actions {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-14px); }
+}
+
+@keyframes pop {
+  0% { transform: scale(1); opacity: 1; }
+  60% { transform: scale(1.25); opacity: 0.9; }
+  100% { transform: scale(0.2); opacity: 0; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}

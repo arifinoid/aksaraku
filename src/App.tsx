@@ -10,6 +10,7 @@ import {
   type Profile,
 } from "./domain";
 import { HomeScreen } from "./features/home/HomeScreen";
+import { GamesScreen } from "./features/games/GamesScreen";
 import { ParentScreen } from "./features/parent/ParentScreen";
 import { PlayScreen } from "./features/play/PlayScreen";
 import { ProfileScreen } from "./features/profiles/ProfileScreen";
@@ -147,6 +148,16 @@ export function App() {
     if (route.name === "play" && current) {
       return (
         <PlayScreen
+          profile={current}
+          settings={settings}
+          onBack={() => setRoute({ name: "home" })}
+        />
+      );
+    }
+
+    if (route.name === "games" && current) {
+      return (
+        <GamesScreen
           profile={current}
           settings={settings}
           onBack={() => setRoute({ name: "home" })}

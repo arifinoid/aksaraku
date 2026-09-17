@@ -10,11 +10,11 @@ import {
   masteryLevel,
   type AppSettings,
   type MasteryScore,
-  type ModuleItem,
   type ModuleKind,
   type Profile,
 } from "../../domain";
 import { unlockAudio } from "../../game";
+import { ColoringGameScreen } from "../games/ColoringGameScreen";
 import { runTask } from "../../platform/task";
 import { listMastery } from "../../storage";
 import { Screen } from "../../ui";
@@ -27,10 +27,15 @@ export interface PlayScreenProps {
   readonly onBack: () => void;
 }
 
+type PlayView =
+  | { readonly kind: "picker" }
+  | { readonly kind: "trace"; readonly id: string }
+  | { readonly kind: "color"; readonly id: string };
+
 export function PlayScreen({ profile, settings, onBack }: PlayScreenProps) {
   const { t } = useTranslation();
-  const [kind, setKind] = useState<ModuleKind>("letter-upper");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [category, setCategory] = useState<ModuleKind>("letter-upper");
+  const [view, setView] = useState<PlayView>({ kind: "picker" });
   const [mastery, setMastery] = useState<readonly MasteryScore[]>([]);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -53,41 +58,59 @@ export function PlayScreen({ profile, settings, onBack }: PlayScreenProps) {
     return map;
   }, [mastery]);
 
-  const items = useMemo(() => itemsByKind(kind), [kind]);
+  const items = useMemo(() => itemsByKind(category), [category]);
 
-  const selected = selectedId ? findGlyphItem(selectedId) : undefined;
+  const backToPicker = () => {
+    setView({ kind: "picker" });
+    setRefreshKey((value) => value + 1);
+  };
 
-  if (selected) {
-    const index = items.findIndex((entry) => entry.id === selected.id);
-    const next = items[(index + 1) % items.length] ?? items[0]!;
-    return (
-      <TracingScreen
-        key={selected.id}
-        item={selected}
-        profile={profile}
-        settings={settings}
-        onBack={() => {
-          setSelectedId(null);
-          setRefreshKey((value) => value + 1);
-        }}
-        onNext={() => setSelectedId(next.id)}
-      />
-    );
+  if (view.kind === "trace") {
+    const selected = findGlyphItem(view.id);
+    if (selected) {
+      const index = items.findIndex((entry) => entry.id === selected.id);
+      const next = items[(index + 1) % items.length] ?? items[0]!;
+      return (
+        <TracingScreen
+          key={selected.id}
+          item={selected}
+          profile={profile}
+          settings={settings}
+          onBack={backToPicker}
+          onNext={() => setView({ kind: "trace", id: next.id })}
+          onColor={() => setView({ kind: "color", id: selected.id })}
+        />
+      );
+    }
+  }
+
+  if (view.kind === "color") {
+    const selected = findGlyphItem(view.id);
+    if (selected) {
+      return (
+        <ColoringGameScreen
+          item={selected}
+          profile={profile}
+          settings={settings}
+          onBack={backToPicker}
+        />
+      );
+    }
   }
 
   return (
     <Screen title={t("play.title")} onBack={onBack}>
       <div className="play__tabs">
-        {GLYPH_CATEGORIES.map((category) => (
+        {GLYPH_CATEGORIES.map((entry) => (
           <button
-            key={category.kind}
+            key={entry.kind}
             type="button"
             className={`play__tab${
-              category.kind === kind ? " play__tab--active" : ""
+              entry.kind === category ? " play__tab--active" : ""
             }`}
-            onClick={() => setKind(category.kind)}
+            onClick={() => setCategory(entry.kind)}
           >
-            {t(categoryLabelKey(category.kind))}
+            {t(categoryLabelKey(entry.kind))}
           </button>
         ))}
       </div>
@@ -101,7 +124,7 @@ export function PlayScreen({ profile, settings, onBack }: PlayScreenProps) {
               key={item.id}
               type="button"
               className={`glyph-card glyph-card--${level}`}
-              onClick={() => setSelectedId(item.id)}
+              onClick={() => setView({ kind: "trace", id: item.id })}
             >
               <span>{item.glyph}</span>
               <span className="glyph-card__level">{t(`mastery.${level}`)}</span>

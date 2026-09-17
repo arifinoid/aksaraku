@@ -43,9 +43,7 @@ export function HomeScreen({
           label={t("home.games")}
           icon="🎈"
           tone="secondary"
-          hint={t("common.soon")}
-          disabled
-          onClick={() => undefined}
+          onClick={() => onNavigate({ name: "games" })}
         />
         <Tile
           label={t("home.rewards")}

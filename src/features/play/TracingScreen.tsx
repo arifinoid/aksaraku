@@ -23,6 +23,7 @@ export interface TracingScreenProps {
   readonly settings: AppSettings;
   readonly onBack: () => void;
   readonly onNext: () => void;
+  readonly onColor: () => void;
 }
 
 export function TracingScreen({
@@ -31,6 +32,7 @@ export function TracingScreen({
   settings,
   onBack,
   onNext,
+  onColor,
 }: TracingScreenProps) {
   const { t } = useTranslation();
   const [coverage, setCoverage] = useState(0);
@@ -141,6 +143,12 @@ export function TracingScreen({
               variant="secondary"
               icon="🔁"
               onClick={retry}
+            />
+            <Button
+              label={t("play.color")}
+              variant="secondary"
+              icon="🎨"
+              onClick={onColor}
             />
             <Button label={t("play.next")} icon="➡️" onClick={onNext} />
           </div>

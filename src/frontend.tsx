@@ -1,13 +1,12 @@
-/**
- * This file is the entry point for the React app, it sets up the root
- * element and renders the App component to the DOM.
- *
- * It is included in `src/index.html`.
- */
-
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
+import { initI18n } from "./i18n";
+import { setupPwa } from "./platform/pwa";
+import "./index.css";
+
+initI18n("id");
+setupPwa();
 
 const elem = document.getElementById("root")!;
 const app = (
@@ -16,5 +15,4 @@ const app = (
   </StrictMode>
 );
 
-// https://bun.com/docs/bundler/hot-reloading#import-meta-hot-data
 (import.meta.hot.data.root ??= createRoot(elem)).render(app);

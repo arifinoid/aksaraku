@@ -1,41 +1,27 @@
 import { serve } from "bun";
 import index from "./index.html";
 
+const staticFile = (path: string, contentType: string) => ({
+  GET: () => new Response(Bun.file(path), { headers: { "content-type": contentType } }),
+});
+
 const server = serve({
   routes: {
-    // Serve index.html for all unmatched routes.
+    "/manifest.webmanifest": staticFile(
+      "public/manifest.webmanifest",
+      "application/manifest+json",
+    ),
+    "/sw.js": staticFile("public/sw.js", "text/javascript"),
+    "/icon.svg": staticFile("public/icon.svg", "image/svg+xml"),
+    "/api/health": {
+      GET: () => Response.json({ status: "ok", app: "aksaraku" }),
+    },
     "/*": index,
-
-    "/api/hello": {
-      async GET(req) {
-        return Response.json({
-          message: "Hello, world!",
-          method: "GET",
-        });
-      },
-      async PUT(req) {
-        return Response.json({
-          message: "Hello, world!",
-          method: "PUT",
-        });
-      },
-    },
-
-    "/api/hello/:name": async req => {
-      const name = req.params.name;
-      return Response.json({
-        message: `Hello, ${name}!`,
-      });
-    },
   },
-
   development: process.env.NODE_ENV !== "production" && {
-    // Enable browser hot reloading in development
     hmr: true,
-
-    // Echo console logs from the browser to the server
     console: true,
   },
 });
 
-console.log(`🚀 Server running at ${server.url}`);
+console.log(`🚀 Aksaraku berjalan di ${server.url}`);

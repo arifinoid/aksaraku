@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Aksaraku">
+  <rect width="512" height="512" rx="112" fill="#ff7a45" />
+  <path d="M256 96c-14 0-26 8-32 20L120 380c-4 9-6 17-6 24 0 22 17 36 38 36 18 0 30-9 38-28l22-54h88l22 54c8 19 20 28 38 28 21 0 38-14 38-36 0-7-2-15-6-24L288 116c-6-12-18-20-32-20Zm-22 198 22-56 22 56h-44Z" fill="#fff7e6" />
+  <circle cx="392" cy="128" r="34" fill="#ffd166" />
+</svg>

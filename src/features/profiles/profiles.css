@@ -1,0 +1,56 @@
+.profiles__subtitle {
+  color: var(--c-muted);
+  font-size: 1.1rem;
+}
+
+.profiles__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  width: 100%;
+  min-height: 140px;
+  padding: var(--space-3);
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  touch-action: manipulation;
+}
+
+.profile-card:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.profile-card__avatar {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.profile-card__name {
+  font-size: 1.2rem;
+  font-weight: 800;
+}
+
+.profiles__form {
+  width: 100%;
+  max-width: 520px;
+}
+
+.profiles__error {
+  color: var(--c-danger);
+  font-weight: 700;
+}

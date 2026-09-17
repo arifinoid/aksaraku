@@ -1,0 +1,31 @@
+.parent__gate {
+  width: 100%;
+  max-width: 520px;
+}
+
+.parent__question {
+  font-size: 1.6rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.parent__error {
+  color: var(--c-danger);
+  font-weight: 700;
+  text-align: center;
+}
+
+.parent__actions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.parent__actions .btn {
+  flex: 1;
+}
+
+.parent__input {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 800;
+}

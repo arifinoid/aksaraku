@@ -1,0 +1,75 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-min);
+  padding: 0 var(--space-4);
+  border: none;
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  font-size: 1.15rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn--lg {
+  min-height: 80px;
+  font-size: 1.4rem;
+  padding: 0 var(--space-5);
+}
+
+.btn--sm {
+  min-height: 48px;
+  font-size: 0.95rem;
+  padding: 0 var(--space-3);
+}
+
+.btn--primary {
+  background: var(--c-primary);
+  color: #fff;
+}
+
+.btn--primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.btn--secondary {
+  background: var(--c-surface);
+  color: var(--c-ink);
+  border: 3px solid var(--c-accent);
+}
+
+.btn--ghost {
+  background: transparent;
+  color: var(--c-muted);
+  box-shadow: none;
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn__icon {
+  display: inline-flex;
+  font-size: 1.5em;
+  line-height: 1;
+}
+
+.btn__label {
+  white-space: nowrap;
+}

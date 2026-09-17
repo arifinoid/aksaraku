@@ -1,0 +1,108 @@
+.play__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.glyph-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  aspect-ratio: 1 / 1;
+  border: 4px solid transparent;
+  border-radius: var(--radius-lg);
+  background: var(--c-surface);
+  box-shadow: var(--shadow-soft);
+  font-size: 2.6rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  touch-action: manipulation;
+}
+
+.glyph-card:active {
+  transform: translateY(3px);
+  box-shadow: none;
+}
+
+.glyph-card--new {
+  border-color: var(--c-bg-2);
+}
+
+.glyph-card--learning {
+  border-color: var(--c-secondary);
+}
+
+.glyph-card--familiar {
+  border-color: var(--c-accent);
+}
+
+.glyph-card--mastered {
+  border-color: var(--c-success);
+}
+
+.glyph-card__level {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--c-muted);
+}
+
+.play__progress {
+  height: 20px;
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  background: var(--c-bg-2);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.play__progress-fill {
+  height: 100%;
+  background: var(--c-primary);
+  border-radius: var(--radius-pill);
+  transition: width 0.15s ease;
+}
+
+.play__hint {
+  text-align: center;
+  font-weight: 800;
+  color: var(--c-muted);
+}
+
+.play__hint--warn {
+  color: var(--c-danger);
+}
+
+.play__overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  background: rgba(255, 247, 230, 0.94);
+  z-index: 10;
+}
+
+.play__stars {
+  font-size: clamp(2.5rem, 12vw, 4.5rem);
+  letter-spacing: 0.35rem;
+}
+
+.play__overlay-title {
+  font-size: clamp(1.8rem, 6vw, 2.8rem);
+}
+
+.play__overlay-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: center;
+}

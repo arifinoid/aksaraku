@@ -38,7 +38,18 @@ export const en: Dict = {
   },
   play: {
     title: "Let's Write",
-    comingSoon: "The writing module is being prepared.",
+    pick: "Pick a letter, number, or shape",
+    retry: "Try Again",
+    next: "Next",
+    great: "Great job!",
+    strokeProgress: "Line {{current}} of {{total}}",
+    offTrack: "Follow the line",
+  },
+  mastery: {
+    new: "New",
+    learning: "Learning",
+    familiar: "Getting there",
+    mastered: "Mastered",
   },
   parent: {
     title: "Parent Area",

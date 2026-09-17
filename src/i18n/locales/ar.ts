@@ -38,7 +38,18 @@ export const ar: Dict = {
   },
   play: {
     title: "هيا نكتب",
-    comingSoon: "وحدة الكتابة قيد الإعداد.",
+    pick: "اختر حرفاً أو رقماً أو شكلاً",
+    retry: "حاول مرة أخرى",
+    next: "التالي",
+    great: "أحسنت!",
+    strokeProgress: "الخط {{current}} من {{total}}",
+    offTrack: "اتبع الخط",
+  },
+  mastery: {
+    new: "جديد",
+    learning: "قيد التعلّم",
+    familiar: "يتحسّن",
+    mastered: "أتقن",
   },
   parent: {
     title: "منطقة الوالدين",

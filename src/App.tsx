@@ -144,7 +144,13 @@ export function App() {
     }
 
     if (route.name === "play" && current) {
-      return <PlayScreen onBack={() => setRoute({ name: "home" })} />;
+      return (
+        <PlayScreen
+          profile={current}
+          settings={settings}
+          onBack={() => setRoute({ name: "home" })}
+        />
+      );
     }
 
     if (route.name === "parent") {

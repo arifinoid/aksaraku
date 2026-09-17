@@ -146,7 +146,7 @@ Referensi: `plans/features.md` (fitur), `plans/architecture.md` (arsitektur), `p
 ### Status fase
 
 - [x] M0 Fondasi
-- [ ] M1 Tracing Engine
+- [x] M1 Tracing Engine
 - [ ] M2 Konten Aksara
 - [ ] M3 Mini Games
 - [ ] M4 Gamifikasi

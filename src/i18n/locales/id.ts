@@ -36,7 +36,18 @@ export const id = {
   },
   play: {
     title: "Ayo Menulis",
-    comingSoon: "Modul menulis sedang disiapkan.",
+    pick: "Pilih huruf, angka, atau bentuk",
+    retry: "Coba Lagi",
+    next: "Lanjut",
+    great: "Hebat!",
+    strokeProgress: "Garis {{current}} dari {{total}}",
+    offTrack: "Ikuti garisnya ya",
+  },
+  mastery: {
+    new: "Baru",
+    learning: "Belajar",
+    familiar: "Lancar",
+    mastered: "Mahir",
   },
   parent: {
     title: "Area Orang Tua",

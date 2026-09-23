@@ -32,10 +32,15 @@ const SLOT_EMOJI: Readonly<Record<string, Readonly<Record<string, string>>>> = {
 
 export interface AvatarScreenProps {
   readonly profile: Profile;
+  readonly reduceMotion: boolean;
   readonly onBack: () => void;
 }
 
-export function AvatarScreen({ profile, onBack }: AvatarScreenProps) {
+export function AvatarScreen({
+  profile,
+  reduceMotion,
+  onBack,
+}: AvatarScreenProps) {
   const { t, i18n } = useTranslation();
   const { unlockedIds } = useRewards();
   const [config, setConfig] = useState<AvatarConfig>(() =>
@@ -64,7 +69,7 @@ export function AvatarScreen({ profile, onBack }: AvatarScreenProps) {
       <div className="avatar__stage">
         {supportsWebgl() ? (
           <Suspense fallback={<div className="avatar__fallback">🐻</div>}>
-            <LazyAvatar3D avatar={avatar} />
+            <LazyAvatar3D avatar={avatar} reduceMotion={reduceMotion} />
           </Suspense>
         ) : (
           <div className="avatar__fallback">🐻</div>

@@ -149,13 +149,20 @@ function Accessory({ kind }: { readonly kind: string }) {
   return null;
 }
 
-function Character({ avatar }: { readonly avatar: ResolvedAvatar }) {
+function Character({
+  avatar,
+  spin,
+}: {
+  readonly avatar: ResolvedAvatar;
+  readonly spin: boolean;
+}) {
   const group = useRef<Group>(null);
   const color = avatar.color?.value ?? FALLBACK_COLOR;
 
   useFrame((_, delta) => {
     const node = group.current;
-    if (node) node.rotation.y += delta * 0.5;
+    if (!node || !spin) return;
+    node.rotation.y += delta * 0.5;
   });
 
   return (
@@ -177,14 +184,21 @@ function Character({ avatar }: { readonly avatar: ResolvedAvatar }) {
 
 export default function Avatar3DScene({
   avatar,
+  reduceMotion = false,
 }: {
   readonly avatar: ResolvedAvatar;
+  readonly reduceMotion?: boolean;
 }) {
   return (
-    <Canvas camera={{ position: [0, 0.35, 3.1], fov: 45 }} dpr={[1, 2]}>
+    <Canvas
+      camera={{ position: [0, 0.35, 3.1], fov: 45 }}
+      dpr={[1, 1.5]}
+      frameloop={reduceMotion ? "demand" : "always"}
+      gl={{ antialias: true, powerPreference: "high-performance" }}
+    >
       <ambientLight intensity={0.9} />
       <directionalLight position={[2.5, 3, 4]} intensity={1.3} />
-      <Character avatar={avatar} />
+      <Character avatar={avatar} spin={!reduceMotion} />
     </Canvas>
   );
 }

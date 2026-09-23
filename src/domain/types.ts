@@ -16,6 +16,7 @@ export type StrokeDirection = "ltr" | "rtl" | "ttb" | "btt" | "curve";
 
 export interface StrokePath {
   readonly points: readonly Vec2[];
+  /** Finger tolerance in screen pixels; scaled to design space at trace time. */
   readonly tolerance: number;
   readonly guideOrder: number;
   readonly direction: StrokeDirection;
@@ -43,6 +44,7 @@ export interface AppSettings {
   readonly locale: Locale;
   readonly hapticsEnabled: boolean;
   readonly audioEnabled: boolean;
+  readonly reduceMotion: boolean;
 }
 
 export interface ScreenTimeSetting {

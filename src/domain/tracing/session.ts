@@ -90,18 +90,20 @@ const applyPoint = (
   session: TraceSession,
   point: Vec2,
   now: number,
+  designPerPx: number,
 ): TraceStep => {
   const stroke = currentStroke(session);
   const covered = session.covered[session.strokeIndex];
 
   if (!stroke || !covered) return complete(session, now);
 
+  const tolerance = stroke.tolerance * designPerPx;
   const distances = segmentDistances(point, stroke.points);
   const minDistance = minOf(distances);
   const deviationSum = session.deviationSum + minDistance;
   const deviationCount = session.deviationCount + 1;
 
-  if (minDistance > stroke.tolerance) {
+  if (minDistance > tolerance) {
     return {
       session: {
         ...session,
@@ -115,7 +117,7 @@ const applyPoint = (
 
   const nextStrokeCovered = covered.map(
     (was, index) =>
-      was || (distances[index] ?? Number.POSITIVE_INFINITY) <= stroke.tolerance,
+      was || (distances[index] ?? Number.POSITIVE_INFINITY) <= tolerance,
   );
   const nextCovered = session.covered.map((entry, index) =>
     index === session.strokeIndex ? nextStrokeCovered : entry,
@@ -155,15 +157,27 @@ const applyPoint = (
   };
 };
 
+/**
+ * `designPerPx` converts the stroke tolerance (screen pixels) into design
+ * units, so a fingertip keeps the same physical tolerance on every screen.
+ */
 export const tracePoint = (
   session: TraceSession,
   point: Vec2,
   now: number,
+  designPerPx = 1,
 ): TraceStep =>
   match(session.phase)
     .with("completed", (): TraceStep => ({ session, event: { _tag: "Ignored" } }))
     .with("idle", (): TraceStep =>
-      applyPoint({ ...session, phase: "drawing", startedAt: now }, point, now),
+      applyPoint(
+        { ...session, phase: "drawing", startedAt: now },
+        point,
+        now,
+        designPerPx,
+      ),
     )
-    .with("drawing", (): TraceStep => applyPoint(session, point, now))
+    .with("drawing", (): TraceStep =>
+      applyPoint(session, point, now, designPerPx),
+    )
     .exhaustive();

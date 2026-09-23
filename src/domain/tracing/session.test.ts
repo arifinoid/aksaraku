@@ -43,6 +43,40 @@ describe("createSession", () => {
   });
 });
 
+describe("tracePoint tolerance scaling", () => {
+  test("the same physical offset gives the same verdict on any canvas", () => {
+    const stroke = horizontalStroke(36);
+    const offsetDesign = 30; // 30 px below the line
+    for (const scale of [3, 5.4, 10]) {
+      const step = tracePoint(
+        createSession([stroke]),
+        p(50, 50 + offsetDesign / scale),
+        0,
+        1 / scale,
+      );
+      expect(step.event._tag).toBe("Progress");
+    }
+  });
+
+  test("beyond the pixel tolerance counts as off track", () => {
+    const stroke = horizontalStroke(36);
+    const scale = 3;
+    const step = tracePoint(
+      createSession([stroke]),
+      p(50, 50 + 40 / scale),
+      0,
+      1 / scale,
+    );
+    expect(step.event._tag).toBe("OffTrack");
+  });
+
+  test("without scaling the tolerance is read as design units", () => {
+    const stroke = horizontalStroke(5);
+    const step = tracePoint(createSession([stroke]), p(50, 60), 0);
+    expect(step.event._tag).toBe("OffTrack");
+  });
+});
+
 describe("tracePoint", () => {
   test("starts drawing on first touch", () => {
     const step = tracePoint(createSession([horizontalStroke()]), p(10, 50), 0);

@@ -45,6 +45,7 @@ export const ar: Dict = {
     strokeProgress: "الخط {{current}} من {{total}}",
     offTrack: "اتبع الخط",
     listen: "استمع",
+    canvasLabel: "منطقة كتابة {{glyph}}",
     color: "لوّن",
   },
   games: {
@@ -153,6 +154,7 @@ export const ar: Dict = {
     language: "اللغة",
     haptics: "الاهتزاز",
     audio: "الصوت",
+    reduceMotion: "تقليل الحركة",
     switchProfile: "تغيير الطفل",
     preview: "معاينة المحتوى",
     manageChildren: "إدارة الأطفال",

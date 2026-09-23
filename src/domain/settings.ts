@@ -9,6 +9,7 @@ export const defaultSettings: AppSettings = {
   locale: DEFAULT_LOCALE,
   hapticsEnabled: true,
   audioEnabled: true,
+  reduceMotion: false,
 };
 
 export const DEFAULT_SESSION_LIMIT_MIN = 15;
@@ -54,6 +55,11 @@ export const setAudio = (
   settings: AppSettings,
   enabled: boolean,
 ): AppSettings => ({ ...settings, audioEnabled: enabled });
+
+export const setReduceMotion = (
+  settings: AppSettings,
+  enabled: boolean,
+): AppSettings => ({ ...settings, reduceMotion: enabled });
 
 export const validateSessionLimit = (
   minutes: number,

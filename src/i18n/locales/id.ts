@@ -43,6 +43,7 @@ export const id = {
     strokeProgress: "Garis {{current}} dari {{total}}",
     offTrack: "Ikuti garisnya ya",
     listen: "Dengar",
+    canvasLabel: "Area menulis {{glyph}}",
     color: "Warnai",
   },
   games: {
@@ -151,6 +152,7 @@ export const id = {
     language: "Bahasa",
     haptics: "Getaran",
     audio: "Suara",
+    reduceMotion: "Kurangi gerakan",
     switchProfile: "Ganti Anak",
     preview: "Pratinjau Konten",
     manageChildren: "Kelola Anak",

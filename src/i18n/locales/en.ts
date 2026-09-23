@@ -45,6 +45,7 @@ export const en: Dict = {
     strokeProgress: "Line {{current}} of {{total}}",
     offTrack: "Follow the line",
     listen: "Listen",
+    canvasLabel: "Writing area for {{glyph}}",
     color: "Color",
   },
   games: {
@@ -153,6 +154,7 @@ export const en: Dict = {
     language: "Language",
     haptics: "Vibration",
     audio: "Sound",
+    reduceMotion: "Reduce motion",
     switchProfile: "Switch Child",
     preview: "Content Preview",
     manageChildren: "Manage Children",

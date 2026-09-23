@@ -15,7 +15,12 @@ import {
 
 export const p = (x: number, y: number): Vec2 => ({ x, y });
 
-export const DEFAULT_TOLERANCE = 7;
+/**
+ * Finger tolerance in screen pixels. The tracing session converts it to design
+ * units per frame, so the physical forgiveness stays constant whether the
+ * canvas is 300px (phone) or 1000px (tablet).
+ */
+export const DEFAULT_TOLERANCE_PX = 36;
 
 const STEPS = 12;
 const DEG_TO_RAD = Math.PI / 180;
@@ -33,20 +38,21 @@ export const ellipse = ellipsePoints;
 export interface StrokeSpec {
   readonly points: readonly Vec2[];
   readonly direction?: StrokeDirection;
+  /** Screen-pixel tolerance; defaults to `DEFAULT_TOLERANCE_PX`. */
   readonly tolerance?: number;
 }
 
 export const s = (
   points: readonly Vec2[],
   direction: StrokeDirection = "ltr",
-  tolerance = DEFAULT_TOLERANCE,
+  tolerance = DEFAULT_TOLERANCE_PX,
 ): StrokeSpec => ({ points, direction, tolerance });
 
 export const ln = (
   from: Vec2,
   to: Vec2,
   direction: StrokeDirection = "ltr",
-  tolerance = DEFAULT_TOLERANCE,
+  tolerance = DEFAULT_TOLERANCE_PX,
 ): StrokeSpec => s(poly([seg(from, to)]), direction, tolerance);
 
 export const toStrokes = (
@@ -55,7 +61,7 @@ export const toStrokes = (
   specs.map((spec, index) => ({
     points: spec.points,
     direction: spec.direction ?? "ltr",
-    tolerance: spec.tolerance ?? DEFAULT_TOLERANCE,
+    tolerance: spec.tolerance ?? DEFAULT_TOLERANCE_PX,
     guideOrder: index,
   }));
 

@@ -29,6 +29,7 @@ export interface ParentScreenProps {
   readonly onChangeLocale: (locale: Locale) => void;
   readonly onToggleHaptics: (enabled: boolean) => void;
   readonly onToggleAudio: (enabled: boolean) => void;
+  readonly onToggleReduceMotion: (enabled: boolean) => void;
   readonly onSelectProfile: (profile: Profile) => void;
   readonly onDeleteProfile: (profile: Profile) => void;
   readonly onClose: () => void;
@@ -65,6 +66,7 @@ export function ParentScreen({
   onChangeLocale,
   onToggleHaptics,
   onToggleAudio,
+  onToggleReduceMotion,
   onSelectProfile,
   onDeleteProfile,
   onClose,
@@ -191,6 +193,11 @@ export function ParentScreen({
           label={t("parent.audio")}
           checked={settings.audioEnabled}
           onChange={onToggleAudio}
+        />
+        <Switch
+          label={t("parent.reduceMotion")}
+          checked={settings.reduceMotion}
+          onChange={onToggleReduceMotion}
         />
       </section>
 

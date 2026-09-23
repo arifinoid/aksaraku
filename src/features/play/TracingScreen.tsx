@@ -129,6 +129,8 @@ export function TracingScreen({
         resetKey={resetKey}
         audioEnabled={settings.audioEnabled}
         hapticsEnabled={settings.hapticsEnabled}
+        reduceMotion={settings.reduceMotion}
+        label={t("play.canvasLabel", { glyph: item.glyph })}
         onEvent={handleEvent}
         onCoverage={setCoverage}
       />
@@ -140,7 +142,10 @@ export function TracingScreen({
         />
       </div>
 
-      <p className={`play__hint${offTrack ? " play__hint--warn" : ""}`}>
+      <p
+        className={`play__hint${offTrack ? " play__hint--warn" : ""}`}
+        aria-live="polite"
+      >
         {offTrack
           ? t("play.offTrack")
           : t("play.strokeProgress", { current: currentLine, total: totalStrokes })}

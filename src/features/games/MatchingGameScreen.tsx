@@ -49,6 +49,7 @@ export function MatchingGameScreen({
     optionCount: OPTIONS,
     profileId: profile.id,
     resetKey: mode,
+    hapticsEnabled: settings.hapticsEnabled,
     onProgress: refresh,
   });
 

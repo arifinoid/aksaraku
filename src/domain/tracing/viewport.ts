@@ -39,3 +39,10 @@ export const toScreenSpace = (design: Vec2, transform: DesignTransform): Vec2 =>
   x: transform.offsetX + design.x * transform.scale,
   y: transform.offsetY + design.y * transform.scale,
 });
+
+/**
+ * Design units covered by one screen pixel. Multiply a pixel value by this to
+ * express it in design space (see `StrokePath.tolerance`).
+ */
+export const designPerPx = (transform: DesignTransform): number =>
+  transform.scale > 0 ? 1 / transform.scale : 1;

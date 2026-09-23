@@ -5,14 +5,29 @@ const staticFile = (path: string, contentType: string) => ({
   GET: () => new Response(Bun.file(path), { headers: { "content-type": contentType } }),
 });
 
+/** In production, prefer the built asset so the precached service worker wins. */
+const assetPath = async (name: string): Promise<string> => {
+  if (process.env.NODE_ENV === "production") {
+    const built = `dist/${name}`;
+    if (await Bun.file(built).exists()) return built;
+  }
+  return `public/${name}`;
+};
+
+const [swPath, manifestPath, iconPath] = await Promise.all([
+  assetPath("sw.js"),
+  assetPath("manifest.webmanifest"),
+  assetPath("icon.svg"),
+]);
+
 const server = serve({
   routes: {
     "/manifest.webmanifest": staticFile(
-      "public/manifest.webmanifest",
+      manifestPath,
       "application/manifest+json",
     ),
-    "/sw.js": staticFile("public/sw.js", "text/javascript"),
-    "/icon.svg": staticFile("public/icon.svg", "image/svg+xml"),
+    "/sw.js": staticFile(swPath, "text/javascript"),
+    "/icon.svg": staticFile(iconPath, "image/svg+xml"),
     "/api/health": {
       GET: () => Response.json({ status: "ok", app: "aksaraku" }),
     },

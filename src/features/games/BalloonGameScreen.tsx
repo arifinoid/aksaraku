@@ -35,6 +35,7 @@ export function BalloonGameScreen({
     roundCount: ROUNDS,
     optionCount: OPTIONS,
     profileId: profile.id,
+    hapticsEnabled: settings.hapticsEnabled,
     onProgress: refresh,
   });
 

@@ -1,6 +1,12 @@
 import { describe, expect, test } from "bun:test";
 import type { Vec2 } from "../types";
-import { DESIGN_SIZE, designTransform, toDesignSpace, toScreenSpace } from "./viewport";
+import {
+  DESIGN_SIZE,
+  designPerPx,
+  designTransform,
+  toDesignSpace,
+  toScreenSpace,
+} from "./viewport";
 
 const p = (x: number, y: number): Vec2 => ({ x, y });
 
@@ -10,6 +16,18 @@ describe("designTransform", () => {
     expect(transform.scale).toBe(1);
     expect(transform.offsetX).toBe(50);
     expect(transform.offsetY).toBe(0);
+  });
+});
+
+describe("designPerPx", () => {
+  test("is the inverse of the design scale", () => {
+    const transform = designTransform({ width: 540, height: 540 });
+    expect(designPerPx(transform)).toBeCloseTo(1 / transform.scale, 10);
+    expect(designPerPx(transform) * 540).toBeCloseTo(DESIGN_SIZE, 6);
+  });
+
+  test("falls back to 1 for a degenerate transform", () => {
+    expect(designPerPx({ scale: 0, offsetX: 0, offsetY: 0 })).toBe(1);
   });
 });
 

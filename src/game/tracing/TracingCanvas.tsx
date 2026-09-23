@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react";
 import {
   createSession,
   currentStroke,
+  designPerPx,
   designTransform,
   toDesignSpace,
   toScreenSpace,
@@ -25,6 +26,8 @@ export interface TracingCanvasProps {
   readonly resetKey: number;
   readonly audioEnabled: boolean;
   readonly hapticsEnabled: boolean;
+  readonly reduceMotion: boolean;
+  readonly label: string;
   readonly onEvent: (event: TraceEvent, session: TraceSession) => void;
   readonly onCoverage: (coverage: number) => void;
 }
@@ -33,23 +36,30 @@ const GUIDE_COLOR = 0xe7d8c4;
 const ACTIVE_COLOR = 0xffd166;
 const PROGRESS_COLOR = 0xff7a45;
 const MARKER_COLOR = 0x4cc9f0;
+const MAX_RESOLUTION = 2;
 
 export function TracingCanvas({
   item,
   resetKey,
   audioEnabled,
   hapticsEnabled,
+  reduceMotion,
+  label,
   onEvent,
   onCoverage,
 }: TracingCanvasProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const sessionRef = useRef<TraceSession>(createSession(item.strokes));
-  const flagsRef = useRef({ audioEnabled, hapticsEnabled });
+  const flagsRef = useRef({ audioEnabled, hapticsEnabled, reduceMotion });
   const handlersRef = useRef({ onEvent, onCoverage });
+  const runtimeRef = useRef<{
+    readonly draw: () => void;
+    readonly applyMotion: (reduce: boolean) => void;
+  } | null>(null);
 
   useEffect(() => {
-    flagsRef.current = { audioEnabled, hapticsEnabled };
-  }, [audioEnabled, hapticsEnabled]);
+    flagsRef.current = { audioEnabled, hapticsEnabled, reduceMotion };
+  }, [audioEnabled, hapticsEnabled, reduceMotion]);
 
   useEffect(() => {
     handlersRef.current = { onEvent, onCoverage };
@@ -126,6 +136,8 @@ export function TracingCanvas({
       } else {
         marker.visible = false;
       }
+
+      if (initialized) app.render();
     };
 
     const emit = (event: TraceEvent) => {
@@ -160,8 +172,14 @@ export function TracingCanvas({
       if (app.screen.width < 1 || app.screen.height < 1) return;
 
       const rect = app.canvas.getBoundingClientRect();
+      const transform = designTransform(rect);
       const design = toDesignSpace({ x: event.clientX, y: event.clientY }, rect);
-      const step = tracePoint(session, design, performance.now());
+      const step = tracePoint(
+        session,
+        design,
+        performance.now(),
+        designPerPx(transform),
+      );
       sessionRef.current = step.session;
       draw();
 
@@ -201,7 +219,12 @@ export function TracingCanvas({
       }
     };
 
+    // The ticker already renders every frame; this only animates the marker.
     const pulse = () => {
+      if (flagsRef.current.reduceMotion) {
+        marker.scale.set(1);
+        return;
+      }
       marker.scale.set(1 + Math.sin(performance.now() / 300) * 0.12);
     };
 
@@ -209,9 +232,11 @@ export function TracingCanvas({
       await app.init({
         backgroundAlpha: 0,
         antialias: true,
+        autoStart: false,
         resizeTo: host,
-        resolution: Math.min(window.devicePixelRatio || 1, 2),
+        resolution: Math.min(window.devicePixelRatio || 1, MAX_RESOLUTION),
         autoDensity: true,
+        powerPreference: "high-performance",
       });
 
       if (disposed) {
@@ -228,6 +253,25 @@ export function TracingCanvas({
       app.canvas.addEventListener("pointerup", onUp);
       app.canvas.addEventListener("pointercancel", onUp);
       app.ticker.add(pulse);
+      // The pulse is decorative: 30fps halves the render cost on weak tablets.
+      app.ticker.maxFPS = 30;
+      runtimeRef.current = {
+        draw,
+        applyMotion: (reduce: boolean) => {
+          if (reduce) {
+            app.ticker.stop();
+            marker.scale.set(1);
+          } else {
+            app.ticker.start();
+          }
+          draw();
+        },
+      };
+      if (flagsRef.current.reduceMotion) {
+        app.ticker.stop();
+      } else {
+        app.ticker.start();
+      }
       window.addEventListener("resize", draw);
       window.addEventListener("orientationchange", draw);
       draw();
@@ -235,6 +279,7 @@ export function TracingCanvas({
 
     return () => {
       disposed = true;
+      runtimeRef.current = null;
       if (!initialized) return;
       app.canvas.removeEventListener("pointerdown", onDown);
       app.canvas.removeEventListener("pointermove", onMove);
@@ -247,5 +292,9 @@ export function TracingCanvas({
     };
   }, [item, resetKey]);
 
-  return <div className="tracing-canvas" ref={hostRef} />;
+  useEffect(() => {
+    runtimeRef.current?.applyMotion(reduceMotion);
+  }, [reduceMotion]);
+
+  return <div className="tracing-canvas" ref={hostRef} role="img" aria-label={label} />;
 }

@@ -2,15 +2,20 @@ import { useTranslation } from "react-i18next";
 import { useRewards } from "../../app/RewardsContext";
 import { isLocale, rewardName } from "../../domain";
 import { playSuccess } from "../../game";
+import { HAPTIC, vibrate } from "../../platform/haptics";
 import { Button } from "../../ui";
 import "../play/play.css";
 import "./rewards.css";
 
 export interface RewardCelebrationProps {
   readonly audioEnabled: boolean;
+  readonly hapticsEnabled: boolean;
 }
 
-export function RewardCelebration({ audioEnabled }: RewardCelebrationProps) {
+export function RewardCelebration({
+  audioEnabled,
+  hapticsEnabled,
+}: RewardCelebrationProps) {
   const { t, i18n } = useTranslation();
   const { celebration, dismissCelebration } = useRewards();
   const locale = isLocale(i18n.language) ? i18n.language : "id";
@@ -38,6 +43,7 @@ export function RewardCelebration({ audioEnabled }: RewardCelebrationProps) {
         icon="🎁"
         onClick={() => {
           playSuccess(audioEnabled);
+          vibrate(HAPTIC.success, hapticsEnabled);
           dismissCelebration();
         }}
       />

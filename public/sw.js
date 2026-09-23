@@ -1,11 +1,14 @@
-const CACHE = "aksaraku-v2";
-const APP_SHELL = ["/", "/manifest.webmanifest", "/icon.svg"];
+const CACHE = "aksaraku-v3";
+const PRECACHE = ["/", "/manifest.webmanifest", "/icon.svg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE)
-      .then((cache) => cache.addAll(APP_SHELL))
+      .then((cache) =>
+        // allSettled: one missing file must not break the whole install.
+        Promise.allSettled(PRECACHE.map((path) => cache.add(path))),
+      )
       .then(() => self.skipWaiting()),
   );
 });

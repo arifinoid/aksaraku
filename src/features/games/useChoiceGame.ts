@@ -13,6 +13,7 @@ import {
   type ProfileId,
 } from "../../domain";
 import { runTask } from "../../platform/task";
+import { HAPTIC, vibrate } from "../../platform/haptics";
 import { recordAttempt } from "../../storage";
 
 export const ADVANCE_DELAY_MS = 900;
@@ -26,6 +27,7 @@ export interface UseChoiceGameOptions {
   readonly optionCount: number;
   readonly profileId: ProfileId;
   readonly resetKey?: string | number;
+  readonly hapticsEnabled?: boolean;
   readonly onProgress?: () => void | Promise<void>;
 }
 
@@ -49,6 +51,7 @@ export function useChoiceGame({
   optionCount,
   profileId,
   resetKey,
+  hapticsEnabled = false,
   onProgress,
 }: UseChoiceGameOptions): ChoiceGame {
   const [session, setSession] = useState<ChoiceSession>(() =>
@@ -62,6 +65,11 @@ export function useChoiceGame({
   const lockedRef = useRef(false);
   const timerRef = useRef<number | null>(null);
   const resetRef = useRef(resetKey);
+  const hapticsRef = useRef(hapticsEnabled);
+
+  useEffect(() => {
+    hapticsRef.current = hapticsEnabled;
+  }, [hapticsEnabled]);
 
   const round = currentRound(session);
   const finished = isComplete(session);
@@ -118,6 +126,10 @@ export function useChoiceGame({
     lockedRef.current = true;
     setFeedback(pending.correct ? "correct" : "wrong");
     setAnsweredOptionId(pending.optionId);
+    vibrate(
+      pending.correct ? HAPTIC.tap : HAPTIC.offTrack,
+      hapticsRef.current,
+    );
 
     if (pending.correct) {
       timerRef.current = window.setTimeout(() => {

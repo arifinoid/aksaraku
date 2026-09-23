@@ -152,6 +152,13 @@ Referensi: `plans/features.md` (fitur), `plans/architecture.md` (arsitektur), `p
   React dev build ikut terkirim (+207 KB & warning bocor ke user).
 - Service Worker hanya didaftarkan saat `NODE_ENV === "production"`; `sw.js`
   memakai network-first untuk navigasi supaya deploy baru tidak tertahan cache.
+  Daftar precache di-inject saat build oleh `scripts/build-sw.ts` (jangan hapus
+  baris `const PRECACHE = [...]` di `public/sw.js`, itu marker).
+- `StrokePath.tolerance` satuannya **piksel layar**; `tracePoint` mengubahnya ke
+  design space lewat argumen `designPerPx`. Jangan bandingkan langsung dengan
+  jarak design space.
+- Animasi yang digerakkan JS (Pixi ticker, `useFrame` R3F) tidak dijangkau
+  `prefers-reduced-motion`; hormati `settings.reduceMotion` secara manual.
 
 ### Status fase
 
@@ -161,5 +168,5 @@ Referensi: `plans/features.md` (fitur), `plans/architecture.md` (arsitektur), `p
 - [x] M3 Mini Games
 - [x] M4 Gamifikasi
 - [x] M5 Parent Dashboard
-- [ ] M6 Aksesibilitas & rilis
+- [x] M6 Aksesibilitas & rilis
 - [ ] M7 Multi-bahasa penuh

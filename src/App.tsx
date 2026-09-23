@@ -7,6 +7,7 @@ import {
   setAudio,
   setHaptics,
   setLocale,
+  setReduceMotion,
   type AppSettings,
   type Locale,
   type Profile,
@@ -127,6 +128,20 @@ export function App() {
     [settings, persistSettings],
   );
 
+  const handleToggleReduceMotion = useCallback(
+    (enabled: boolean) => {
+      if (!settings) return;
+      persistSettings(setReduceMotion(settings, enabled));
+    },
+    [settings, persistSettings],
+  );
+
+  useEffect(() => {
+    document.documentElement.dataset.motion = settings?.reduceMotion
+      ? "reduced"
+      : "full";
+  }, [settings?.reduceMotion]);
+
   const handleCreateProfile = useCallback((profile: Profile) => {
     setProfiles((prev) => [...prev, profile]);
     void runTask(saveProfile(profile));
@@ -240,6 +255,7 @@ export function App() {
       return (
         <AvatarScreen
           profile={current}
+          reduceMotion={settings.reduceMotion}
           onBack={() => setRoute({ name: "home" })}
         />
       );
@@ -260,6 +276,7 @@ export function App() {
           onChangeLocale={handleChangeLocale}
           onToggleHaptics={handleToggleHaptics}
           onToggleAudio={handleToggleAudio}
+          onToggleReduceMotion={handleToggleReduceMotion}
           onSelectProfile={handleSelectProfile}
           onDeleteProfile={handleDeleteProfile}
           onClose={() => setRoute({ name: "home" })}
@@ -292,7 +309,10 @@ export function App() {
     <RewardsProvider profileId={current.id}>
       <SessionProvider profileId={current.id}>
         <main className="app-shell">{guarded}</main>
-        <RewardCelebration audioEnabled={settings.audioEnabled} />
+        <RewardCelebration
+          audioEnabled={settings.audioEnabled}
+          hapticsEnabled={settings.hapticsEnabled}
+        />
       </SessionProvider>
     </RewardsProvider>
   );

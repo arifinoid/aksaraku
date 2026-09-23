@@ -16,6 +16,7 @@ import {
   type Profile,
 } from "../../domain";
 import { playPop, playSuccess } from "../../game";
+import { HAPTIC, vibrate } from "../../platform/haptics";
 import { newId } from "../../platform/ids";
 import { runTask } from "../../platform/task";
 import { recordAttempt } from "../../storage";
@@ -78,6 +79,7 @@ export function ColoringGameScreen({
     })();
     setSummary(true);
     playSuccess(settings.audioEnabled);
+    vibrate(HAPTIC.success, settings.hapticsEnabled);
   };
 
   const restart = () => {
@@ -128,6 +130,7 @@ export function ColoringGameScreen({
             key={swatch}
             type="button"
             aria-label={swatch}
+            aria-pressed={!sticker && swatch === color}
             className={`swatch${!sticker && swatch === color ? " swatch--active" : ""}`}
             style={{ background: swatch }}
             onClick={() => {
@@ -141,6 +144,7 @@ export function ColoringGameScreen({
             key={emoji}
             type="button"
             aria-label={emoji}
+            aria-pressed={sticker === emoji}
             className={`swatch swatch--sticker${sticker === emoji ? " swatch--active" : ""}`}
             onClick={() => setSticker(sticker === emoji ? null : emoji)}
           >

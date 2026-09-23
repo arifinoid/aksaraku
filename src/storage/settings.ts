@@ -12,6 +12,16 @@ const SETTINGS_KEY = "app";
 const readBoolean = (value: unknown, fallback: boolean): boolean =>
   typeof value === "boolean" ? value : fallback;
 
+/** Respects the OS "reduce motion" preference until the parent chooses. */
+const prefersReducedMotion = (): boolean => {
+  if (typeof window === "undefined" || !window.matchMedia) return false;
+  try {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  } catch {
+    return false;
+  }
+};
+
 export const loadSettings = (): TE.TaskEither<StorageError, AppSettings> =>
   TE.tryCatch(async () => {
     const row = await db.settings.get(SETTINGS_KEY);
@@ -26,6 +36,7 @@ export const loadSettings = (): TE.TaskEither<StorageError, AppSettings> =>
         defaultSettings.hapticsEnabled,
       ),
       audioEnabled: readBoolean(stored.audioEnabled, defaultSettings.audioEnabled),
+      reduceMotion: readBoolean(stored.reduceMotion, prefersReducedMotion()),
     };
   }, storageError);
 

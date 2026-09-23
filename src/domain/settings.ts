@@ -15,12 +15,16 @@ export const DEFAULT_SESSION_LIMIT_MIN = 15;
 export const DEFAULT_BREAK_REMINDER_MIN = 5;
 export const MIN_SESSION_LIMIT_MIN = 5;
 export const MAX_SESSION_LIMIT_MIN = 60;
+export const MIN_BREAK_REMINDER_MIN = 0;
+export const MAX_BREAK_REMINDER_MIN = 60;
 
 export const SESSION_LIMIT_OPTIONS: readonly number[] = [10, 15, 20, 30];
+export const BREAK_REMINDER_OPTIONS: readonly number[] = [0, 3, 5, 10, 15];
 
 export type SettingsError =
   | { readonly _tag: "InvalidLocale"; readonly locale: string }
-  | { readonly _tag: "InvalidSessionLimit"; readonly minutes: number };
+  | { readonly _tag: "InvalidSessionLimit"; readonly minutes: number }
+  | { readonly _tag: "InvalidBreakReminder"; readonly minutes: number };
 
 export const settingsErrorMessageKey = (error: SettingsError): string => {
   switch (error._tag) {
@@ -28,6 +32,8 @@ export const settingsErrorMessageKey = (error: SettingsError): string => {
       return "settings.errors.invalidLocale";
     case "InvalidSessionLimit":
       return "settings.errors.invalidSessionLimit";
+    case "InvalidBreakReminder":
+      return "settings.errors.invalidBreakReminder";
   }
 };
 
@@ -81,4 +87,25 @@ export const updateSessionLimit = (
   pipe(
     validateSessionLimit(minutes),
     E.map((valid) => ({ ...setting, sessionLimitMin: valid })),
+  );
+
+export const updateBreakReminder = (
+  setting: ScreenTimeSetting,
+  minutes: number,
+): E.Either<SettingsError, ScreenTimeSetting> =>
+  pipe(
+    E.fromPredicate(
+      (value: number) =>
+        Number.isFinite(value) &&
+        value >= MIN_BREAK_REMINDER_MIN &&
+        value <= MAX_BREAK_REMINDER_MIN,
+      (value: number): SettingsError => ({
+        _tag: "InvalidBreakReminder",
+        minutes: value,
+      }),
+    )(minutes),
+    E.map((valid) => ({
+      ...setting,
+      breakReminderMin: Math.round(valid),
+    })),
   );

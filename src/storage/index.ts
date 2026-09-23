@@ -7,3 +7,4 @@ export * from "./attempts";
 export * from "./mastery";
 export * from "./rewards";
 export * from "./avatar";
+export * from "./sessions";

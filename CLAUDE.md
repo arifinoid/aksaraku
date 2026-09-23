@@ -160,6 +160,6 @@ Referensi: `plans/features.md` (fitur), `plans/architecture.md` (arsitektur), `p
 - [x] M2 Konten Aksara
 - [x] M3 Mini Games
 - [x] M4 Gamifikasi
-- [ ] M5 Parent Dashboard
+- [x] M5 Parent Dashboard
 - [ ] M6 Aksesibilitas & rilis
 - [ ] M7 Multi-bahasa penuh

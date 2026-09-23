@@ -23,3 +23,33 @@ export const deleteProfile = (
   id: string,
 ): TE.TaskEither<StorageError, void> =>
   TE.tryCatch(() => db.profiles.delete(id), storageError);
+
+/** Removes the profile together with everything recorded for it. */
+export const deleteProfileCascade = (
+  id: string,
+): TE.TaskEither<StorageError, void> =>
+  TE.tryCatch(
+    () =>
+      db.transaction(
+        "rw",
+        [
+          db.profiles,
+          db.attempts,
+          db.mastery,
+          db.profileRewards,
+          db.avatars,
+          db.sessions,
+          db.screenTime,
+        ],
+        async () => {
+          await db.profiles.delete(id);
+          await db.attempts.where("profileId").equals(id).delete();
+          await db.mastery.where("profileId").equals(id).delete();
+          await db.profileRewards.where("profileId").equals(id).delete();
+          await db.avatars.delete(id);
+          await db.sessions.delete(id);
+          await db.screenTime.delete(id);
+        },
+      ),
+    storageError,
+  );

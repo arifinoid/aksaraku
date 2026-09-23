@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Route } from "./app/routes";
 import { RewardsProvider } from "./app/RewardsContext";
+import { SessionProvider } from "./app/SessionContext";
 import {
   setAudio,
   setHaptics,
@@ -15,13 +16,18 @@ import { GamesScreen } from "./features/games/GamesScreen";
 import { AvatarScreen } from "./features/avatar/AvatarScreen";
 import { CollectionScreen } from "./features/rewards/CollectionScreen";
 import { RewardCelebration } from "./features/rewards/RewardCelebration";
-import { ParentScreen } from "./features/parent/ParentScreen";
+import {
+  ParentScreen,
+  type ParentView,
+} from "./features/parent/ParentScreen";
 import { PlayScreen } from "./features/play/PlayScreen";
 import { ProfileScreen } from "./features/profiles/ProfileScreen";
 import { GlyphPreviewScreen } from "./features/preview/GlyphPreviewScreen";
+import { SessionGate } from "./features/session/SessionGate";
 import { changeLocale } from "./i18n";
 import { runTask } from "./platform/task";
 import {
+  deleteProfileCascade,
   listProfiles,
   loadSettings,
   resetDatabase,
@@ -31,6 +37,14 @@ import {
 import { Button, Screen } from "./ui";
 
 type Status = "loading" | "ready" | "error";
+
+const CHILD_ROUTES: readonly Route["name"][] = [
+  "home",
+  "play",
+  "games",
+  "collection",
+  "avatar",
+];
 
 const needsReset = (message: string): boolean =>
   /upgrade|primary key|databaseclosed|invalidstate|version/i.test(message);
@@ -43,6 +57,7 @@ export function App() {
   const [profiles, setProfiles] = useState<readonly Profile[]>([]);
   const [current, setCurrent] = useState<Profile | null>(null);
   const [route, setRoute] = useState<Route>({ name: "profiles" });
+  const [parentView, setParentView] = useState<ParentView>("menu");
 
   useEffect(() => {
     let active = true;
@@ -116,15 +131,35 @@ export function App() {
     setProfiles((prev) => [...prev, profile]);
     void runTask(saveProfile(profile));
     setCurrent(profile);
+    setParentView("menu");
     setRoute({ name: "home" });
   }, []);
 
   const handleSelectProfile = useCallback((profile: Profile) => {
     setCurrent(profile);
+    setParentView("menu");
     setRoute({ name: "home" });
   }, []);
 
-  const goToProfiles = useCallback(() => setRoute({ name: "profiles" }), []);
+  const handleDeleteProfile = useCallback(
+    (profile: Profile) => {
+      const remaining = profiles.filter((entry) => entry.id !== profile.id);
+      if (remaining.length === 0) return;
+      setProfiles(remaining);
+      void runTask(deleteProfileCascade(profile.id));
+      if (current?.id === profile.id) {
+        setCurrent(remaining[0] ?? null);
+        setParentView("menu");
+        setRoute({ name: "home" });
+      }
+    },
+    [profiles, current],
+  );
+
+  const openParent = useCallback((view: ParentView) => {
+    setParentView(view);
+    setRoute({ name: "parent" });
+  }, []);
 
   const handleReload = useCallback(() => {
     window.location.reload();
@@ -171,8 +206,8 @@ export function App() {
         <HomeScreen
           profile={current}
           onNavigate={setRoute}
-          onParent={() => setRoute({ name: "parent" })}
-          onSwitchProfile={goToProfiles}
+          onParent={() => openParent("menu")}
+          onSwitchProfile={() => openParent("children")}
         />
       );
     }
@@ -214,15 +249,20 @@ export function App() {
       return <GlyphPreviewScreen onBack={() => setRoute({ name: "parent" })} />;
     }
 
-    if (route.name === "parent") {
+    if (route.name === "parent" && current) {
       return (
         <ParentScreen
+          profile={current}
+          profiles={profiles}
           settings={settings}
+          view={parentView}
+          onViewChange={setParentView}
           onChangeLocale={handleChangeLocale}
           onToggleHaptics={handleToggleHaptics}
           onToggleAudio={handleToggleAudio}
-          onClose={() => setRoute(current ? { name: "home" } : { name: "profiles" })}
-          onSwitchProfile={goToProfiles}
+          onSelectProfile={handleSelectProfile}
+          onDeleteProfile={handleDeleteProfile}
+          onClose={() => setRoute({ name: "home" })}
           onPreview={() => setRoute({ name: "preview" })}
         />
       );
@@ -241,10 +281,19 @@ export function App() {
     return <main className="app-shell">{renderRoute()}</main>;
   }
 
+  const content = renderRoute();
+  const guarded = CHILD_ROUTES.includes(route.name) ? (
+    <SessionGate>{content}</SessionGate>
+  ) : (
+    content
+  );
+
   return (
     <RewardsProvider profileId={current.id}>
-      <main className="app-shell">{renderRoute()}</main>
-      <RewardCelebration audioEnabled={settings.audioEnabled} />
+      <SessionProvider profileId={current.id}>
+        <main className="app-shell">{guarded}</main>
+        <RewardCelebration audioEnabled={settings.audioEnabled} />
+      </SessionProvider>
     </RewardsProvider>
   );
 }

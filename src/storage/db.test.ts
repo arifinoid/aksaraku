@@ -20,11 +20,18 @@ describe("db schema", () => {
   });
 
   test("rewards became per profile without reusing the old store", () => {
-    const latest = DB_VERSIONS.at(-1)!;
-    expect(latest.stores.rewards).toBeNull();
-    expect(primaryKeyOf(latest.stores.profileRewards as string)).toBe(
+    const migration = DB_VERSIONS.find(
+      (entry) => entry.stores.profileRewards !== undefined,
+    )!;
+    expect(migration.stores.rewards).toBeNull();
+    expect(primaryKeyOf(migration.stores.profileRewards as string)).toBe(
       "[profileId+id]",
     );
+  });
+
+  test("sessions are keyed by profile", () => {
+    const latest = DB_VERSIONS.at(-1)!;
+    expect(primaryKeyOf(latest.stores.sessions as string)).toBe("profileId");
   });
 
   test("detects a primary key change", () => {

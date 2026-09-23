@@ -2,6 +2,7 @@ import Dexie, { type Table } from "dexie";
 import type {
   AvatarConfig,
   MasteryScore,
+  PlaySession,
   Profile,
   Reward,
   ScreenTimeSetting,
@@ -49,6 +50,12 @@ export const DB_VERSIONS: readonly DbVersion[] = [
       avatars: "profileId",
     },
   },
+  {
+    version: 3,
+    stores: {
+      sessions: "profileId",
+    },
+  },
 ];
 
 export const primaryKeyOf = (spec: string): string => {
@@ -87,6 +94,7 @@ export class AksarakuDb extends Dexie {
   mastery!: Table<MasteryScore, [string, string]>;
   profileRewards!: Table<Reward, [string, string]>;
   avatars!: Table<AvatarRecord, string>;
+  sessions!: Table<PlaySession, string>;
   settings!: Table<SettingRow, string>;
 
   constructor() {

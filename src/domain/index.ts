@@ -7,3 +7,5 @@ export * from "./tracing";
 export * from "./games";
 export * from "./rewards";
 export * from "./avatar";
+export * from "./report";
+export * from "./session";

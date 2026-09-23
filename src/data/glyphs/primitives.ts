@@ -77,7 +77,6 @@ export const item = (
   glyph,
   strokes: toStrokes(specs),
   phoneme,
-  locale: "id",
   labelKey: "",
 });
 

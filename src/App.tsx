@@ -72,8 +72,6 @@ export function App() {
         return;
       }
 
-      await changeLocale(loadedSettings.right.locale);
-
       const loadedProfiles = await runTask(listProfiles());
       if (!active) return;
       if (loadedProfiles._tag === "Left") {
@@ -84,7 +82,10 @@ export function App() {
 
       const list = loadedProfiles.right;
       const first = list[0] ?? null;
-      setSettings(loadedSettings.right);
+      const locale = first?.locale ?? loadedSettings.right.locale;
+      await changeLocale(locale);
+
+      setSettings({ ...loadedSettings.right, locale });
       setProfiles(list);
       setCurrent(first);
       setRoute(first ? { name: "home" } : { name: "profiles" });
@@ -101,7 +102,7 @@ export function App() {
     void runTask(saveSettings(next));
   }, []);
 
-  const handleChangeLocale = useCallback(
+  const applyLocale = useCallback(
     (locale: Locale) => {
       if (!settings) return;
       const result = setLocale(settings, locale);
@@ -110,6 +111,20 @@ export function App() {
       persistSettings(result.right);
     },
     [settings, persistSettings],
+  );
+
+  const handleChangeLocale = useCallback(
+    (locale: Locale) => {
+      applyLocale(locale);
+      if (!current) return;
+      const next = { ...current, locale };
+      setCurrent(next);
+      setProfiles((prev) =>
+        prev.map((entry) => (entry.id === next.id ? next : entry)),
+      );
+      void runTask(saveProfile(next));
+    },
+    [applyLocale, current],
   );
 
   const handleToggleHaptics = useCallback(
@@ -142,19 +157,42 @@ export function App() {
       : "full";
   }, [settings?.reduceMotion]);
 
-  const handleCreateProfile = useCallback((profile: Profile) => {
-    setProfiles((prev) => [...prev, profile]);
-    void runTask(saveProfile(profile));
-    setCurrent(profile);
-    setParentView("menu");
-    setRoute({ name: "home" });
-  }, []);
+  const handleCreateProfile = useCallback(
+    (profile: Profile) => {
+      setProfiles((prev) => [...prev, profile]);
+      void runTask(saveProfile(profile));
+      setCurrent(profile);
+      setParentView("menu");
+      setRoute({ name: "home" });
+      applyLocale(profile.locale);
+    },
+    [applyLocale],
+  );
 
-  const handleSelectProfile = useCallback((profile: Profile) => {
-    setCurrent(profile);
-    setParentView("menu");
-    setRoute({ name: "home" });
-  }, []);
+  const handleSelectProfile = useCallback(
+    (profile: Profile) => {
+      setCurrent(profile);
+      setParentView("menu");
+      setRoute({ name: "home" });
+      applyLocale(profile.locale);
+    },
+    [applyLocale],
+  );
+
+  const handleChangeProfileLocale = useCallback(
+    (profile: Profile, locale: Locale) => {
+      const next = { ...profile, locale };
+      setProfiles((prev) =>
+        prev.map((entry) => (entry.id === next.id ? next : entry)),
+      );
+      void runTask(saveProfile(next));
+      if (current?.id === next.id) {
+        setCurrent(next);
+        applyLocale(locale);
+      }
+    },
+    [current, applyLocale],
+  );
 
   const handleDeleteProfile = useCallback(
     (profile: Profile) => {
@@ -163,12 +201,14 @@ export function App() {
       setProfiles(remaining);
       void runTask(deleteProfileCascade(profile.id));
       if (current?.id === profile.id) {
-        setCurrent(remaining[0] ?? null);
+        const next = remaining[0] ?? null;
+        setCurrent(next);
         setParentView("menu");
         setRoute({ name: "home" });
+        if (next) applyLocale(next.locale);
       }
     },
-    [profiles, current],
+    [profiles, current, applyLocale],
   );
 
   const openParent = useCallback((view: ParentView) => {
@@ -279,6 +319,7 @@ export function App() {
           onToggleReduceMotion={handleToggleReduceMotion}
           onSelectProfile={handleSelectProfile}
           onDeleteProfile={handleDeleteProfile}
+          onChangeProfileLocale={handleChangeProfileLocale}
           onClose={() => setRoute({ name: "home" })}
           onPreview={() => setRoute({ name: "preview" })}
         />

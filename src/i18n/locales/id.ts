@@ -19,6 +19,7 @@ export const id = {
     subtitle: "Pilih anak atau tambah profil baru",
     add: "Tambah Anak",
     namePlaceholder: "Nama anak",
+    language: "Bahasa",
     start: "Mulai",
     empty: "Belum ada profil. Yuk tambah anak dulu.",
     errors: {
@@ -44,6 +45,7 @@ export const id = {
     offTrack: "Ikuti garisnya ya",
     listen: "Dengar",
     canvasLabel: "Area menulis {{glyph}}",
+    objectHint: "{{glyph}} untuk {{object}}",
     color: "Warnai",
   },
   games: {
@@ -162,6 +164,7 @@ export const id = {
     deleteConfirm: "Yakin hapus?",
     deleteHint: "Menghapus anak juga menghapus kemajuan dan koleksinya.",
     lastChildHint: "Minimal harus ada satu anak.",
+    childLanguage: "Bahasa untuk {{name}}",
     cancel: "Batal",
   },
   session: {

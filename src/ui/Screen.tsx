@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { useDirection } from "../i18n";
 import { Button } from "./Button";
 import "./screen.css";
 
@@ -19,6 +20,8 @@ export function Screen({
   center = false,
 }: ScreenProps) {
   const { t } = useTranslation();
+  const direction = useDirection();
+  const backIcon = direction === "rtl" ? "→" : "←";
 
   return (
     <section className="screen">
@@ -27,7 +30,7 @@ export function Screen({
           {onBack ? (
             <Button
               label={t("common.back")}
-              icon="←"
+              icon={backIcon}
               variant="secondary"
               size="sm"
               onClick={onBack}

@@ -1,5 +1,6 @@
 import { useState, type PointerEvent as ReactPointerEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { useDirection } from "../../i18n";
 import { useRewards } from "../../app/RewardsContext";
 import { COLOR_PALETTE, STICKER_SET } from "../../data";
 import {
@@ -44,6 +45,7 @@ export function ColoringGameScreen({
   onBack,
 }: ColoringGameScreenProps) {
   const { t } = useTranslation();
+  const direction = useDirection();
   const { refresh } = useRewards();
   const [state, setState] = useState(() => createColoringState(item.id));
   const [color, setColor] = useState(COLOR_PALETTE[0]!);
@@ -165,7 +167,7 @@ export function ColoringGameScreen({
           label={t("common.back")}
           variant="ghost"
           size="sm"
-          icon="↩️"
+          icon={direction === "rtl" ? "↪️" : "↩️"}
           onClick={() => setState((current) => removeLastSticker(current))}
         />
         <Button

@@ -234,3 +234,12 @@
   flex-wrap: wrap;
 }
 
+.child-row__locale {
+  flex: 0 0 10rem;
+}
+
+.child-row__locale .field__select {
+  width: 100%;
+  min-height: 48px;
+}
+

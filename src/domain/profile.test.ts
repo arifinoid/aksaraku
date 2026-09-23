@@ -70,7 +70,7 @@ describe("createProfile", () => {
     expect(E.isLeft(result)).toBe(true);
     if (E.isLeft(result)) {
       expect(profileErrorMessageKey(result.left)).toBe(
-        "profile.errors.invalidLocale",
+        "profiles.errors.invalidLocale",
       );
     }
   });

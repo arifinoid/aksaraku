@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRewards } from "../../app/RewardsContext";
+import { findGlyphItem, itemPhoneme, objectName } from "../../data";
 import {
   scoreSession,
   type AppSettings,
@@ -11,6 +12,7 @@ import {
   type TraceSession,
 } from "../../domain";
 import { TracingCanvas } from "../../game";
+import { useActiveLocale, useDirection } from "../../i18n";
 import { newId } from "../../platform/ids";
 import { speakPhoneme } from "../../platform/speech";
 import { runTask } from "../../platform/task";
@@ -36,6 +38,9 @@ export function TracingScreen({
   onColor,
 }: TracingScreenProps) {
   const { t } = useTranslation();
+  const locale = useActiveLocale();
+  const direction = useDirection();
+  const nextIcon = direction === "rtl" ? "⬅️" : "➡️";
   const { refresh } = useRewards();
   const [coverage, setCoverage] = useState(0);
   const [strokeIndex, setStrokeIndex] = useState(0);
@@ -72,7 +77,12 @@ export function TracingScreen({
             await refresh();
           })();
           window.setTimeout(
-            () => speakPhoneme(item.phoneme, item.locale, settings.audioEnabled),
+            () =>
+              speakPhoneme(
+                itemPhoneme(item, locale),
+                locale,
+                settings.audioEnabled,
+              ),
             650,
           );
           break;
@@ -90,9 +100,8 @@ export function TracingScreen({
       }
     },
     [
-      item.id,
-      item.locale,
-      item.phoneme,
+      item,
+      locale,
       profile.id,
       refresh,
       settings.audioEnabled,
@@ -109,6 +118,7 @@ export function TracingScreen({
   }, []);
 
   const currentLine = Math.min(strokeIndex + 1, totalStrokes);
+  const object = objectName(item, locale);
 
   return (
     <Screen
@@ -120,10 +130,15 @@ export function TracingScreen({
           icon="🔊"
           variant="secondary"
           size="sm"
-          onClick={() => speakPhoneme(item.phoneme, item.locale, true)}
+          onClick={() => speakPhoneme(itemPhoneme(item, locale), locale, true)}
         />
       }
     >
+      {object ? (
+        <p className="play__object">
+          {t("play.objectHint", { glyph: item.glyph, object })}
+        </p>
+      ) : null}
       <TracingCanvas
         item={item}
         resetKey={resetKey}
@@ -170,7 +185,7 @@ export function TracingScreen({
               icon="🎨"
               onClick={onColor}
             />
-            <Button label={t("play.next")} icon="➡️" onClick={onNext} />
+            <Button label={t("play.next")} icon={nextIcon} onClick={onNext} />
           </div>
         </div>
       ) : null}

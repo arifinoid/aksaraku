@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { avatarEmoji } from "../../data/avatars";
-import type { Profile } from "../../domain";
+import type { Locale, Profile } from "../../domain";
+import { LOCALE_OPTIONS } from "../../i18n";
 import { Button, Screen } from "../../ui";
 import "./parent.css";
 
@@ -10,6 +11,7 @@ export interface ParentChildrenProps {
   readonly current: Profile;
   readonly onSelect: (profile: Profile) => void;
   readonly onDelete: (profile: Profile) => void;
+  readonly onChangeLocale: (profile: Profile, locale: Locale) => void;
   readonly onBack: () => void;
 }
 
@@ -18,6 +20,7 @@ export function ParentChildren({
   current,
   onSelect,
   onDelete,
+  onChangeLocale,
   onBack,
 }: ParentChildrenProps) {
   const { t } = useTranslation();
@@ -40,6 +43,28 @@ export function ParentChildren({
                 </span>
               ) : null}
             </span>
+
+            <label className="child-row__locale">
+              <span className="visually-hidden">
+                {t("parent.childLanguage", { name: profile.name })}
+              </span>
+              <select
+                className="field__select"
+                value={profile.locale}
+                onChange={(event) =>
+                  onChangeLocale(
+                    profile,
+                    event.currentTarget.value as Locale,
+                  )
+                }
+              >
+                {LOCALE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
 
             {confirming === profile.id ? (
               <span className="child-row__actions">

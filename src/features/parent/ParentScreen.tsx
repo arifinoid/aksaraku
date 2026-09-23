@@ -32,6 +32,7 @@ export interface ParentScreenProps {
   readonly onToggleReduceMotion: (enabled: boolean) => void;
   readonly onSelectProfile: (profile: Profile) => void;
   readonly onDeleteProfile: (profile: Profile) => void;
+  readonly onChangeProfileLocale: (profile: Profile, locale: Locale) => void;
   readonly onClose: () => void;
   readonly onPreview: () => void;
 }
@@ -69,6 +70,7 @@ export function ParentScreen({
   onToggleReduceMotion,
   onSelectProfile,
   onDeleteProfile,
+  onChangeProfileLocale,
   onClose,
   onPreview,
 }: ParentScreenProps) {
@@ -99,6 +101,7 @@ export function ParentScreen({
         current={profile}
         onSelect={onSelectProfile}
         onDelete={onDeleteProfile}
+        onChangeLocale={onChangeProfileLocale}
         onBack={() => onViewChange("menu")}
       />
     );

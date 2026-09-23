@@ -1,6 +1,6 @@
 import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import type { Locale } from "../domain";
+import { initReactI18next, useTranslation } from "react-i18next";
+import { isLocale, type Locale } from "../domain";
 import { ar } from "./locales/ar";
 import { en } from "./locales/en";
 import { id } from "./locales/id";
@@ -47,6 +47,18 @@ export const initI18n = (locale: Locale): typeof i18n => {
 export const changeLocale = async (locale: Locale): Promise<void> => {
   await i18n.changeLanguage(locale);
   applyDirection(locale);
+};
+
+/** Current UI language, narrowed to a supported locale. */
+export const useActiveLocale = (): Locale => {
+  const { i18n: instance } = useTranslation();
+  return isLocale(instance.language) ? instance.language : "id";
+};
+
+/** Reading direction of the current UI language. */
+export const useDirection = (): "ltr" | "rtl" => {
+  const { i18n: instance } = useTranslation();
+  return isRtl(instance.language) ? "rtl" : "ltr";
 };
 
 export default i18n;

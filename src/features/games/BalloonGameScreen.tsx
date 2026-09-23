@@ -2,8 +2,9 @@ import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useRewards } from "../../app/RewardsContext";
 import { balloonCandidates, starsForAccuracy, type AppSettings, type Profile } from "../../domain";
-import { findGlyphItem, GLYPH_ITEMS } from "../../data";
+import { findGlyphItem, GLYPH_ITEMS, itemPhoneme } from "../../data";
 import { playOffTrack, playPop, playStrokeComplete } from "../../game";
+import { useActiveLocale } from "../../i18n";
 import { speakPhoneme, supportsSpeech } from "../../platform/speech";
 import { Button, Screen } from "../../ui";
 import { GameSummary } from "./GameSummary";
@@ -25,6 +26,7 @@ export function BalloonGameScreen({
   onBack,
 }: BalloonGameScreenProps) {
   const { t } = useTranslation();
+  const locale = useActiveLocale();
   const { refresh } = useRewards();
   const canSpeak = supportsSpeech();
 
@@ -44,8 +46,10 @@ export function BalloonGameScreen({
   useEffect(() => {
     if (!promptItemId) return;
     const item = findGlyphItem(promptItemId);
-    if (item) speakPhoneme(item.phoneme, item.locale, settings.audioEnabled);
-  }, [promptItemId, settings.audioEnabled]);
+    if (item) {
+      speakPhoneme(itemPhoneme(item, locale), locale, settings.audioEnabled);
+    }
+  }, [promptItemId, locale, settings.audioEnabled]);
 
   useEffect(() => {
     if (game.feedback === "correct") playStrokeComplete(settings.audioEnabled);
@@ -57,7 +61,7 @@ export function BalloonGameScreen({
     const item = findGlyphItem(promptItemId);
     if (item) {
       playPop(settings.audioEnabled);
-      speakPhoneme(item.phoneme, item.locale, true);
+      speakPhoneme(itemPhoneme(item, locale), locale, true);
     }
   };
 

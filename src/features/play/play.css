@@ -102,6 +102,13 @@
   color: var(--c-muted);
 }
 
+.play__object {
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--c-primary-dark);
+}
+
 .play__hint--warn {
   color: var(--c-danger);
 }

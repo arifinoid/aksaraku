@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { GLYPH_CATEGORIES } from "../../data";
+import { GLYPH_CATEGORIES, itemPhoneme } from "../../data";
+import { useActiveLocale } from "../../i18n";
 import type { ModuleItem, Vec2 } from "../../domain";
 import { Screen } from "../../ui";
 import "./preview.css";
@@ -51,6 +52,7 @@ export interface GlyphPreviewScreenProps {
 
 export function GlyphPreviewScreen({ onBack }: GlyphPreviewScreenProps) {
   const { t } = useTranslation();
+  const locale = useActiveLocale();
 
   return (
     <Screen title={t("preview.title")} onBack={onBack}>
@@ -63,7 +65,7 @@ export function GlyphPreviewScreen({ onBack }: GlyphPreviewScreenProps) {
               <figure key={item.id} className="preview__cell">
                 <GlyphSvg item={item} />
                 <figcaption className="preview__caption">
-                  {item.glyph} · {item.phoneme}
+                  {item.glyph} · {itemPhoneme(item, locale)}
                 </figcaption>
               </figure>
             ))}

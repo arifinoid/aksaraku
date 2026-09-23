@@ -21,6 +21,7 @@ export const ar: Dict = {
     subtitle: "اختر طفلاً أو أضف ملفاً جديداً",
     add: "إضافة طفل",
     namePlaceholder: "اسم الطفل",
+    language: "اللغة",
     start: "ابدأ",
     empty: "لا توجد ملفات بعد. أضف طفلاً أولاً.",
     errors: {
@@ -46,6 +47,7 @@ export const ar: Dict = {
     offTrack: "اتبع الخط",
     listen: "استمع",
     canvasLabel: "منطقة كتابة {{glyph}}",
+    objectHint: "{{glyph}} مثل {{object}}",
     color: "لوّن",
   },
   games: {
@@ -164,6 +166,7 @@ export const ar: Dict = {
     deleteConfirm: "تأكيد الحذف؟",
     deleteHint: "حذف الطفل يحذف أيضًا تقدّمه ومجموعته.",
     lastChildHint: "يجب أن يبقى طفل واحد على الأقل.",
+    childLanguage: "لغة {{name}}",
     cancel: "إلغاء",
   },
   session: {

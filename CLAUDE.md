@@ -159,6 +159,11 @@ Referensi: `plans/features.md` (fitur), `plans/architecture.md` (arsitektur), `p
   jarak design space.
 - Animasi yang digerakkan JS (Pixi ticker, `useFrame` R3F) tidak dijangkau
   `prefers-reduced-motion`; hormati `settings.reduceMotion` secara manual.
+- Bahasa aktif ditentukan `Profile.locale` (bukan `AppSettings.locale`, yang
+  hanya default saat belum ada profil). Nama fonik per bahasa ada di
+  `src/data/phonemes.ts`; pakai `itemPhoneme(item, locale)`, jangan `item.phoneme`.
+- Ikon arah harus dicerminkan untuk RTL lewat `useDirection()` (`src/i18n`),
+  jangan hardcode `←`/`➡️`.
 
 ### Status fase
 
@@ -169,4 +174,4 @@ Referensi: `plans/features.md` (fitur), `plans/architecture.md` (arsitektur), `p
 - [x] M4 Gamifikasi
 - [x] M5 Parent Dashboard
 - [x] M6 Aksesibilitas & rilis
-- [ ] M7 Multi-bahasa penuh
+- [x] M7 Multi-bahasa penuh

@@ -27,8 +27,8 @@ export interface ModuleItem {
   readonly kind: ModuleKind;
   readonly glyph: string;
   readonly strokes: readonly StrokePath[];
+  /** Default (Indonesian) spoken name; see `phonemeFor` for other locales. */
   readonly phoneme: string;
-  readonly locale: Locale;
   readonly labelKey: string;
 }
 

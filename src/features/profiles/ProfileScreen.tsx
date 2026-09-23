@@ -4,11 +4,12 @@ import { useTranslation } from "react-i18next";
 import { avatarEmoji, DEFAULT_AVATAR_ID } from "../../data/avatars";
 import {
   createProfile,
-  isLocale,
-  profileErrorMessageKey,
+  type Locale,
   type Profile,
   type ProfileId,
+  profileErrorMessageKey,
 } from "../../domain";
+import { LOCALE_OPTIONS, useActiveLocale } from "../../i18n";
 import { newId } from "../../platform/ids";
 import { Button, Screen } from "../../ui";
 import "./profiles.css";
@@ -24,8 +25,10 @@ export function ProfileScreen({
   onSelect,
   onCreate,
 }: ProfileScreenProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
+  const activeLocale = useActiveLocale();
   const [name, setName] = useState("");
+  const [locale, setLocale] = useState<Locale>(activeLocale);
   const [errorKey, setErrorKey] = useState<string | null>(null);
 
   const submit = () => {
@@ -33,7 +36,7 @@ export function ProfileScreen({
       id: newId() as ProfileId,
       name,
       avatarId: DEFAULT_AVATAR_ID,
-      locale: isLocale(i18n.language) ? i18n.language : "id",
+      locale,
       createdAt: Date.now(),
     });
 
@@ -89,6 +92,22 @@ export function ProfileScreen({
             placeholder={t("profiles.namePlaceholder")}
             onChange={(event) => setName(event.currentTarget.value)}
           />
+        </label>
+        <label className="field">
+          <span className="field__label">{t("profiles.language")}</span>
+          <select
+            className="field__select"
+            value={locale}
+            onChange={(event) =>
+              setLocale(event.currentTarget.value as Locale)
+            }
+          >
+            {LOCALE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
         </label>
         {errorKey ? (
           <p className="profiles__error" role="alert">

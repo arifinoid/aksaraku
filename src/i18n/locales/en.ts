@@ -21,6 +21,7 @@ export const en: Dict = {
     subtitle: "Pick a child or add a new profile",
     add: "Add Child",
     namePlaceholder: "Child name",
+    language: "Language",
     start: "Start",
     empty: "No profiles yet. Add a child first.",
     errors: {
@@ -46,6 +47,7 @@ export const en: Dict = {
     offTrack: "Follow the line",
     listen: "Listen",
     canvasLabel: "Writing area for {{glyph}}",
+    objectHint: "{{glyph}} for {{object}}",
     color: "Color",
   },
   games: {
@@ -164,6 +166,7 @@ export const en: Dict = {
     deleteConfirm: "Delete for sure?",
     deleteHint: "Deleting a child also removes their progress and collection.",
     lastChildHint: "There must always be at least one child.",
+    childLanguage: "Language for {{name}}",
     cancel: "Cancel",
   },
   session: {

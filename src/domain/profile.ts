@@ -63,10 +63,10 @@ export const createProfile = (
 export const profileErrorMessageKey = (error: ProfileError): string => {
   switch (error._tag) {
     case "EmptyName":
-      return "profile.errors.emptyName";
+      return "profiles.errors.emptyName";
     case "NameTooLong":
-      return "profile.errors.nameTooLong";
+      return "profiles.errors.nameTooLong";
     case "InvalidLocale":
-      return "profile.errors.invalidLocale";
+      return "profiles.errors.invalidLocale";
   }
 };

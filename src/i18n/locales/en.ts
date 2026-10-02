@@ -190,4 +190,53 @@ export const en: Dict = {
     reset: "Reset Data",
     resetHint: "Deletes all profiles and progress on this device.",
   },
+  landing: {
+    nav: {
+      install: "Install App",
+      skip: "Skip to content",
+    },
+    hero: {
+      tagline: "Learn while playing",
+      subtitle: "Interactive education app for toddlers 3+. Write, play, and learn — no internet, no ads.",
+      ctaInstall: "Install Now",
+      ctaHow: "See how it works",
+    },
+    features: {
+      title: "What's in Aksaraku?",
+      writing: { title: "Writing", desc: "Trace letters, numbers, and shapes with step-by-step guidance." },
+      games: { title: "Games", desc: "Match, pop balloons, and color while learning." },
+      rewards: { title: "Rewards", desc: "Collect stickers, trophies, and characters with every practice." },
+      parent: { title: "Parent Dashboard", desc: "Track progress, set time limits, and manage child profiles." },
+    },
+    how: {
+      title: "How to Start",
+      step1: { title: "Install", desc: "Add to home screen" },
+      step2: { title: "Choose Child", desc: "Create a profile for your little one" },
+      step3: { title: "Start Learning", desc: "Pick a letter, number, or game" },
+    },
+    trust: {
+      title: "Why Aksaraku?",
+      offline: "Works without internet",
+      noAds: "No ads, no interruptions",
+      private: "Data stays on your device",
+      multiChild: "Profiles for each child",
+    },
+    languages: {
+      title: "Three Languages",
+      id: "Bahasa Indonesia",
+      en: "English",
+      ar: "العربية (RTL)",
+    },
+    footer: {
+      cta: "Get Started",
+      madeBy: "Made with ❤️ by Rohmad's AI Engineering Team",
+    },
+    install: {
+      instructions: "How to Install",
+      ios: "Tap the Share button, then choose \"Add to Home Screen\".",
+      android: "Tap the menu, then choose \"Add to Home screen\".",
+      desktop: "Click the install icon in the address bar, or use the browser menu.",
+      openApp: "Open App",
+    },
+  },
 };

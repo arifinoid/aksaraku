@@ -1,0 +1,7 @@
+name = "aksaraku"
+compatibility_date = "2026-10-01"
+pages_build_output_dir = "./dist"
+
+# Production branch — deploys from this branch go to the production
+# subdomain (aksaraku.pages.dev). All other branches get preview URLs.
+# [vars] — non-secret environment variables can be added here if needed.

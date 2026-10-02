@@ -1,6 +1,7 @@
 import i18n from "i18next";
 import { initReactI18next, useTranslation } from "react-i18next";
-import { isLocale, type Locale } from "../domain";
+import { isLocale } from "../domain/locale";
+import type { Locale } from "../domain/types";
 import { ar } from "./locales/ar";
 import { en } from "./locales/en";
 import { id } from "./locales/id";

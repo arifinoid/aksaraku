@@ -1,6 +1,7 @@
 import { sequenceS } from "fp-ts/Apply";
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
+import { LOCALES, isLocale } from "./locale";
 import type { AvatarId, Locale, Profile, ProfileId } from "./types";
 
 export type ProfileError =
@@ -9,10 +10,7 @@ export type ProfileError =
   | { readonly _tag: "InvalidLocale"; readonly locale: string };
 
 export const MAX_NAME_LENGTH = 20;
-export const LOCALES: readonly Locale[] = ["id", "en", "ar"];
-
-export const isLocale = (value: string): value is Locale =>
-  (LOCALES as readonly string[]).includes(value);
+export { LOCALES, isLocale };
 
 export const normalizeName = (raw: string): string =>
   raw.trim().replace(/\s+/g, " ");

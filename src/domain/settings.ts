@@ -1,6 +1,6 @@
 import * as E from "fp-ts/Either";
 import { pipe } from "fp-ts/function";
-import { isLocale } from "./profile";
+import { isLocale } from "./locale";
 import type { AppSettings, Locale, ScreenTimeSetting } from "./types";
 
 export const DEFAULT_LOCALE: Locale = "id";

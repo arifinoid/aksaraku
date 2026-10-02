@@ -1,5 +1,6 @@
 import { serve } from "bun";
 import index from "./index.html";
+import landing from "./landing.html";
 
 const staticFile = (path: string, contentType: string) => ({
   GET: () => new Response(Bun.file(path), { headers: { "content-type": contentType } }),
@@ -31,6 +32,9 @@ const server = serve({
     "/api/health": {
       GET: () => Response.json({ status: "ok", app: "aksaraku" }),
     },
+    "/": landing,
+    "/app": index,
+    "/app/*": index,
     "/*": index,
   },
   development: process.env.NODE_ENV !== "production" && {

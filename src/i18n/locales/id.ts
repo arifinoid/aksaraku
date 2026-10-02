@@ -188,4 +188,53 @@ export const id = {
     reset: "Atur Ulang Data",
     resetHint: "Menghapus semua profil dan kemajuan di perangkat ini.",
   },
+  landing: {
+    nav: {
+      install: "Pasang Aplikasi",
+      skip: "Lewati ke konten",
+    },
+    hero: {
+      tagline: "Belajar sambil bermain",
+      subtitle: "Aplikasi edukasi interaktif untuk balita 3+. Menulis, bermain, dan belajar — tanpa internet, tanpa iklan.",
+      ctaInstall: "Pasang Sekarang",
+      ctaHow: "Lihat cara kerjanya",
+    },
+    features: {
+      title: "Apa yang ada di Aksaraku?",
+      writing: { title: "Menulis", desc: "Trace huruf, angka, dan bentuk dengan panduan langkah demi langkah." },
+      games: { title: "Permainan", desc: "Cocokkan, pecahkan balon, dan mewarnai sambil belajar." },
+      rewards: { title: "Hadiah", desc: "Kumpulkan stiker, piala, dan karakter setiap berlatih." },
+      parent: { title: "Dashboard Orang Tua", desc: "Pantau perkembangan, atur batas waktu, dan kelola profil anak." },
+    },
+    how: {
+      title: "Cara Memulai",
+      step1: { title: "Pasang", desc: "Tambahkan ke layar utama" },
+      step2: { title: "Pilih Anak", desc: "Buat profil untuk si kecil" },
+      step3: { title: "Mulai Belajar", desc: "Pilih huruf, angka, atau permainan" },
+    },
+    trust: {
+      title: "Mengapa Aksaraku?",
+      offline: "Berfungsi tanpa internet",
+      noAds: "Tanpa iklan, tanpa gangguan",
+      private: "Data tersimpan di perangkat",
+      multiChild: "Profil untuk setiap anak",
+    },
+    languages: {
+      title: "Tiga Bahasa",
+      id: "Bahasa Indonesia",
+      en: "English",
+      ar: "العربية (RTL)",
+    },
+    footer: {
+      cta: "Mulai Sekarang",
+      madeBy: "Dibuat dengan ❤️ oleh Tim AI Engineering Rohmad",
+    },
+    install: {
+      instructions: "Cara Memasang",
+      ios: "Ketuk tombol Bagikan, lalu pilih \"Tambah ke Layar Utama\".",
+      android: "Ketuk menu, lalu pilih \"Tambah ke layar utama\".",
+      desktop: "Klik ikon pasang di address bar, atau gunakan menu browser.",
+      openApp: "Buka Aplikasi",
+    },
+  },
 } as const;

@@ -1,0 +1,22 @@
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Robots-Tag: index, follow
+
+# Service worker — must not be cached aggressively so updates ship fast
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Manifest — short cache, content may change between deploys
+/manifest.webmanifest
+  Cache-Control: public, max-age=3600
+
+# Static hashed assets — immutable, long cache
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+/*.css
+  Cache-Control: public, max-age=31536000, immutable

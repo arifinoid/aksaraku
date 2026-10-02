@@ -25,7 +25,12 @@ const AR = flatten(ar);
 const sorted = (value: Flat): string[] => Object.keys(value).sort();
 
 /** Keys that are intentionally the same in every language. */
-const LANGUAGE_NEUTRAL = new Set(["app.name"]);
+const LANGUAGE_NEUTRAL = new Set([
+  "app.name",
+  "landing.languages.id",
+  "landing.languages.en",
+  "landing.languages.ar",
+]);
 
 describe("locale dictionaries", () => {
   test("have the exact same keys", () => {
@@ -79,5 +84,51 @@ describe("locale dictionaries", () => {
   test("expose the same shape through the Dict type", () => {
     const dict: Dict = en;
     expect(dict.parent.title.length).toBeGreaterThan(0);
+  });
+
+  test("include the landing namespace with all required keys", () => {
+    const required = [
+      "landing.nav.install",
+      "landing.nav.skip",
+      "landing.hero.tagline",
+      "landing.hero.subtitle",
+      "landing.hero.ctaInstall",
+      "landing.hero.ctaHow",
+      "landing.features.title",
+      "landing.features.writing.title",
+      "landing.features.writing.desc",
+      "landing.features.games.title",
+      "landing.features.games.desc",
+      "landing.features.rewards.title",
+      "landing.features.rewards.desc",
+      "landing.features.parent.title",
+      "landing.features.parent.desc",
+      "landing.how.title",
+      "landing.how.step1.title",
+      "landing.how.step1.desc",
+      "landing.how.step2.title",
+      "landing.how.step2.desc",
+      "landing.how.step3.title",
+      "landing.how.step3.desc",
+      "landing.trust.title",
+      "landing.trust.offline",
+      "landing.trust.noAds",
+      "landing.trust.private",
+      "landing.trust.multiChild",
+      "landing.languages.title",
+      "landing.languages.id",
+      "landing.languages.en",
+      "landing.languages.ar",
+      "landing.footer.cta",
+      "landing.footer.madeBy",
+      "landing.install.instructions",
+      "landing.install.ios",
+      "landing.install.android",
+      "landing.install.desktop",
+      "landing.install.openApp",
+    ];
+    for (const key of required) {
+      expect(`${key}: ${ID[key] ?? "MISSING"}`).not.toMatch(/MISSING$/);
+    }
   });
 });

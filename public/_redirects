@@ -1,0 +1,15 @@
+# Cloudflare Pages routing for the dual-entry PWA.
+#
+# The landing page is the front door at `/` (lightweight, no PixiJS/Three/Dexie).
+# The interactive app lives at `/app` and its sub-paths.
+#
+# Static assets (JS/CSS/SVG/manifest/sw.js) are matched first by the Pages
+# asset server and served directly; only paths that don't resolve to a file
+# hit these rules.
+
+# Landing page is the root entry.
+/          /landing.html   200
+
+# App SPA fallback — all app paths serve the app shell.
+/app       /index.html     200
+/app/*     /index.html     200

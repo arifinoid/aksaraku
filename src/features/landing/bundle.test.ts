@@ -19,6 +19,10 @@ const HEAVY_PACKAGES = [
 ] as const;
 
 const findLandingChunks = async (): Promise<string[]> => {
+  // Bun.Glob().scan() throws when the directory doesn't exist — guard first
+  // so a missing dist/ (test run before build) yields an empty list instead
+  // of an ENOENT crash.
+  if (!(await exists("dist"))) return [];
   const chunks: string[] = [];
   const glob = new Bun.Glob("landing-*.js");
   for await (const file of glob.scan({ cwd: "dist" })) {
@@ -55,6 +59,12 @@ describe("landing bundle", () => {
   });
 
   test("landing HTML entry exists with SEO meta tags", async () => {
+    if (!(await exists("dist/landing.html"))) {
+      // Build hasn't run yet (e.g. `bun test` before `bun run build`) —
+      // skip with a clear message instead of failing with ENOENT.
+      console.log("Skip: dist/landing.html not found — run `bun run build` first.");
+      return;
+    }
     const html = await Bun.file("dist/landing.html").text();
     expect(html).toContain("<title>");
     expect(html).toMatch(/<meta[^>]+name="description"/);

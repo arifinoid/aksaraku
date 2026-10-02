@@ -3,13 +3,18 @@
 # The landing page is the front door at `/` (lightweight, no PixiJS/Three/Dexie).
 # The interactive app lives at `/app` and its sub-paths.
 #
-# Static assets (JS/CSS/SVG/manifest/sw.js) are matched first by the Pages
-# asset server and served directly; only paths that don't resolve to a file
-# hit these rules.
+# Why /app is a real directory (dist/app/index.html) instead of a _redirects
+# rewrite to /index.html:
+#   Cloudflare's pretty-URL normalization runs BEFORE _redirects rules and emits
+#   hard 308s for any request whose path matches an asset after normalization
+#   (e.g. /app -> / for dist/index.html, /index.html -> /). Those 308s cannot be
+#   shadowed by rewrite (200) rules, so /app must not normalize onto an asset
+#   path. Serving /app/ from a real directory index avoids normalization
+#   entirely. See docs/infra/cloudflare-pages-routing.md.
 
 # Landing page is the root entry.
 /          /landing.html   200
 
-# App SPA fallback — all app paths serve the app shell.
-/app       /index.html     200
-/app/*     /index.html     200
+# App shell: /app normalizes to /app/ (308), which serves dist/app/index.html.
+# Sub-paths and unknown paths fall back to the app shell for client-side routes.
+/app/*     /app/index.html     200

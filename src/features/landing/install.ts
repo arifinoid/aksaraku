@@ -33,3 +33,23 @@ export const classifyInstall = (ctx: InstallContext): InstallAction => {
   if (ctx.hasBeforeInstallPrompt) return { action: "prompt" };
   return { action: "instructions", platform: ctx.platform };
 };
+
+/** What should happen when the user clicks the install/open CTA. */
+export type InstallClickOutcome =
+  | { readonly kind: "go-to-app" }
+  | { readonly kind: "trigger-prompt" }
+  | { readonly kind: "show-instructions" };
+
+export const resolveInstallClick = ({
+  action,
+  hasDeferredPrompt,
+}: {
+  readonly action: InstallAction;
+  readonly hasDeferredPrompt: boolean;
+}): InstallClickOutcome => {
+  if (action.action === "open") return { kind: "go-to-app" };
+  if (action.action === "prompt" && hasDeferredPrompt) {
+    return { kind: "trigger-prompt" };
+  }
+  return { kind: "show-instructions" };
+};

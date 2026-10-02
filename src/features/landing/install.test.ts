@@ -2,6 +2,8 @@ import { describe, expect, test } from "bun:test";
 import {
   classifyInstall,
   detectPlatform,
+  resolveInstallClick,
+  type InstallAction,
   type InstallContext,
 } from "./install";
 
@@ -117,5 +119,46 @@ describe("classifyInstall", () => {
       platform: "android",
     };
     expect(classifyInstall(ctx)).toEqual({ action: "open" });
+  });
+});
+
+describe("resolveInstallClick", () => {
+  /** Open action means the app is installed — clicking navigates to /app. */
+  test("returns go-to-app for open action", () => {
+    const action: InstallAction = { action: "open" };
+    expect(resolveInstallClick({ action, hasDeferredPrompt: true })).toEqual({
+      kind: "go-to-app",
+    });
+  });
+
+  test("returns go-to-app for open action even without deferred prompt", () => {
+    const action: InstallAction = { action: "open" };
+    expect(resolveInstallClick({ action, hasDeferredPrompt: false })).toEqual({
+      kind: "go-to-app",
+    });
+  });
+
+  /** Native prompt is available → trigger it, don't navigate. */
+  test("returns trigger-prompt for prompt action with deferred prompt", () => {
+    const action: InstallAction = { action: "prompt" };
+    expect(resolveInstallClick({ action, hasDeferredPrompt: true })).toEqual({
+      kind: "trigger-prompt",
+    });
+  });
+
+  /** Prompt action without a captured event can't fire — fall back to instructions. */
+  test("returns show-instructions for prompt action without deferred prompt", () => {
+    const action: InstallAction = { action: "prompt" };
+    expect(resolveInstallClick({ action, hasDeferredPrompt: false })).toEqual({
+      kind: "show-instructions",
+    });
+  });
+
+  /** No native prompt available → show per-platform instructions modal. */
+  test("returns show-instructions for instructions action", () => {
+    const action: InstallAction = { action: "instructions", platform: "ios" };
+    expect(resolveInstallClick({ action, hasDeferredPrompt: false })).toEqual({
+      kind: "show-instructions",
+    });
   });
 });

@@ -28,11 +28,11 @@ jobs:
       - name: Typecheck
         run: bunx tsc --noEmit
 
-      - name: Test
-        run: bun test
-
       - name: Build
         run: NODE_ENV=production bun run build
+
+      - name: Test
+        run: bun test
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4

@@ -340,3 +340,130 @@
 [dir="rtl"] .landing__badge {
   text-align: right;
 }
+
+/* Language selector custom dropdown */
+.landing__lang-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.landing__lang-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  min-height: var(--touch-min);
+  min-width: var(--touch-min);
+  border: 3px solid var(--c-accent);
+  background: var(--c-surface);
+  border-radius: var(--radius-pill);
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  transition: filter 0.15s ease;
+}
+
+.landing__lang-trigger:hover,
+.landing__lang-trigger:focus {
+  filter: brightness(1.05);
+  outline: none;
+}
+
+.landing__lang-flag {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.landing__lang-chevron {
+  font-size: 0.7rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+[dir="rtl"] .landing__lang-chevron {
+  transform: rotate(180deg);
+}
+
+.landing__lang-wrapper[aria-expanded="true"] .landing__lang-chevron {
+  transform: rotate(180deg);
+}
+
+[dir="rtl"] .landing__lang-wrapper[aria-expanded="true"] .landing__lang-chevron {
+  transform: rotate(0deg);
+}
+
+.landing__lang-menu {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  right: 0;
+  min-width: 180px;
+  background: var(--c-surface);
+  border: 2px solid var(--c-accent);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-pop);
+  z-index: 100;
+  overflow: hidden;
+  animation: landing__lang-menu-in 0.15s ease-out;
+}
+
+@keyframes landing__lang-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.landing__lang-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s ease;
+  white-space: nowrap;
+}
+
+.landing__lang-option:hover,
+.landing__lang-option:focus {
+  background: var(--c-primary-light);
+  outline: none;
+}
+
+.landing__lang-option.is-active {
+  background: var(--c-primary-light);
+}
+
+.landing__lang-option-flag {
+  font-size: 1.3rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.landing__lang-option-label {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--c-ink);
+}
+
+.landing__lang-option.is-active .landing__lang-option-label {
+  color: var(--c-primary);
+}
+
+@media (max-width: 480px) {
+  .landing__lang-menu {
+    right: -4px;
+    min-width: calc(100vw - 32px);
+  }
+}

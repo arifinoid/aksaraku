@@ -26,6 +26,12 @@ export const LOCALE_OPTIONS: readonly {
   { value: "ar", label: "العربية" },
 ];
 
+export const LOCALE_FLAG: Record<Locale, string> = {
+  id: "🇮🇩",
+  en: "🇬🇧",
+  ar: "🇸🇦",
+};
+
 export const applyDirection = (locale: string): void => {
   document.documentElement.lang = locale;
   document.documentElement.dir = isRtl(locale) ? "rtl" : "ltr";

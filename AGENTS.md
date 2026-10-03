@@ -1,155 +1,97 @@
-# AI Engineering Team — Aksaraku Launch Team
+# AGENTS.md — Aksaraku Workflow Rules (MANDATORY)
 
-> Rohmad's AI Engineering Team for Aksaraku — PWA edukasi balita (3+) tracing huruf/angka/shapes, mini-games, gamifikasi, parent dashboard, i18n (id/en/ar RTL), offline-first, Service Worker.
+**Applies to: ALL agents, ALL models, ALL providers, ALL sessions.**  
+No exceptions. If you don't understand → ASK Tung (Rohmad). Do not assume.
 
-## Team Roster
+---
 
-| Profile | Role | Focus |
-|---------|------|-------|
-| `planner` | Product Planner / PM | Launch plan, landing page spec, metrics, prioritization |
-| `backend-dev` | Backend Engineer | Cloudflare Workers/Pages config, SQLite sync, API endpoints |
-| `frontend-dev` | Frontend Engineer | PWA build, landing page, performance, accessibility |
-| `qa-engineer` | QA Engineer | Device testing (tablet touch), regression, a11y audit |
-| `devops` | DevOps Engineer | Cloudflare Pages deploy, CI/CD, custom domain, monitoring |
+## 1. GIT WORKFLOW (NON-NEGOTIABLE)
 
-**Coordinator**: `default` profile (kentung) — Rohmad's personal assistant.
+| Step | Action | Required |
+|------|--------|----------|
+| 1 | `git checkout -b feat/short-desc` | ✅ MUST branch from `main` |
+| 2 | Commit changes (`git commit -m "type(scope): msg"`) | ✅ Conventional commits |
+| 3 | `git push -u origin feat/short-desc` | ✅ Push branch |
+| 4 | Open PR via `gh pr create` | ✅ PR required |
+| 5 | Wait for review/approval | ✅ No self-merge without review |
+| 6 | `gh pr merge --squash --delete-branch` | ✅ Squash + delete branch |
 
-## Project Context
+**FORBIDDEN:** `git push origin main` directly. **Zero tolerance.**  
+Previous violation: commit `fdbeadb` (React #310 fix) pushed straight to main — **never again.**
 
-**Repo**: `/home/ubuntu/aksaraku` (existing, MVP-complete)
-**Stack**: Bun + React 19 + TypeScript + PixiJS + @react-three/fiber + Dexie + i18next
-**Hosting**: Cloudflare Pages (free tier, subdomain `aksaraku.pages.dev`)
-**Deploy**: `bash deploy.sh` (requires `wrangler login` from laptop)
+---
 
-## Sprint 1: Launch Ready (Week 1)
+## 2. TASK EXECUTION PROTOCOL
 
-### Critical Path
-1. **Cloudflare auth & deploy** — `wrangler login` → `bash deploy.sh`
-2. **Device testing** — Tablet Android/iOS: tracing accuracy, touch targets 64px, haptic, audio
-3. **Performance audit** — Lighthouse PWA score, bundle size, offline cache
-4. **Custom subdomain** — `aksaraku.pages.dev` live & HTTPS
+**Kantung (coordinator) → routes to correct profile:**
+- `planner` → spec/design tasks
+- `backend-dev` → API/data/storage
+- `frontend-dev` → UI/React/PixiJS
+- `qa-engineer` → test/device checklist
+- `devops` → infra/CI/deploy
 
-### Landing Page (Parallel)
-1. **Design brief** → `docs/specs/landing-page-brief.md` (planner)
-2. **Implement** → `/landing` route or separate `landing/` folder (frontend-dev)
-3. **Deploy** → Same domain `/` path
+**Each task:** Kanban card → assigned profile → worker spawns in isolated workspace → branch → PR → review → merge.
 
-## Workflow
+**Verification:** Every claim must have tool output proof (curl, build log, test result). "Trust me" = rejected.
 
-### Task Management
-- Board: `digital-product` (Kanban)
-- Workdir: `/home/ubuntu/aksaraku`
-- Tasks created via: `hermes kanban --board digital-product create "title" --assignee <profile> --workspace dir:/home/ubuntu/aksaraku`
-- **CRITICAL**: Always use `--workspace dir:/home/ubuntu/aksaraku` (scratch workspaces are ephemeral)
+---
 
-### Sprint Cycle
-1. **Planning** (planner): Define sprint goals, create Kanban tasks, assign to agents
-2. **Development** (backend-dev, frontend-dev): Pick up tasks, implement, create PRs
-3. **Review** (qa-engineer): Code review, run tests, block/approve
-4. **Deploy** (devops): Cloudflare Pages deploy
-5. **Retro** (planner): Summarize what went well, what didn't, action items
+## 3. MODEL/PROVIDER SWITCHING RULES
 
-### Communication Protocol
-- Tag agents in task descriptions: `@backend-dev`, `@frontend-dev`, etc.
-- Comments on tasks via: `hermes kanban comment <task-id> "message"`
-- Specs in `docs/specs/`, ADRs in `docs/adr/`, runbooks in `docs/runbooks/`
+When model/provider changes (9Router ↔ OpenRouter ↔ llm-kita.com ↔ local):
 
-## Coding Conventions
-
-### Git
-- Branch naming: `feat/<task-id>-<slug>`, `fix/<task-id>-<slug>`, `chore/<slug>`
-- Commit format: `type(scope): message` (conventional commits)
-- PRs require: description, test plan, breaking changes note
-- Squash merge to `main`
-
-### Code Style (per CLAUDE.md)
-- **Runtime**: Bun (no Node.js, no Express, no Vite, no better-sqlite3, no pg, no ws)
-- **Testing**: `bun test` only
-- **Typecheck**: `bunx tsc --noEmit`
-- **Build**: `NODE_ENV=production bun run build` (env var, not --define)
-- **Dependencies**: No new deps without reason (see CLAUDE.md forbidden list)
-
-### Definition of Done
-- [ ] Code written and self-reviewed
-- [ ] Tests written and passing (`bun test`)
-- [ ] Typecheck passes (`bunx tsc --noEmit`)
-- [ ] Linting passes (ESLint if configured)
-- [ ] PR reviewed by qa-engineer
-- [ ] Documentation updated
-- [ ] Deployed to Cloudflare Pages preview
-- [ ] Smoke test on real device (tablet preferred)
-
-## File Structure
-
-```
-aksaraku/
-├── AGENTS.md              # This file
-├── CLAUDE.md              # Project conventions (authoritative)
-├── deploy.sh              # Deploy script (run from laptop after wrangler login)
-├── wrangler.toml          # Cloudflare Pages config
-├── package.json           # Bun + deps
-├── dist/                  # Production build (gitignored)
-├── public/                # Static assets, manifest, sw.js
-├── src/
-│   ├── app/               # Routing, contexts
-│   ├── data/              # Phonemes, content
-│   ├── domain/            # Pure logic (no React/DOM)
-│   ├── features/          # Feature screens
-│   ├── game/              # Game logic
-│   ├── i18n/              # Locales (id/en/ar + RTL)
-│   ├── platform/          # Task runner
-│   ├── storage/           # IndexedDB (Dexie) + SQLite
-│   ├── ui/                # Reusable components
-│   ├── App.tsx            # Root component
-│   ├── index.ts           # Entry point (Bun.serve)
-│   └── index.html         # HTML entry
-├── scripts/
-│   └── build-sw.ts        # Service Worker precache injector
-└── tests/                 # bun test files
-```
-
-## Tooling
-- **RTK**: Terminal output compression — active at gateway level (~45% savings)
-- **Hermes compression**: Context window compression (threshold 50%, target 20%)
-- **Ruang**: 3D mission control at http://127.0.0.1:3001
-- **Kanban**: `hermes kanban --board digital-product`
-
-## Known Limitations & Workarounds
-
-### Workdir
-`terminal.workdir` in config does not propagate to chat sessions or Kanban tasks.
-**Workaround**: Always use `--workspace dir:/home/ubuntu/aksaraku` when creating Kanban tasks:
-```bash
-hermes kanban --board digital-product create "task title" \
-  --assignee backend-dev \
-  --workspace dir:/home/ubuntu/aksaraku
-```
-
-### Concurrent Task Workspaces (MANDATORY — learned the hard way 2026-10-03)
-Two tasks assigned `--workspace dir:<same-tree>` CANNOT run in parallel: one git tree holds one checkout. The 2026-10-03 collision (devops + frontend-dev both live in /home/ubuntu/aksaraku, mixed uncommitted work from two agents, one agent process had to be killed) is why this rule exists.
-
-**Policy — coordinator MUST pick one:**
-1. **Serial**: only one `dir:` task running at a time; gate the second task's start on the first's merge.
-2. **Parallel**: use isolated workspaces at creation:
-   ```bash
-   hermes kanban --board digital-product create "task" \
-     --assignee <profile> \
-     --workspace worktree --branch wt/<taskid>-<slug>
+1. **This AGENTS.md stays active** — rules don't reset
+2. **Fallback chain** in `/home/ubuntu/.hermes/config.yaml`:
+   ```yaml
+   fallback_providers: [9Router, OpenRouter, llm-kita.com]
    ```
-   Note: a task's workspace is fixed at creation — an existing `dir:` task cannot be migrated in place. Create a successor task with `worktree:` if needed.
+3. **Profile configs** in `/home/ubuntu/.hermes/profiles/{role}/config.yaml` — each role has its own `system_prompt` + `llm_config`
+4. **If quota exhausted (402/429):** STOP. Report to Tung. Do NOT fake completion.
+5. **If unsure about rule interpretation:** ASK Tung. Do not guess.
 
-**Branch + PR rules (all agents):** work on feature branches, PR to main (main auto-deploys). Never commit directly to main. Never mark a task done without running its curl-based acceptance criteria — the coordinator re-verifies every claim before closing (two false-dones occurred in Sprint 1).
+---
 
-### Skills Per Profile
-Hermes does not support granular per-skill toggling per profile. `hermes skills opt-out` is all-or-nothing (nuclear).
-**Workaround**: Each SOUL.md lists which skills to prioritize. Use `--skills` flag on Kanban tasks to preload specific skills:
-```bash
-hermes kanban --board digital-product create "implement API" \
-  --assignee backend-dev \
-  --workspace dir:/home/ubuntu/aksaraku \
-  --skills test-driven-development,systematic-debugging
-```
+## 4. VERIFICATION STANDARDS
 
-## Current Sprint Tasks (to be created)
+| Check | Tool | Pass Criteria |
+|-------|------|---------------|
+| Build | `bun run build` | Exit 0, dist/ generated |
+| Deploy | `curl -I https://aksaraku.pages.dev/app/` | HTTP 200 |
+| Lint | `bunx tsc --noEmit` | No new errors |
+| Test | `bun test` | All pass |
 
-See `hermes kanban --board digital-product list`
+**Screenshot/video evidence** required for UI changes.
+
+---
+
+## 5. BUG FIX WORKFLOW
+
+1. Reproduce → identify root cause (code trace)
+2. Minimal fix (shortest diff)
+3. Build + verify locally
+4. Branch → PR → review → merge
+5. Deploy → verify live URL
+
+**No drive-by fixes.** Every fix traced to source.
+
+---
+
+## 6. COMMUNICATION STYLE
+
+- Casual Indonesian: `gw` (I), `lu` (you), `Tung` (assistant)
+- Terse, caveman style — no fluff
+- Technical substance exact
+- No invented abbreviations
+
+---
+
+## 7. ESCALATION
+
+**Blocked on quota?** → Report to Tung, wait for top-up.  
+**Rule unclear?** → Ask Tung.  
+**Agent claims done but no proof?** → Reject, demand verification.
+
+---
+
+**Last updated:** 2026-10-03  
+**Authority:** Tung (Rohmad Arifin) — sole decision maker on rule changes.

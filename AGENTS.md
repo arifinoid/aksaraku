@@ -125,6 +125,21 @@ hermes kanban --board digital-product create "task title" \
   --workspace dir:/home/ubuntu/aksaraku
 ```
 
+### Concurrent Task Workspaces (MANDATORY — learned the hard way 2026-10-03)
+Two tasks assigned `--workspace dir:<same-tree>` CANNOT run in parallel: one git tree holds one checkout. The 2026-10-03 collision (devops + frontend-dev both live in /home/ubuntu/aksaraku, mixed uncommitted work from two agents, one agent process had to be killed) is why this rule exists.
+
+**Policy — coordinator MUST pick one:**
+1. **Serial**: only one `dir:` task running at a time; gate the second task's start on the first's merge.
+2. **Parallel**: use isolated workspaces at creation:
+   ```bash
+   hermes kanban --board digital-product create "task" \
+     --assignee <profile> \
+     --workspace worktree --branch wt/<taskid>-<slug>
+   ```
+   Note: a task's workspace is fixed at creation — an existing `dir:` task cannot be migrated in place. Create a successor task with `worktree:` if needed.
+
+**Branch + PR rules (all agents):** work on feature branches, PR to main (main auto-deploys). Never commit directly to main. Never mark a task done without running its curl-based acceptance criteria — the coordinator re-verifies every claim before closing (two false-dones occurred in Sprint 1).
+
 ### Skills Per Profile
 Hermes does not support granular per-skill toggling per profile. `hermes skills opt-out` is all-or-nothing (nuclear).
 **Workaround**: Each SOUL.md lists which skills to prioritize. Use `--skills` flag on Kanban tasks to preload specific skills:

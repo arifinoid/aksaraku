@@ -14,6 +14,7 @@ import type { Locale } from "../../domain/types";
 import {
   classifyInstall,
   detectPlatform,
+  resolveInstallClick,
   type InstallAction,
 } from "./install";
 import { pickInitialLocale } from "./locale";
@@ -82,13 +83,13 @@ const useInstall = () => {
     deferredRef.current = null;
   }, []);
 
-  return { action, triggerInstall };
+  return { action, triggerInstall, hasDeferredPrompt: deferredRef };
 };
 
 export function LandingPage() {
   const { t } = useTranslation();
   const [showInstructions, setShowInstructions] = useState(false);
-  const { action, triggerInstall } = useInstall();
+  const { action, triggerInstall, hasDeferredPrompt } = useInstall();
 
   // Set initial locale on mount.
   useEffect(() => {
@@ -98,12 +99,17 @@ export function LandingPage() {
   }, []);
 
   const handleInstallClick = useCallback(() => {
-    if (action.action === "prompt") {
+    const outcome = resolveInstallClick({
+      action,
+      hasDeferredPrompt: hasDeferredPrompt.current !== null,
+    });
+    if (outcome.kind === "go-to-app") {
+      window.location.assign("/app");
+    } else if (outcome.kind === "trigger-prompt") {
       void triggerInstall();
-    } else if (action.action === "instructions") {
+    } else {
       setShowInstructions(true);
     }
-    // action === "open" → no-op (already installed)
   }, [action, triggerInstall]);
 
   const handleLocaleChange = useCallback<EventHandler<SyntheticEvent<HTMLSelectElement>>>((e) => {
@@ -115,9 +121,12 @@ export function LandingPage() {
   }, []);
 
   const scrollToHow = useCallback(() => {
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
     document
       .getElementById("how-it-works")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+      ?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
   }, []);
 
   const installLabel = useMemo(() => {
@@ -127,10 +136,15 @@ export function LandingPage() {
   }, [action, t]);
 
   const instructionsKey = useMemo(() => {
-    if (action.action !== "instructions") return null;
-    return action.platform === "ios"
+    // The instructions action carries its platform; the "prompt without a
+    // deferred event" fallback falls back to what we detected on mount.
+    const platform =
+      action.action === "instructions"
+        ? action.platform
+        : detectPlatform(navigator.userAgent);
+    return platform === "ios"
       ? "landing.install.ios"
-      : action.platform === "android"
+      : platform === "android"
         ? "landing.install.android"
         : "landing.install.desktop";
   }, [action]);

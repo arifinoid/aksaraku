@@ -4,12 +4,11 @@ import {
   useMemo,
   useRef,
   useState,
-  type EventHandler,
-  type SyntheticEvent,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { changeLocale, LOCALE_OPTIONS } from "../../i18n";
+import { changeLocale, LOCALE_OPTIONS, useActiveLocale } from "../../i18n";
 import { isLocale } from "../../domain/locale";
+import { LOCALE_FLAG } from "../../i18n";
 import type { Locale } from "../../domain/types";
 import {
   classifyInstall,
@@ -38,14 +37,9 @@ const useInstall = () => {
     const platform = detectPlatform(navigator.userAgent);
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
-      // iOS Safari uses a different marker
       (navigator as Navigator & { standalone?: boolean }).standalone === true;
 
-    // Set initial state without prompt available.
-    setAction({
-      action: "instructions",
-      platform,
-    });
+    setAction({ action: "instructions", platform });
 
     const onBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
@@ -60,7 +54,6 @@ const useInstall = () => {
       onBeforeInstallPrompt as EventListener,
     );
 
-    // If already standalone, show "open".
     if (isStandalone) {
       setAction({ action: "open" });
     }
@@ -89,13 +82,40 @@ const useInstall = () => {
 export function LandingPage() {
   const { t } = useTranslation();
   const [showInstructions, setShowInstructions] = useState(false);
+  const [showLangMenu, setShowLangMenu] = useState(false);
+  const langMenuRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const { action, triggerInstall, hasDeferredPrompt } = useInstall();
 
-  // Set initial locale on mount.
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
     const locale = pickInitialLocale(saved, navigator.language);
     void changeLocale(locale);
+  }, []);
+
+  const handleLocaleChange = useCallback((locale: Locale) => {
+    localStorage.setItem(STORAGE_KEY, locale);
+    void changeLocale(locale);
+    setShowLangMenu(false);
+  }, []);
+
+  const handleLangTriggerClick = useCallback(() => {
+    setShowLangMenu((prev) => !prev);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        langMenuRef.current &&
+        !langMenuRef.current.contains(e.target as Node) &&
+        triggerRef.current &&
+        !triggerRef.current.contains(e.target as Node)
+      ) {
+        setShowLangMenu(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleInstallClick = useCallback(() => {
@@ -110,15 +130,7 @@ export function LandingPage() {
     } else {
       setShowInstructions(true);
     }
-  }, [action, triggerInstall]);
-
-  const handleLocaleChange = useCallback<EventHandler<SyntheticEvent<HTMLSelectElement>>>((e) => {
-    const value = e.currentTarget.value;
-    if (isLocale(value)) {
-      localStorage.setItem(STORAGE_KEY, value);
-      void changeLocale(value as Locale);
-    }
-  }, []);
+  }, [action, triggerInstall, hasDeferredPrompt]);
 
   const scrollToHow = useCallback(() => {
     const reduceMotion = window.matchMedia(
@@ -136,8 +148,6 @@ export function LandingPage() {
   }, [action, t]);
 
   const instructionsKey = useMemo(() => {
-    // The instructions action carries its platform; the "prompt without a
-    // deferred event" fallback falls back to what we detected on mount.
     const platform =
       action.action === "instructions"
         ? action.platform
@@ -145,9 +155,11 @@ export function LandingPage() {
     return platform === "ios"
       ? "landing.install.ios"
       : platform === "android"
-        ? "landing.install.android"
-        : "landing.install.desktop";
+      ? "landing.install.android"
+      : "landing.install.desktop";
   }, [action]);
+
+  const currentLocale = useActiveLocale();
 
   return (
     <div className="landing">
@@ -162,25 +174,53 @@ export function LandingPage() {
             <span>{t("app.name")}</span>
           </a>
           <div className="landing__nav-actions">
-            <label className="visually-hidden" htmlFor="lang-select">
-              {t("parent.language")}
-            </label>
-            <select
-              id="lang-select"
-              className="landing__lang"
-              onChange={handleLocaleChange}
-              defaultValue=""
+            <div
+              className="landing__lang-wrapper"
+              role="combobox"
+              aria-expanded={showLangMenu}
+              aria-haspopup="listbox"
               aria-label={t("parent.language")}
             >
-              <option value="" disabled>
-                🌐
-              </option>
-              {LOCALE_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+              <button
+                ref={triggerRef}
+                type="button"
+                className="landing__lang-trigger"
+                onClick={handleLangTriggerClick}
+                aria-label={t("parent.language")}
+                aria-expanded={showLangMenu}
+                aria-haspopup="listbox"
+              >
+                <span className="landing__lang-flag" aria-hidden="true">
+                  {LOCALE_FLAG[useActiveLocale()]}
+                </span>
+                <span className="landing__lang-chevron" aria-hidden="true">
+                  ▼
+                </span>
+              </button>
+              {showLangMenu && (
+                <div
+                  ref={langMenuRef}
+                  className="landing__lang-menu"
+                  role="listbox"
+                  aria-label={t("parent.language")}
+                >
+                  {LOCALE_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.value}
+                      role="option"
+                      className={`landing__lang-option ${useActiveLocale() === opt.value ? "is-active" : ""}`}
+                      onClick={() => handleLocaleChange(opt.value)}
+                      aria-selected={useActiveLocale() === opt.value}
+                    >
+                      <span className="landing__lang-option-flag" aria-hidden="true">
+                        {LOCALE_FLAG[opt.value]}
+                      </span>
+                      <span className="landing__lang-option-label">{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <button
               type="button"
               className="landing__install-btn"

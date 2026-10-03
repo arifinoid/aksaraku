@@ -98,11 +98,11 @@ export function TracingCanvas({
         const active =
           index === session.strokeIndex && session.phase !== "completed";
         if (stroke.points.length === 0) return;
+        guide.fill({ color: active ? ACTIVE_COLOR : GUIDE_COLOR });
         for (const point of stroke.points) {
           const screen = toScreenSpace(point, transform);
           guide.circle(screen.x, screen.y, active ? 3.4 : 2.4);
         }
-        guide.fill({ color: active ? ACTIVE_COLOR : GUIDE_COLOR });
       });
 
       progress.clear();

@@ -32,10 +32,10 @@ export interface TracingCanvasProps {
   readonly onCoverage: (coverage: number) => void;
 }
 
-const GUIDE_COLOR = 0xe7d8c4;
-const ACTIVE_COLOR = 0xffd166;
-const PROGRESS_COLOR = 0xff7a45;
-const MARKER_COLOR = 0x4cc9f0;
+const GUIDE_COLOR = 0x8a7663; // --c-muted: visible on white
+const ACTIVE_COLOR = 0xff7a45; // --c-primary: active stroke
+const PROGRESS_COLOR = 0xff7a45; // --c-primary: traced progress
+const MARKER_COLOR = 0x4cc9f0; // --c-secondary: start marker
 const MAX_RESOLUTION = 2;
 
 export function TracingCanvas({

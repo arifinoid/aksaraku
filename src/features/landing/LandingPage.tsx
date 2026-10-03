@@ -81,6 +81,7 @@ const useInstall = () => {
 
 export function LandingPage() {
   const { t } = useTranslation();
+  const activeLocale = useActiveLocale();
   const [showInstructions, setShowInstructions] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
   const langMenuRef = useRef<HTMLDivElement>(null);
@@ -191,7 +192,7 @@ export function LandingPage() {
                 aria-haspopup="listbox"
               >
                 <span className="landing__lang-flag" aria-hidden="true">
-                  {LOCALE_FLAG[useActiveLocale()]}
+                  {LOCALE_FLAG[activeLocale]}
                 </span>
                 <span className="landing__lang-chevron" aria-hidden="true">
                   ▼
@@ -208,9 +209,9 @@ export function LandingPage() {
                     <button
                       key={opt.value}
                       role="option"
-                      className={`landing__lang-option ${useActiveLocale() === opt.value ? "is-active" : ""}`}
+                      className={`landing__lang-option ${activeLocale === opt.value ? "is-active" : ""}`}
                       onClick={() => handleLocaleChange(opt.value)}
-                      aria-selected={useActiveLocale() === opt.value}
+                      aria-selected={activeLocale === opt.value}
                     >
                       <span className="landing__lang-option-flag" aria-hidden="true">
                         {LOCALE_FLAG[opt.value]}

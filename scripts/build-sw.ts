@@ -19,6 +19,9 @@ const glob = new Bun.Glob("**/*");
 const files: string[] = [];
 for await (const file of glob.scan({ cwd: DIST, onlyFiles: true })) {
   if (file.endsWith(".map") || file === "sw.js") continue;
+  // Skip intermediate copies of the app shell — the canonical precache
+  // routes are "/" (landing rewrite) and "/app/" (directory index).
+  if (file === "app.html" || file === "app/index.html") continue;
   files.push(toRoute(file));
 }
 files.sort();

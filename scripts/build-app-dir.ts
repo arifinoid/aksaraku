@@ -20,8 +20,17 @@ const APP_DIR = `${DIST}/app`;
 
 const shell = await Bun.file(APP_HTML).text();
 
+// The shell is served at BOTH / (where ./ resolves to dist root — fine) and
+// /app/ (where ./ resolves to /app/* — assets don't exist there, so the SPA
+// fallback serves HTML at the asset URL and the app renders blank). The app
+// copies therefore get root-absolute asset refs; dist/index.html itself is
+// left untouched to keep the change minimal.
+const absolute = shell
+  .replaceAll('href="./', 'href="/')
+  .replaceAll('src="./', 'src="/');
+
 // Copy the app shell under public/ so build-sw.ts precaches it too.
-await Bun.write(`${DIST}/app.html`, shell);
-await Bun.write(`${APP_DIR}/index.html`, shell);
+await Bun.write(`${DIST}/app.html`, absolute);
+await Bun.write(`${APP_DIR}/index.html`, absolute);
 
 console.log("✅ app shell: dist/app/index.html (+ dist/app.html) written");

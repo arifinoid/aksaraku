@@ -1,50 +1,160 @@
 name: CI
-
-on:
+'on':
   push:
-    branches: [main]
+    branches:
+    - main
   pull_request:
-    branches: [main]
-
+    branches:
+    - main
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   build-test:
     name: Typecheck + Test + Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+    - uses: actions/checkout@v4
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+    - name: Install dependencies
+      run: bun install --frozen-lockfile
+    - name: Typecheck
+      run: bunx tsc --noEmit
+    - name: Build
+      run: NODE_ENV=production bun run build
+    - name: Test
+      run: bun test src
+    - name: Upload dist artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: dist
+        path: dist/
+        retention-days: 7
+  ai-review:
+    name: AI Code Review Gate
+    needs: build-test
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
+      contents: read
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Install Hermes CLI
+      run: 'curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
+        echo "$HOME/.hermes/bin" >> $GITHUB_PATH'
+    - name: Get PR info
+      id: pr_info
+      run: |
+        PR_NUMBER=$(echo "${{ github.ref }}" | sed 's|refs/pull/||;s|/merge||')
+        PR_BODY=$(gh pr view $PR_NUMBER --json body -q .body)
+        PRD_PATH=$(echo "$PR_BODY" | grep -i '^PRD:' | head -1 | sed 's/^PRD:[[:space:]]*//' | xargs)
+        gh pr diff $PR_NUMBER > /tmp/pr.diff
+        echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+        echo "prd_path=$PRD_PATH" >> $GITHUB_OUTPUT
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Validate PRD link exists
+      if: steps.pr_info.outputs.prd_path == ''
+      run: |
+        echo "::error::PRD link missing in PR description. Add 'PRD: <path>' line."
+        exit 1
+    - name: Validate PRD file exists
+      run: |
+        if [ ! -f "${{ steps.pr_info.outputs.prd_path }}" ]; then
+          echo "::error::PRD file not found at ${{ steps.pr_info.outputs.prd_path }}"
+          exit 1
+        fi
+    - name: Validate AC format (Given/When/Then)
+      run: |
+        PR_BODY=$(gh pr view ${{ steps.pr_info.outputs.pr_number }} --json body -q .body)
+        if ! echo "$PR_BODY" | grep -q "## Acceptance Criteria"; then
+          echo "::error::Missing '## Acceptance Criteria' section in PR body"
+          exit 1
+        fi
+        AC_SECTION=$(echo "$PR_BODY" | sed -n '/## Acceptance Criteria/,/^## /p')
+        for KW in Given When Then; do
+          if ! echo "$AC_SECTION" | grep -qi "$KW"; then
+            echo "::error::Acceptance Criteria must contain '$KW' keyword"
+            exit 1
+          fi
+        done
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Check gate flag
+      id: gate
+      run: |
+        if [ "${{ vars.REVIEW_GATE_ENABLED }}" = "true" ]; then
+          echo "enabled=true" >> $GITHUB_OUTPUT
+        else
+          echo "enabled=false" >> $GITHUB_OUTPUT
+          echo "AI review gate disabled (REVIEW_GATE_ENABLED != true). AC checks above still enforced."
+        fi
+    - name: Build review prompt
+      if: steps.gate.outputs.enabled == 'true'
+      run: |
+        python3 .github/scripts/build_review_prompt.py \
+          .github/ai-review-prompt.md \
+          "${{ steps.pr_info.outputs.prd_path }}" \
+          /tmp/pr.diff /tmp/review_prompt.txt
+    - name: Run Hermes review
+      id: run_review
+      if: steps.gate.outputs.enabled == 'true'
+      run: |
+        RESULT=$(hermes chat --provider 9router --model arifinoid-hermes-combo -q "$(cat /tmp/review_prompt.txt)" 2>&1)
+        echo "result<<EOF" >> $GITHUB_OUTPUT
+        echo "$RESULT" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+    - name: Parse reviewer verdict
+      id: parse
+      if: steps.gate.outputs.enabled == 'true'
+      run: |
+        RESULT="${{ steps.run_review.outputs.result }}"
+        JSON=$(echo "$RESULT" | grep -A 100 '^{' | head -20)
+        echo "$JSON" > /tmp/verdict.json
+        if ! jq -e . /tmp/verdict.json >/dev/null 2>&1; then
+          echo "::error::Reviewer returned invalid JSON"
+          echo "result=$RESULT"
+          exit 1
+        fi
+        echo "passed=$(jq -r .passed /tmp/verdict.json)" >> $GITHUB_OUTPUT
+        echo "security_count=$(jq -r '.security_concerns | length' /tmp/verdict.json)" >> $GITHUB_OUTPUT
+        echo "logic_count=$(jq -r '.logic_errors | length' /tmp/verdict.json)" >> $GITHUB_OUTPUT
+        echo "summary=$(jq -r .summary /tmp/verdict.json)" >> $GITHUB_OUTPUT
+    - name: Post review comment
+      if: steps.gate.outputs.enabled == 'true'
+      run: |
+        PR_NUMBER=${{ steps.pr_info.outputs.pr_number }}
+        VERDICT_JSON=$(cat /tmp/verdict.json)
+        if [ "${{ steps.parse.outputs.passed }}" = "true" ]; then VERDICT="APPROVED"; else VERDICT="REQUEST CHANGES"; fi
+        gh pr comment $PR_NUMBER --body "### AI Code Review Result
+        **Verdict**: $VERDICT
+        **Summary**: ${{ steps.parse.outputs.summary }}
+        **Security concerns**: ${{ steps.parse.outputs.security_count }}
+        **Logic errors**: ${{ steps.parse.outputs.logic_count }}
 
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+        <details>
+        <summary>Full JSON</summary>
 
-      - name: Typecheck
-        run: bunx tsc --noEmit
-
-      - name: Build
-        run: NODE_ENV=production bun run build
-
-      - name: Test
-        run: bun test src
-
-      # E2E Test temporarily disabled - run locally for now
-      # - name: E2E Test
-      #   run: npx playwright test
-
-      - name: Upload dist artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
-          retention-days: 7
-
+        ```json
+        $VERDICT_JSON
+        ```
+        </details>"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Fail if review failed
+      if: steps.parse.outputs.passed != 'true' && steps.gate.outputs.enabled == 'true'
+      run: |
+        echo "::error::AI review failed: ${{ steps.parse.outputs.summary }}"
+        echo "Security concerns: ${{ steps.parse.outputs.security_count }}"
+        echo "Logic errors: ${{ steps.parse.outputs.logic_count }}"
+        exit 1
   deploy:
     name: Deploy to Cloudflare Pages
     needs: build-test
@@ -54,30 +164,25 @@ jobs:
       name: production
       url: https://aksaraku.pages.dev
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
-
-      - name: Build
-        run: NODE_ENV=production bun run build
-
-      - name: Create project (first deploy only)
-        run: |
-          if ! npx wrangler pages project list 2>/dev/null | grep -q "aksaraku"; then
-            npx wrangler pages project create aksaraku --production-branch=main
-          fi
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-
-      - name: Deploy
-        run: npx wrangler pages deploy dist --project-name=aksaraku --branch=main
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    - uses: actions/checkout@v4
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+    - name: Install dependencies
+      run: bun install --frozen-lockfile
+    - name: Build
+      run: NODE_ENV=production bun run build
+    - name: Create project (first deploy only)
+      run: |
+        if ! npx wrangler pages project list 2>/dev/null | grep -q "aksaraku"; then
+          npx wrangler pages project create aksaraku --production-branch=main
+        fi
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    - name: Deploy
+      run: npx wrangler pages deploy dist --project-name=aksaraku --branch=main
+      env:
+        CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

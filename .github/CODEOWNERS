@@ -1,0 +1,7 @@
+# CODEOWNERS — Required reviews for all PRs to main
+
+* @kentung
+@qa-engineer
+@planner
+
+# Protect main — no self-merge

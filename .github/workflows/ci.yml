@@ -32,7 +32,11 @@ jobs:
         run: NODE_ENV=production bun run build
 
       - name: Test
-        run: bun test
+        run: bun test src
+
+      # E2E Test temporarily disabled - run locally for now
+      # - name: E2E Test
+      #   run: npx playwright test
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4

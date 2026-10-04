@@ -103,19 +103,17 @@ test.describe('Happy Path - Session & Task Selection', () => {
   });
 
   // TC-010: Play screen displays level categories
-  test.skip('TC-010: Play screen shows category tabs', async ({ page }) => {
-    // TODO: Tile click navigates but PlayScreen elements not found
-    // Need to debug: tile selector, navigation timing, or PlayScreen rendering
+  test('TC-010: Play screen shows category tabs', async ({ page }) => {
     await createProfile(page, 'CategoryTest');
     await page.waitForTimeout(1000);
     
-    // Navigate to play screen - click first tile (tracing)
-    const firstTile = page.locator('.tile-grid button, [class*="tile"]').first();
-    await expect(firstTile).toBeVisible({ timeout: 10000 });
-    await firstTile.click();
+    // Navigate to play screen - click first tile (tracing ✏️)
+    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    await expect(tracingTile).toBeVisible({ timeout: 10000 });
+    await tracingTile.click();
     
     // Should show category tabs
-    await expect(page.locator('.play__tabs').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.play__tabs')).toBeVisible({ timeout: 10000 });
     await expect(page.locator('button.play__tab').first()).toBeVisible();
     
     // Should show grid of items
@@ -123,13 +121,12 @@ test.describe('Happy Path - Session & Task Selection', () => {
   });
 
   // TC-011: Click category → shows task list
-  test.skip('TC-011: Category tabs switch task lists', async ({ page }) => {
-    // TODO: Blocked by TC-010 - PlayScreen not loading
+  test('TC-011: Category tabs switch task lists', async ({ page }) => {
     await createProfile(page, 'TaskListTest');
     await page.waitForTimeout(1000);
     
-    const firstTile = page.locator('.tile-grid button, [class*="tile"]').first();
-    await firstTile.click();
+    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    await tracingTile.click();
     
     await expect(page.locator('.glyph-card').first()).toBeVisible({ timeout: 10000 });
     
@@ -149,13 +146,12 @@ test.describe('Happy Path - Session & Task Selection', () => {
   });
 
   // TC-012: Click task → opens tracing screen
-  test.skip('TC-012: Click task opens tracing canvas', async ({ page }) => {
-    // TODO: Blocked by TC-010 - PlayScreen not loading
+  test('TC-012: Click task opens tracing canvas', async ({ page }) => {
     await createProfile(page, 'CanvasTest');
     await page.waitForTimeout(1000);
     
-    const firstTile = page.locator('.tile-grid button, [class*="tile"]').first();
-    await firstTile.click();
+    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    await tracingTile.click();
     
     const firstTask = page.locator('.glyph-card').first();
     await expect(firstTask).toBeVisible({ timeout: 10000 });

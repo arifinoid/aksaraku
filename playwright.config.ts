@@ -26,7 +26,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: '/home/ubuntu/.bun/bin/bun --hot src/index.ts',
+    command: 'bun --hot src/index.ts',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,

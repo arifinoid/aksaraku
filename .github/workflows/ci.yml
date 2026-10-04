@@ -54,7 +54,7 @@ jobs:
       run: |
         PR_NUMBER=$(echo "${{ github.ref }}" | sed 's|refs/pull/||;s|/merge||')
         PR_BODY=$(gh pr view $PR_NUMBER --json body -q .body)
-        PRD_PATH=$(echo "$PR_BODY" | grep -i "^PRD:" | head -1 | sed 's/^PRD:\\s*//' | xargs)
+        PRD_PATH=$(echo "$PR_BODY" | grep -i '^PRD:' | head -1 | sed 's/^PRD:[[:space:]]*//' | xargs)
         gh pr diff $PR_NUMBER > /tmp/pr.diff
         echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
         echo "prd_path=$PRD_PATH" >> $GITHUB_OUTPUT

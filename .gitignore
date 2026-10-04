@@ -1,10 +1,17 @@
 # dependencies (bun install)
 node_modules
 
+# lockfile (bun uses bun.lockb)
+package-lock.json
+
 # output
 out
 dist
 *.tgz
+
+# test artifacts
+playwright-report
+test-results
 
 # code coverage
 coverage

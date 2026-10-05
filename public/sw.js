@@ -1,4 +1,4 @@
-const CACHE = "aksaraku-v3";
+const CACHE = "aksaraku-v4";
 const PRECACHE = ["/", "/manifest.webmanifest", "/icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -6,7 +6,6 @@ self.addEventListener("install", (event) => {
     caches
       .open(CACHE)
       .then((cache) =>
-        // allSettled: one missing file must not break the whole install.
         Promise.allSettled(PRECACHE.map((path) => cache.add(path))),
       )
       .then(() => self.skipWaiting()),
@@ -52,7 +51,12 @@ self.addEventListener("fetch", (event) => {
       const network = fetch(request)
         .then((response) => cachePut(request, response))
         .catch(() => cached ?? Response.error());
-      return cached ?? network;
+
+      if (cached) {
+        network.then(() => {}); // keep sw alive for background update
+        return cached;
+      }
+      return network;
     }),
   );
 });

@@ -1,5 +1,5 @@
 import { Application, Container, Graphics } from "pixi.js";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   createSession,
   currentStroke,
@@ -30,6 +30,7 @@ export interface TracingCanvasProps {
   readonly label: string;
   readonly onEvent: (event: TraceEvent, session: TraceSession) => void;
   readonly onCoverage: (coverage: number) => void;
+  readonly onError?: (message: string) => void;
 }
 
 const GUIDE_COLOR = 0x8a7663; // --c-muted: visible on white
@@ -37,6 +38,8 @@ const ACTIVE_COLOR = 0xff7a45; // --c-primary: active stroke
 const PROGRESS_COLOR = 0xff7a45; // --c-primary: traced progress
 const MARKER_COLOR = 0x4cc9f0; // --c-secondary: start marker
 const MAX_RESOLUTION = 2;
+const GUIDE_RADIUS = 3.4;
+const ACTIVE_RADIUS = 4.4;
 
 export function TracingCanvas({
   item,
@@ -47,8 +50,10 @@ export function TracingCanvas({
   label,
   onEvent,
   onCoverage,
+  onError,
 }: TracingCanvasProps) {
   const hostRef = useRef<HTMLDivElement>(null);
+  const [fatal, setFatal] = useState<string | null>(null);
   const sessionRef = useRef<TraceSession>(createSession(item.strokes));
   const flagsRef = useRef({ audioEnabled, hapticsEnabled, reduceMotion });
   const handlersRef = useRef({ onEvent, onCoverage });
@@ -82,6 +87,7 @@ export function TracingCanvas({
     let drawing = false;
     let activePointer: number | null = null;
     let coverage = 0;
+    let observer: ResizeObserver | null = null;
 
     sessionRef.current = createSession(item.strokes);
 
@@ -101,7 +107,7 @@ export function TracingCanvas({
         const color = active ? ACTIVE_COLOR : GUIDE_COLOR;
         for (const point of stroke.points) {
           const screen = toScreenSpace(point, transform);
-          guide.circle(screen.x, screen.y, active ? 3.4 : 2.4);
+          guide.circle(screen.x, screen.y, active ? ACTIVE_RADIUS : GUIDE_RADIUS);
           guide.fill({ color });
         }
       });
@@ -230,15 +236,31 @@ export function TracingCanvas({
     };
 
     void (async () => {
-      await app.init({
+      const options = {
         backgroundAlpha: 0,
         antialias: true,
         autoStart: false,
         resizeTo: host,
         resolution: Math.min(window.devicePixelRatio || 1, MAX_RESOLUTION),
         autoDensity: true,
-        powerPreference: "high-performance",
-      });
+        powerPreference: "high-performance" as const,
+      };
+
+      try {
+        await app.init(options);
+      } catch {
+        // WebGL/WebGPU context creation can fail outright (blocklisted GPU,
+        // hardware acceleration off, too many live contexts). The 2D canvas
+        // renderer needs no GPU, so retry before giving up.
+        try {
+          await app.init({ ...options, preference: "canvas" });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          setFatal(message);
+          onError?.(message);
+          return;
+        }
+      }
 
       if (disposed) {
         app.destroy(true, { children: true });
@@ -275,6 +297,19 @@ export function TracingCanvas({
       }
       window.addEventListener("resize", draw);
       window.addEventListener("orientationchange", draw);
+      // `resizeTo` only reacts to window resizes. If the host is still 0x0 when
+      // the app initialises (layout not settled) the canvas would stay blank
+      // forever, so also watch the host itself.
+      const next = new ResizeObserver(() => {
+        const width = host.clientWidth;
+        const height = host.clientHeight;
+        if (width > 0 && height > 0) {
+          app.renderer.resize(width, height);
+        }
+        draw();
+      });
+      observer = next;
+      next.observe(host);
       draw();
     })();
 
@@ -288,6 +323,8 @@ export function TracingCanvas({
       app.canvas.removeEventListener("pointercancel", onUp);
       window.removeEventListener("resize", draw);
       window.removeEventListener("orientationchange", draw);
+      observer?.disconnect();
+      observer = null;
       app.ticker.remove(pulse);
       app.destroy(true, { children: true });
     };
@@ -296,6 +333,18 @@ export function TracingCanvas({
   useEffect(() => {
     runtimeRef.current?.applyMotion(reduceMotion);
   }, [reduceMotion]);
+
+  if (fatal) {
+    return (
+      <div
+        className="tracing-canvas tracing-canvas--error"
+        role="alert"
+        aria-label={label}
+      >
+        <p className="tracing-canvas__error">{fatal}</p>
+      </div>
+    );
+  }
 
   return <div className="tracing-canvas" ref={hostRef} role="img" aria-label={label} />;
 }

@@ -1,4 +1,8 @@
 import { Application, Container, Graphics } from "pixi.js";
+// Pixi v8 calls `new Function` internally; our CSP (public/_headers,
+// script-src 'self') blocks eval, so this registers eval-free polyfills.
+// Must stay before any `new Application()` call.
+import "pixi.js/unsafe-eval";
 import { useEffect, useRef, useState } from "react";
 import {
   createSession,

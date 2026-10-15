@@ -108,10 +108,20 @@ jobs:
       id: run_review
       if: steps.gate.outputs.enabled == 'true'
       run: |
+        # NOTE: don't let `set -e` swallow the reviewer error — print it so
+        # the log shows WHY hermes failed (auth, quota, model name, ...).
+        set +e
         RESULT=$(hermes chat --provider 9router --model arifinoid-hermes-combo -q "$(cat /tmp/review_prompt.txt)" 2>&1)
+        CODE=$?
+        set -e
+        echo "$RESULT"
         echo "result<<EOF" >> $GITHUB_OUTPUT
         echo "$RESULT" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
+        if [ $CODE -ne 0 ]; then
+          echo "::error::hermes chat exited with code $CODE (see output above)"
+          exit $CODE
+        fi
     - name: Parse reviewer verdict
       id: parse
       if: steps.gate.outputs.enabled == 'true'

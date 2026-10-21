@@ -168,6 +168,7 @@ export const id = {
     cancel: "Batal",
   },
   session: {
+    loading: "Sebentar ya…",
     expiredTitle: "Waktunya istirahat",
     expiredHint:
       "Sesi belajar hari ini sudah selesai. Minta Bunda atau Ayah membuka lagi ya.",

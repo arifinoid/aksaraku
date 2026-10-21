@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "../../app/SessionContext";
-import { isBreakDueSince, isExpiredSince } from "../../domain";
+import { isBreakDue, isSessionExpired } from "../../domain";
 import { ParentGate } from "../parent/ParentGate";
 import "./session.css";
 
@@ -15,8 +15,7 @@ export function SessionGate({ children }: SessionGateProps) {
   const { t } = useTranslation();
   const {
     ready,
-    startedAt,
-    lastBreakAt,
+    session,
     limitMin,
     breakReminderMin,
     restart,
@@ -35,17 +34,19 @@ export function SessionGate({ children }: SessionGateProps) {
     };
   }, []);
 
-  if (!ready) {
-    return <>{children}</>;
+  // Fail closed: until the session is known, the child must not reach the
+  // app. Rendering the children here would let a storage failure (or a slow
+  // load) open the app with no screen-time limit at all.
+  if (!ready || !session) {
+    return (
+      <div className="session-loading" role="status" aria-live="polite">
+        <p className="session-loading__text">{t("session.loading")}</p>
+      </div>
+    );
   }
 
-  const expired = isExpiredSince(startedAt, limitMin, now);
-  const breakDue = isBreakDueSince(
-    startedAt,
-    breakReminderMin,
-    lastBreakAt,
-    now,
-  );
+  const expired = isSessionExpired(session, limitMin, now);
+  const breakDue = isBreakDue(session, breakReminderMin, now);
 
   if (expired) {
     return (

@@ -54,3 +54,15 @@
   min-width: 200px;
   text-align: center;
 }
+
+.session-loading {
+  min-height: 60vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+}
+
+.session-loading__text {
+  font-weight: 700;
+  color: var(--c-muted);
+}

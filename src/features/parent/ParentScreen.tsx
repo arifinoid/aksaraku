@@ -6,7 +6,7 @@ import {
   BREAK_REMINDER_OPTIONS,
   SESSION_LIMIT_OPTIONS,
   formatRemaining,
-  remainingSince,
+  remainingMs,
   type AppSettings,
   type Locale,
   type Profile,
@@ -41,7 +41,7 @@ const TICK_MS = 10_000;
 
 function SessionRemaining() {
   const { t } = useTranslation();
-  const { startedAt, limitMin } = useSession();
+  const { session, limitMin } = useSession();
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -49,10 +49,12 @@ function SessionRemaining() {
     return () => clearInterval(id);
   }, []);
 
+  if (!session) return null;
+
   return (
     <p className="panel__hint">
       {t("parent.sessionRemaining", {
-        time: formatRemaining(remainingSince(startedAt, limitMin, now)),
+        time: formatRemaining(remainingMs(session, limitMin, now)),
       })}
     </p>
   );

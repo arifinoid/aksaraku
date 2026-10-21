@@ -170,6 +170,7 @@ export const en: Dict = {
     cancel: "Cancel",
   },
   session: {
+    loading: "One moment…",
     expiredTitle: "Time for a break",
     expiredHint:
       "Today's learning session is over. Ask a parent to unlock it again.",

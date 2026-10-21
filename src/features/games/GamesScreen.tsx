@@ -64,7 +64,7 @@ export function GamesScreen({ profile, settings, onBack }: GamesScreenProps) {
 
   return (
     <Screen title={t("games.title")} onBack={onBack}>
-      <div className="games__hub">
+      <div className="games__hub motion-stagger">
         <Tile
           label={t("games.matching")}
           icon="🧩"

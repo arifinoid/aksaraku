@@ -115,7 +115,7 @@ export function PlayScreen({ profile, settings, onBack }: PlayScreenProps) {
         ))}
       </div>
 
-      <div className="play__grid">
+      <div className="play__grid motion-stagger">
         {items.map((item) => {
           const entry = levels.get(item.id);
           const level = masteryLevel(entry?.score, entry?.attempts ?? 0);
@@ -123,7 +123,7 @@ export function PlayScreen({ profile, settings, onBack }: PlayScreenProps) {
             <button
               key={item.id}
               type="button"
-              className={`glyph-card glyph-card--${level}`}
+              className={`glyph-card glyph-card--${level} pressable`}
               onClick={() => setView({ kind: "trace", id: item.id })}
             >
               <span>{item.glyph}</span>

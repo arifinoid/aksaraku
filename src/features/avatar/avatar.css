@@ -53,11 +53,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: var(--c-bg-2);
-  font-size: 1.3rem;
+  font-size: 1.8rem;
 }
 
 .avatar__option-name {

@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import type { StarCount } from "../../domain";
-import { Button } from "../../ui";
+import { Button, StarRow } from "../../ui";
 import "../play/play.css";
 
 export interface GameSummaryProps {
@@ -24,7 +24,7 @@ export function GameSummary({
 
   return (
     <div className="play__overlay">
-      <p className="play__stars">{"⭐".repeat(stars) || "💪"}</p>
+      <StarRow stars={stars} />
       <h2 className="play__overlay-title">{t("games.finished")}</h2>
       <p className="games__prompt-text">
         {message ?? t("games.score", { correct, total })}

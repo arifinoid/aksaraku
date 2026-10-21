@@ -188,6 +188,8 @@ export const id = {
     retry: "Coba Lagi",
     reset: "Atur Ulang Data",
     resetHint: "Menghapus semua profil dan kemajuan di perangkat ini.",
+    crash: "Ayah, ada yang-error. Coba lagi ya.",
+    crashRetry: "Coba Lagi",
   },
   landing: {
     nav: {

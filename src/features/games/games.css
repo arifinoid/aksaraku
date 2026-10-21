@@ -55,15 +55,19 @@
   border-radius: var(--radius-lg);
   background: var(--c-surface);
   box-shadow: var(--shadow-soft);
+  font-family: var(--font-display);
   font-size: clamp(1.8rem, 6vw, 2.8rem);
   font-weight: 800;
   cursor: pointer;
-  transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+  transition:
+    transform var(--motion-fast) var(--motion-out),
+    border-color var(--motion-fast) var(--motion-out),
+    background var(--motion-fast) var(--motion-out);
   touch-action: manipulation;
 }
 
 .option-card:active {
-  transform: translateY(3px);
+  transform: translateY(3px) scale(0.95);
   box-shadow: none;
 }
 
@@ -178,13 +182,20 @@
 }
 
 .swatch {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   border: 4px solid transparent;
   cursor: pointer;
   box-shadow: var(--shadow-soft);
   touch-action: manipulation;
+  transition:
+    transform var(--motion-fast) var(--motion-out),
+    border-color var(--motion-fast) var(--motion-out);
+}
+
+.swatch:active {
+  transform: scale(0.92);
 }
 
 .swatch--active {
@@ -227,4 +238,16 @@
 @keyframes pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.06); }
+}
+
+/*
+ * The balloon is the biggest target in the game, so it gets the loudest
+ * feedback: it squashes on press and tips over when it pops.
+ */
+.balloon:active {
+  transform: translateY(4px) scale(0.94);
+}
+
+.balloon--pop {
+  animation: pop 0.35s var(--motion-out) forwards;
 }

@@ -7,6 +7,7 @@ import {
   initI18n,
   isRtl,
 } from "./i18n";
+import { setupFonts } from "./platform/fonts";
 import { setupPwa } from "./platform/pwa";
 import { LandingPage } from "./features/landing/LandingPage";
 import { pickInitialLocale } from "./features/landing/locale";
@@ -28,6 +29,7 @@ const applyRtlFlag = (): void => {
 
 setupLanding();
 applyRtlFlag();
+setupFonts();
 setupPwa();
 
 const elem = document.getElementById("root")!;

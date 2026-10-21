@@ -1,0 +1,226 @@
+/*
+ * Motion system.
+ *
+ * Every animation in the app is defined here, so the whole thing moves the
+ * same way. The rules are deliberately short: a toddler's attention moves
+ * on quickly, and an animation they cannot skip is a delay, not a reward.
+ *
+ * Two things drive all of it:
+ *
+ * - `--motion-*` tokens in src/index.css hold the durations and curves.
+ * - `prefers-reduced-motion` and the in-app "reduce motion" switch both
+ *   neutralise everything declared here. JavaScript-driven animation (the
+ *   Pixi ticker, the R3F frame loop) is NOT covered by this file and has to
+ *   be handled in code.
+ *
+ * FILL MODE MATTERS. Entrance animations use `backwards`, not `both`.
+ * `both` retains the final keyframe values indefinitely, and an animation
+ * that owns `transform` keeps owning it: the retained `transform` both
+ * blocks the `:active` press transform and turns the element into a
+ * containing block for `position: fixed` descendants. `backwards` applies
+ * the first keyframe during the stagger delay and then hands the property
+ * back to the normal cascade.
+ */
+
+/* --- Press feedback ---------------------------------------------------- */
+
+/*
+ * The core interaction loop of the app: a child taps something and needs to
+ * see that the tap registered. The default `:active` press (a 3px nudge)
+ * is too quiet for that, so interactive surfaces get a proper squash.
+ */
+.pressable {
+  transition:
+    transform var(--motion-fast) var(--motion-out),
+    box-shadow var(--motion-fast) var(--motion-out),
+    filter var(--motion-fast) var(--motion-out);
+  will-change: transform;
+}
+
+.pressable:active:not(:disabled) {
+  transform: translateY(4px) scale(0.96);
+}
+
+/* --- Entrances ---------------------------------------------------------- */
+
+/*
+ * Screens fade and lift in. The key is to remount the element: React keeps
+ * the same DOM node across route changes, so an animation only replays when
+ * the class is added fresh.
+ *
+ * NOTE: this animation animates `transform`, and `animation-fill-mode: both`
+ * retains the final `transform` value indefinitely. A retained transform
+ * makes the element a containing block for `position: fixed` descendants.
+ * That is why `.screen` uses `motion-fade` (opacity only) instead of
+ * `motion-enter` — the tracing success overlay is `position: fixed` and
+ * would otherwise be trapped inside the screen instead of covering the
+ * viewport. Use `motion-enter` only on elements that have no fixed
+ * descendants.
+ */
+@keyframes motion-enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.motion-enter {
+  animation: motion-enter var(--motion-slow) var(--motion-out) backwards;
+}
+
+/* A softer variant for large blocks that should not slide. */
+@keyframes motion-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.motion-fade {
+  animation: motion-fade var(--motion-base) var(--motion-out) backwards;
+}
+
+/* --- Pop ---------------------------------------------------------------- */
+
+/*
+ * For moments of success: a reward appears, a star lands, an option is
+ * chosen. The overshoot is what makes it read as "pop" rather than "fade".
+ */
+@keyframes motion-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.motion-pop {
+  animation: motion-pop var(--motion-slow) var(--motion-spring) both;
+}
+
+/* A star that lands a beat after the one before it. */
+.motion-pop--stagger-1 {
+  animation-delay: 90ms;
+}
+
+.motion-pop--stagger-2 {
+  animation-delay: 180ms;
+}
+
+.motion-pop--stagger-3 {
+  animation-delay: 270ms;
+}
+
+/* --- Attention ---------------------------------------------------------- */
+
+/* A gentle nudge for something the child should look at. */
+@keyframes motion-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.motion-bounce {
+  animation: motion-bounce 1.8s var(--motion-out) infinite;
+}
+
+/* A slow pulse for a hint that something is available. */
+@keyframes motion-glow {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.08);
+  }
+}
+
+.motion-glow {
+  animation: motion-glow 2.2s ease-in-out infinite;
+}
+
+/* --- Reward celebration ------------------------------------------------- */
+
+/*
+ * The reward moment. A ring of colour expands behind the unlocked item so
+ * the child's eye goes straight to it. Purely decorative, so it is hidden
+ * from assistive technology.
+ */
+@keyframes motion-ring {
+  0% {
+    opacity: 0.85;
+    transform: scale(0.35);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+.motion-ring {
+  position: absolute;
+  inset: -18%;
+  border-radius: 50%;
+  border: 6px solid var(--c-accent);
+  pointer-events: none;
+  animation: motion-ring 900ms var(--motion-out) forwards;
+}
+
+@keyframes motion-confetti {
+  0% {
+    opacity: 1;
+    transform: translateY(-12vh) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(78vh) rotate(540deg);
+  }
+}
+
+.motion-confetti {
+  position: fixed;
+  top: 0;
+  font-size: 1.6rem;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  animation: motion-confetti var(--motion-slow) linear forwards;
+}
+
+/* --- Staggered lists ---------------------------------------------------- */
+
+/*
+ * Grids of glyph cards or reward tiles. Each child fades in slightly after
+ * the one before it, which reads as the group arriving rather than the
+ * screen popping.
+ */
+.motion-stagger > * {
+  animation: motion-enter var(--motion-base) var(--motion-out) backwards;
+}
+
+.motion-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.motion-stagger > *:nth-child(2) { animation-delay: 45ms; }
+.motion-stagger > *:nth-child(3) { animation-delay: 90ms; }
+.motion-stagger > *:nth-child(4) { animation-delay: 135ms; }
+.motion-stagger > *:nth-child(5) { animation-delay: 180ms; }
+.motion-stagger > *:nth-child(6) { animation-delay: 225ms; }
+.motion-stagger > *:nth-child(7) { animation-delay: 270ms; }
+.motion-stagger > *:nth-child(8) { animation-delay: 315ms; }
+.motion-stagger > *:nth-child(n + 9) { animation-delay: 360ms; }

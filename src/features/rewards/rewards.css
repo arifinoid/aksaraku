@@ -21,6 +21,10 @@
   border: 3px solid var(--c-success);
   background: var(--c-surface);
   box-shadow: var(--shadow-soft);
+  /* The card is the positioning context for the expanding ring, so the
+     ring is allowed to spill outside the card. */
+  position: relative;
+  overflow: visible;
 }
 
 .reward-card__emoji {
@@ -58,3 +62,38 @@
   justify-content: center;
   max-width: 520px;
 }
+
+/*
+ * The celebration emoji. Its own class rather than the star row's: the
+ * stars are sized for a row of glyphs, this is a single character.
+ */
+.rewards__burst {
+  font-size: clamp(3rem, 14vw, 5rem);
+  line-height: 1;
+}
+
+/*
+ * The celebration overlay. The confetti is a separate layer behind the
+ * content so it falls past the reward card instead of over the text.
+ */
+.rewards__celebrate {
+  position: fixed;
+  overflow: hidden;
+}
+
+.rewards__confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.rewards__celebrate > *:not(.rewards__confetti) {
+  position: relative;
+  z-index: 1;
+}
+
+/*
+ * The unlocked card carries an expanding ring so the child's eye goes
+ * straight to the thing they just earned.
+ */

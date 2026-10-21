@@ -32,7 +32,7 @@ export function HomeScreen({
         />
       }
     >
-      <div className="tile-grid">
+      <div className="tile-grid motion-stagger">
         <Tile
           label={t("home.tracing")}
           icon="✏️"

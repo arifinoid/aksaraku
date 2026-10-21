@@ -1,5 +1,13 @@
-const CACHE = "aksaraku-v4";
+const CACHE = "aksaraku-v5";
 const PRECACHE = ["/", "/manifest.webmanifest", "/icon.svg"];
+
+/**
+ * The app shell lives at `/app/` (see public/_redirects). It must be the
+ * offline fallback for every `/app` navigation — falling back to "/" would
+ * serve the landing page, whose relative asset URLs do not resolve under
+ * `/app/` and leave the child staring at a blank screen.
+ */
+const APP_SHELL = "/app/";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -38,10 +46,19 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
 
   if (request.mode === "navigate") {
+    const isAppRoute = url.pathname === APP_SHELL || url.pathname.startsWith("/app");
     event.respondWith(
       fetch(request)
         .then((response) => cachePut(request, response))
-        .catch(() => caches.match(request).then((cached) => cached ?? caches.match("/"))),
+        .catch(() =>
+          caches
+            .match(request)
+            .then(
+              (cached) =>
+                cached ??
+                caches.match(isAppRoute ? APP_SHELL : "/"),
+            ),
+        ),
     );
     return;
   }

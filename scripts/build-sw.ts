@@ -15,15 +15,26 @@ const toRoute = (file: string): string => {
   return normalized === "index.html" ? "/" : `/${normalized}`;
 };
 
+/**
+ * The app shell must be reachable offline under the URL the child actually
+ * navigates to. Cloudflare serves `/app/` from `dist/app/index.html` (see
+ * public/_redirects), so that exact route has to be precached — otherwise the
+ * navigation fallback in public/sw.js answers with the landing page and the
+ * app never opens offline.
+ */
+const APP_ROUTES = ["/app/"];
+
 const glob = new Bun.Glob("**/*");
 const files: string[] = [];
 for await (const file of glob.scan({ cwd: DIST, onlyFiles: true })) {
   if (file.endsWith(".map") || file === "sw.js") continue;
-  // Skip intermediate copies of the app shell — the canonical precache
-  // routes are "/" (landing rewrite) and "/app/" (directory index).
+  // `dist/app/index.html` and `dist/app.html` are copies of the same shell.
+  // Only the canonical route "/app/" is precached; the copies would just
+  // duplicate the HTML in the cache.
   if (file === "app.html" || file === "app/index.html") continue;
   files.push(toRoute(file));
 }
+files.push(...APP_ROUTES);
 files.sort();
 
 if (files.length === 0) {

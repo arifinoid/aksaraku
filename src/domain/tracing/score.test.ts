@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import type { StrokePath, Vec2 } from "../types";
 import { line, samplePath } from "./sampling";
 import { scoreSession, starsForAccuracy } from "./score";
-import { createSession, tracePoint } from "./session";
+import { createSession, endStroke, tracePoint } from "./session";
 
 const p = (x: number, y: number): Vec2 => ({ x, y });
 
@@ -18,7 +18,8 @@ const completedSession = () => {
   [10, 20, 30, 40, 50, 60, 70].forEach((x, index) => {
     session = tracePoint(session, p(x, 50), index * 100).session;
   });
-  return session;
+  // The item closes when the child lifts their finger.
+  return endStroke(session, 700).session;
 };
 
 describe("starsForAccuracy", () => {
@@ -36,10 +37,12 @@ describe("scoreSession", () => {
     const session = completedSession();
     const score = scoreSession(session, 1000);
 
-    expect(score.accuracy).toBeCloseTo(0.875);
+    // The stroke reached the completion threshold, so it scores in full
+    // instead of being capped at the raw coverage.
+    expect(score.accuracy).toBe(1);
     expect(score.offTrackCount).toBe(0);
     expect(score.deviationAvg).toBeCloseTo(0);
-    expect(score.durationMs).toBe(600);
-    expect(score.stars).toBe(2);
+    expect(score.durationMs).toBe(700);
+    expect(score.stars).toBe(3);
   });
 });

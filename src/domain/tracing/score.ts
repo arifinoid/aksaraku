@@ -1,4 +1,4 @@
-import { overallCoverage, type TraceSession } from "./session";
+import { traceAccuracy, type TraceSession } from "./session";
 
 export type StarCount = 0 | 1 | 2 | 3;
 
@@ -17,7 +17,7 @@ export const scoreSession = (
   session: TraceSession,
   now: number,
 ): TraceScore => {
-  const accuracy = overallCoverage(session);
+  const accuracy = traceAccuracy(session);
   const end = session.completedAt ?? now;
   const start = session.startedAt ?? end;
   return {

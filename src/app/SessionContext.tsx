@@ -4,15 +4,18 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import {
+  bankSession,
   defaultScreenTime,
   markBreak,
   restartSession,
   resumeSession,
   startSession,
+  touchSession,
   updateBreakReminder,
   updateSessionLimit,
   type PlaySession,
@@ -29,6 +32,7 @@ import {
 
 export interface SessionValue {
   readonly ready: boolean;
+  readonly session: PlaySession | null;
   readonly startedAt: number;
   readonly lastBreakAt: number | null;
   readonly limitMin: number;
@@ -40,6 +44,14 @@ export interface SessionValue {
 }
 
 const SessionContext = createContext<SessionValue | null>(null);
+
+/**
+ * How often the app records that it is still being used.
+ *
+ * This anchors the screen-time accounting: the time between two heartbeats
+ * is charged even if the app is killed in between.
+ */
+const HEARTBEAT_MS = 30_000;
 
 export interface SessionProviderProps {
   readonly profileId: ProfileId;
@@ -63,17 +75,22 @@ export function SessionProvider({ profileId, children }: SessionProviderProps) {
         runTask(loadSession(profileId)),
       ]);
       if (!active) return;
-      if (settingResult._tag === "Left" || sessionResult._tag === "Left") {
-        return;
-      }
 
-      const stored = sessionResult.right;
+      // A storage failure must not leave the child without a screen-time
+      // limit, and it must not block the app from loading either. Fall back
+      // to the default limit and a fresh session, and carry on.
+      const setting =
+        settingResult._tag === "Right"
+          ? settingResult.right
+          : defaultScreenTime(profileId);
+      const stored =
+        sessionResult._tag === "Right" ? sessionResult.right : undefined;
       const next =
         stored === undefined
           ? startSession(profileId, now)
           : resumeSession(stored, now);
 
-      setSetting(settingResult.right);
+      setSetting(setting);
       setSession(next);
       setReady(true);
       void runTask(saveSession(next));
@@ -83,6 +100,71 @@ export function SessionProvider({ profileId, children }: SessionProviderProps) {
       active = false;
     };
   }, [profileId]);
+
+  /**
+   * Ends the foreground stretch when the app is hidden and starts a new one
+   * when it comes back.
+   *
+   * Without this, closing the app and reopening it would hand the child a
+   * fresh allowance — the time in between simply vanished. Banking keeps the
+   * budget intact across reloads, which is what makes the parental limit
+   * actually enforceable.
+   */
+  useEffect(() => {
+    if (!ready) return;
+
+    const onVisibilityChange = () => {
+      const now = Date.now();
+      setSession((current) => {
+        if (!current) return current;
+        const next =
+          document.visibilityState === "hidden"
+            ? bankSession(current, now)
+            : resumeSession(current, now);
+        void runTask(saveSession(next));
+        return next;
+      });
+    };
+
+    const onPageHide = () => {
+      setSession((current) => {
+        if (!current) return current;
+        const next = bankSession(current, Date.now());
+        void runTask(saveSession(next));
+        return next;
+      });
+    };
+
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("pagehide", onPageHide);
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("pagehide", onPageHide);
+    };
+  }, [ready]);
+
+  /**
+   * Records that the app is still in use.
+   *
+   * `lastSeenAt` is the anchor for charging screen time, so it has to track
+   * reality while the child is playing. Without this heartbeat a reload
+   * would discard the time played since the session was loaded.
+   */
+  useEffect(() => {
+    if (!ready) return;
+
+    const id = setInterval(() => {
+      if (document.visibilityState === "hidden") return;
+      setSession((current) => {
+        if (!current) return current;
+        const next = touchSession(current, Date.now());
+        void runTask(saveSession(next));
+        return next;
+      });
+    }, HEARTBEAT_MS);
+
+    return () => clearInterval(id);
+  }, [ready]);
 
   const restart = useCallback(() => {
     setSession((current) => {
@@ -128,6 +210,7 @@ export function SessionProvider({ profileId, children }: SessionProviderProps) {
   const value = useMemo<SessionValue>(
     () => ({
       ready,
+      session,
       startedAt: session?.startedAt ?? Date.now(),
       lastBreakAt: session?.lastBreakAt ?? null,
       limitMin: setting.sessionLimitMin,
@@ -139,6 +222,7 @@ export function SessionProvider({ profileId, children }: SessionProviderProps) {
     }),
     [
       ready,
+      session,
       session?.startedAt,
       session?.lastBreakAt,
       setting.sessionLimitMin,

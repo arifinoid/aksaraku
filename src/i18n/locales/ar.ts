@@ -170,6 +170,7 @@ export const ar: Dict = {
     cancel: "إلغاء",
   },
   session: {
+    loading: "لحظة من فضلك…",
     expiredTitle: "وقت الاستراحة",
     expiredHint: "انتهت جلسة التعلّم اليوم. اطلب من أحد الوالدين فتحها مجددًا.",
     parentUnlock: "الوالدين",

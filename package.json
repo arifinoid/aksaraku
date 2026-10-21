@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun --hot src/index.ts",
-    "build": "NODE_ENV=production bun build ./src/index.html ./src/landing.html --outdir=dist --sourcemap --target=browser --minify --splitting --env='BUN_PUBLIC_*' --entry-naming=[dir]/[name].[ext] && cp -r public/. dist/ && bun scripts/build-app-dir.ts && bun scripts/build-sw.ts",
+    "build": "bun scripts/clean-dist.ts && NODE_ENV=production bun build ./src/index.html ./src/landing.html --outdir=dist --sourcemap --target=browser --minify --splitting --env='BUN_PUBLIC_*' --entry-naming=[dir]/[name].[ext] && cp -r public/. dist/ && bun scripts/build-app-dir.ts && bun scripts/build-sw.ts",
     "start": "NODE_ENV=production bun src/index.ts",
     "test": "bun test src",
     "typecheck": "bunx tsc --noEmit"

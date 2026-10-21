@@ -190,6 +190,8 @@ export const en: Dict = {
     retry: "Try Again",
     reset: "Reset Data",
     resetHint: "Deletes all profiles and progress on this device.",
+    crash: "Oops, something went wrong. Let's try that again.",
+    crashRetry: "Try Again",
   },
   landing: {
     nav: {

@@ -185,6 +185,17 @@ Referensi: `docs/specs/` (spesifikasi fitur), `docs/infra/architecture.md`
   `COMPLETION_THRESHOLD` hanya aturan "lanjut ke stroke berikutnya", bukan
   aturan penilaian. Item ditutup saat jari diangkat (`endStroke`), bukan saat
   coverage penuh.
+- **Font HARUS self-host di `public/fonts/`, JANGAN `@font-face` di `src/`.**
+  CSP-nya `font-src 'self' data:`, jadi font dari CDN diblokir; dan bundler CSS
+  Bun akan base64-inline setiap font yang dirujuk `@font-face` (+180 KB di
+  critical path). `public/fonts/fonts.css` di-load runtime lewat
+  `src/platform/fonts.ts` (`setupFonts()`), sehingga font tetap file terpisah
+  yang bisa di-cache dan masuk precache service worker.
+- **Semua animasi CSS lewat `src/ui/motion.css` + token `--motion-*`**
+  (`src/index.css`). Durasi & easing tidak boleh ditulis literal di komponen.
+  `prefers-reduced-motion` dan `data-motion="reduced"` menetralkan file itu
+  otomatis; animasi JS (Pixi ticker, `useFrame`) tidak - harus cek
+  `settings.reduceMotion` manual.
 
 ### Status fase
 

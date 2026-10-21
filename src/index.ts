@@ -15,11 +15,43 @@ const assetPath = async (name: string): Promise<string> => {
   return `public/${name}`;
 };
 
+/**
+ * The fonts directory. `Bun.file().exists()` is false for a directory, so
+ * this checks the directory itself rather than a file inside it.
+ */
+const fontsDir = await (async () => {
+  if (process.env.NODE_ENV === "production") {
+    const built = "dist/fonts";
+    if (await Bun.file(`${built}/fonts.css`).exists()) return built;
+  }
+  return "public/fonts";
+})();
+
 const [swPath, manifestPath, iconPath] = await Promise.all([
   assetPath("sw.js"),
   assetPath("manifest.webmanifest"),
   assetPath("icon.svg"),
 ]);
+
+/**
+ * The self-hosted web fonts. They live in `public/fonts/` so the build
+ * copies them verbatim instead of the CSS bundler base64-inlining them
+ * (see `src/platform/fonts.ts` for the full reasoning).
+ *
+ * The catch-all route below would otherwise answer these requests with the
+ * app shell, and the browser would try to parse HTML as CSS.
+ */
+const fontFile = (name: string) => ({
+  GET: async () => {
+    const file = Bun.file(`${fontsDir}/${name}`);
+    if (!(await file.exists())) {
+      return new Response("Not found", { status: 404 });
+    }
+    return new Response(file, {
+      headers: { "content-type": "font/woff2" },
+    });
+  },
+});
 
 const server = serve({
   routes: {
@@ -29,6 +61,14 @@ const server = serve({
     ),
     "/sw.js": staticFile(swPath, "text/javascript"),
     "/icon.svg": staticFile(iconPath, "image/svg+xml"),
+    "/fonts/fonts.css": staticFile(`${fontsDir}/fonts.css`, "text/css"),
+    "/fonts/nunito-latin.woff2": fontFile("nunito-latin.woff2"),
+    "/fonts/nunito-latin-ext.woff2": fontFile("nunito-latin-ext.woff2"),
+    "/fonts/baloo2-latin.woff2": fontFile("baloo2-latin.woff2"),
+    "/fonts/baloo2-latin-ext.woff2": fontFile("baloo2-latin-ext.woff2"),
+    "/fonts/baloo-bhaijaan2-arabic.woff2": fontFile(
+      "baloo-bhaijaan2-arabic.woff2",
+    ),
     "/api/health": {
       GET: () => Response.json({ status: "ok", app: "aksaraku" }),
     },

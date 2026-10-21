@@ -17,7 +17,7 @@ import { newId } from "../../platform/ids";
 import { speakPhoneme } from "../../platform/speech";
 import { runTask } from "../../platform/task";
 import { recordAttempt, saveAttempt } from "../../storage";
-import { Button, Screen } from "../../ui";
+import { Button, Screen, StarRow } from "../../ui";
 import "./play.css";
 
 export interface TracingScreenProps {
@@ -168,9 +168,7 @@ export function TracingScreen({
 
       {score ? (
         <div className="play__overlay">
-          <p className="play__stars">
-            {"⭐".repeat(score.stars) || "💪"}
-          </p>
+          <StarRow stars={score.stars} />
           <h2 className="play__overlay-title">{t("play.great")}</h2>
           <div className="play__overlay-actions">
             <Button

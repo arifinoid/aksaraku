@@ -12,7 +12,9 @@
 }
 
 .screen__title {
-  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4.5vw, 2.6rem);
+  font-weight: 800;
   flex: 1;
 }
 
@@ -55,12 +57,14 @@
   background: var(--c-surface);
   box-shadow: var(--shadow-soft);
   cursor: pointer;
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition:
+    transform var(--motion-fast) var(--motion-out),
+    box-shadow var(--motion-fast) var(--motion-out);
   touch-action: manipulation;
 }
 
 .tile:active:not(:disabled) {
-  transform: translateY(3px);
+  transform: translateY(4px) scale(0.96);
   box-shadow: none;
 }
 
@@ -72,9 +76,13 @@
 .tile__icon {
   font-size: 3.5rem;
   line-height: 1;
+  /* The icon is the first thing a child looks for, so it gets the
+     bouncy display face rather than the body face. */
+  font-family: var(--font-display);
 }
 
 .tile__label {
+  font-family: var(--font-display);
   font-size: 1.3rem;
   font-weight: 800;
 }
@@ -123,8 +131,8 @@
 }
 
 .switch__input {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   accent-color: var(--c-primary);
   cursor: pointer;
 }
@@ -172,4 +180,30 @@
 
 .panel__hint {
   color: var(--c-muted);
+}
+
+/*
+ * Crash screen. The mascot is doing the reassuring, the copy is short
+ * because a child cannot read a paragraph, and the button is the only
+ * thing that matters.
+ */
+.crash {
+  align-items: center;
+  text-align: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  max-width: 420px;
+  animation: motion-pop var(--motion-slow) var(--motion-spring) both;
+}
+
+.crash__emoji {
+  font-size: 4.5rem;
+  line-height: 1;
+  animation: motion-bounce 2.4s var(--motion-out) infinite;
+}
+
+.crash__text {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 800;
 }

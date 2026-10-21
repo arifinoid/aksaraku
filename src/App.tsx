@@ -353,6 +353,7 @@ export function App() {
         <RewardCelebration
           audioEnabled={settings.audioEnabled}
           hapticsEnabled={settings.hapticsEnabled}
+          reduceMotion={settings.reduceMotion}
         />
       </SessionProvider>
     </RewardsProvider>

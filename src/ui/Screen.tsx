@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useDirection } from "../i18n";
 import { Button } from "./Button";
+import "./motion.css";
 import "./screen.css";
 
 export interface ScreenProps {
@@ -24,7 +25,7 @@ export function Screen({
   const backIcon = direction === "rtl" ? "→" : "←";
 
   return (
-    <section className="screen">
+    <section className="screen motion-enter">
       {(title || onBack || actions) && (
         <header className="screen__header">
           {onBack ? (
@@ -40,7 +41,9 @@ export function Screen({
           {actions ? <div className="screen__actions">{actions}</div> : null}
         </header>
       )}
-      <div className={`screen__content${center ? " screen__content--center" : ""}`}>
+      <div
+        className={`screen__content${center ? " screen__content--center" : ""}`}
+      >
         {children}
       </div>
     </section>

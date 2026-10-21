@@ -9,15 +9,24 @@
   border-radius: var(--radius-pill);
   font-weight: 800;
   font-size: 1.15rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
   cursor: pointer;
   box-shadow: var(--shadow-soft);
-  transition: transform 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease;
+  transition:
+    transform var(--motion-fast) var(--motion-out),
+    box-shadow var(--motion-fast) var(--motion-out),
+    filter var(--motion-fast) var(--motion-out);
   user-select: none;
   touch-action: manipulation;
 }
 
+/*
+ * The press is deliberately squashy rather than a small nudge: a child
+ * tapping a 64px target needs clear feedback that the tap registered.
+ */
 .btn:active:not(:disabled) {
-  transform: translateY(3px);
+  transform: translateY(3px) scale(0.95);
   box-shadow: none;
 }
 
@@ -34,7 +43,7 @@
 }
 
 .btn--sm {
-  min-height: 48px;
+  min-height: 56px;
   font-size: 0.95rem;
   padding: 0 var(--space-3);
 }

@@ -27,7 +27,7 @@ export function CollectionScreen({ onBack }: CollectionScreenProps) {
       {KINDS.map((kind) => (
         <section key={kind} className="panel">
           <h2 className="panel__title">{t(`rewards.kind.${kind}`)}</h2>
-          <div className="rewards__grid">
+          <div className="rewards__grid motion-stagger">
             {definitions
               .filter((definition) => definition.kind === kind)
               .map((definition) => {

@@ -58,7 +58,7 @@ When model/provider changes (9Router ↔ OpenRouter ↔ llm-kita.com ↔ local):
 | Build | `bun run build` | Exit 0, dist/ generated |
 | Deploy | `curl -I https://aksaraku.pages.dev/app/` | HTTP 200 |
 | Lint | `bunx tsc --noEmit` | No new errors |
-| Test | `bun test` | All pass |
+| Test | `bun test src` | All pass |
 
 **Screenshot/video evidence** required for UI changes.
 

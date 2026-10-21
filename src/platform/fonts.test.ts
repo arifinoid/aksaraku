@@ -115,4 +115,35 @@ describe("motion system", () => {
     expect(index).toContain("prefers-reduced-motion: reduce");
     expect(index).toContain('data-motion="reduced"');
   });
+
+  test("entrance animations do not retain their transform", () => {
+    // `animation-fill-mode: both` keeps the final keyframe's values in
+    // effect indefinitely. An entrance animation that owns `transform`
+    // would then keep owning it: the retained transform blocks the
+    // `:active` press transform, and it turns the element into a
+    // containing block for `position: fixed` descendants — which would
+    // trap the tracing success overlay inside the screen.
+    //
+    // `backwards` applies the first keyframe during the stagger delay and
+    // then hands the property back to the normal cascade.
+    const motion = readFileSync(join(SRC, "ui", "motion.css"), "utf8");
+    const entrance = [...motion.matchAll(/animation: (motion-[\w-]+)[^;]*;/g)]
+      .map((match) => match[0]!)
+      .filter((rule) => rule.includes("motion-enter") || rule.includes("motion-fade"));
+
+    expect(entrance.length).toBeGreaterThan(0);
+    for (const rule of entrance) {
+      expect(rule).not.toMatch(/\bboth\b/);
+    }
+  });
+
+  test("the screen wrapper does not animate transform", () => {
+    // `Screen` renders the tracing success overlay (`position: fixed`)
+    // as a child. A transform on the screen would make it the containing
+    // block for that overlay, so the overlay would cover the screen
+    // instead of the viewport.
+    const screen = readFileSync(join(SRC, "ui", "Screen.tsx"), "utf8");
+    expect(screen).toContain("motion-fade");
+    expect(screen).not.toContain("motion-enter");
+  });
 });

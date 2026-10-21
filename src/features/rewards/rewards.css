@@ -64,6 +64,15 @@
 }
 
 /*
+ * The celebration emoji. Its own class rather than the star row's: the
+ * stars are sized for a row of glyphs, this is a single character.
+ */
+.rewards__burst {
+  font-size: clamp(3rem, 14vw, 5rem);
+  line-height: 1;
+}
+
+/*
  * The celebration overlay. The confetti is a separate layer behind the
  * content so it falls past the reward card instead of over the text.
  */

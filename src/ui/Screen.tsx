@@ -25,7 +25,7 @@ export function Screen({
   const backIcon = direction === "rtl" ? "→" : "←";
 
   return (
-    <section className="screen motion-enter">
+    <section className="screen motion-fade">
       {(title || onBack || actions) && (
         <header className="screen__header">
           {onBack ? (

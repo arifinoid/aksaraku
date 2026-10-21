@@ -73,7 +73,7 @@ export function RewardCelebration({
         </div>
       )}
 
-      <p className="play__stars motion-pop" aria-hidden="true">
+      <p className="rewards__burst motion-pop" aria-hidden="true">
         🎉
       </p>
       <h2 className="play__overlay-title">{t("rewards.unlocked")}</h2>

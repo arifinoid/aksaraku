@@ -12,6 +12,14 @@
  *   neutralise everything declared here. JavaScript-driven animation (the
  *   Pixi ticker, the R3F frame loop) is NOT covered by this file and has to
  *   be handled in code.
+ *
+ * FILL MODE MATTERS. Entrance animations use `backwards`, not `both`.
+ * `both` retains the final keyframe values indefinitely, and an animation
+ * that owns `transform` keeps owning it: the retained `transform` both
+ * blocks the `:active` press transform and turns the element into a
+ * containing block for `position: fixed` descendants. `backwards` applies
+ * the first keyframe during the stagger delay and then hands the property
+ * back to the normal cascade.
  */
 
 /* --- Press feedback ---------------------------------------------------- */
@@ -38,8 +46,16 @@
 /*
  * Screens fade and lift in. The key is to remount the element: React keeps
  * the same DOM node across route changes, so an animation only replays when
- * the class is added fresh. `Screen` sets `key` on the wrapper, which is
- * what makes this fire.
+ * the class is added fresh.
+ *
+ * NOTE: this animation animates `transform`, and `animation-fill-mode: both`
+ * retains the final `transform` value indefinitely. A retained transform
+ * makes the element a containing block for `position: fixed` descendants.
+ * That is why `.screen` uses `motion-fade` (opacity only) instead of
+ * `motion-enter` — the tracing success overlay is `position: fixed` and
+ * would otherwise be trapped inside the screen instead of covering the
+ * viewport. Use `motion-enter` only on elements that have no fixed
+ * descendants.
  */
 @keyframes motion-enter {
   from {
@@ -53,7 +69,7 @@
 }
 
 .motion-enter {
-  animation: motion-enter var(--motion-slow) var(--motion-out) both;
+  animation: motion-enter var(--motion-slow) var(--motion-out) backwards;
 }
 
 /* A softer variant for large blocks that should not slide. */
@@ -67,7 +83,7 @@
 }
 
 .motion-fade {
-  animation: motion-fade var(--motion-base) var(--motion-out) both;
+  animation: motion-fade var(--motion-base) var(--motion-out) backwards;
 }
 
 /* --- Pop ---------------------------------------------------------------- */
@@ -196,7 +212,7 @@
  * screen popping.
  */
 .motion-stagger > * {
-  animation: motion-enter var(--motion-base) var(--motion-out) both;
+  animation: motion-enter var(--motion-base) var(--motion-out) backwards;
 }
 
 .motion-stagger > *:nth-child(1) { animation-delay: 0ms; }

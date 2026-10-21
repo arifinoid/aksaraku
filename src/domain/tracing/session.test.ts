@@ -4,7 +4,9 @@ import { line, samplePath } from "./sampling";
 import {
   createSession,
   currentStroke,
+  endStroke,
   overallCoverage,
+  traceAccuracy,
   tracePoint,
   type TraceEvent,
   type TraceSession,
@@ -84,27 +86,48 @@ describe("tracePoint", () => {
     expect(step.session.startedAt).toBe(0);
   });
 
-  test("completes a single stroke item", () => {
+  test("completes a single stroke item once the child lifts their finger", () => {
     const points = [10, 20, 30, 40, 50, 60, 70].map((x) => p(x, 50));
-    const { session, events } = run([horizontalStroke()], points);
+    const { session } = run([horizontalStroke()], points);
 
-    expect(session.phase).toBe("completed");
-    expect(session.completedAt).toBe(60);
-    expect(overallCoverage(session)).toBeCloseTo(0.875);
-    expect(events[events.length - 1]?._tag).toBe("ItemCompleted");
-    expect(events.filter((event) => event._tag === "OffTrack")).toHaveLength(0);
+    expect(session.phase).toBe("drawing");
+
+    const step = endStroke(session, 100);
+
+    expect(step.event._tag).toBe("ItemCompleted");
+    expect(step.session.phase).toBe("completed");
+    expect(step.session.completedAt).toBe(100);
+    expect(overallCoverage(step.session)).toBeCloseTo(0.875);
   });
 
-  test("advances through multiple strokes", () => {
+  test("keeps the last stroke open while it is still incomplete", () => {
+    // Only the first segment of the stroke is traced.
+    const { session } = run([horizontalStroke()], [p(10, 50), p(20, 50)]);
+
+    const step = endStroke(session, 100);
+
+    expect(step.event._tag).toBe("Progress");
+    expect(step.session.phase).toBe("drawing");
+    expect(step.session.strokeIndex).toBe(0);
+  });
+
+  test("advances to the next stroke when a finished one is closed", () => {
     const strokes = [horizontalStroke(), horizontalStroke()];
     const points = [10, 20, 30, 40, 50, 60, 70, 10, 20, 30, 40, 50, 60, 70].map(
       (x) => p(x, 50),
     );
     const { session, events } = run(strokes, points);
 
-    expect(session.phase).toBe("completed");
+    // The first stroke passed the completion threshold and moved the child on
+    // to the second one; the second is closed by lifting the finger.
     expect(session.strokeIndex).toBe(1);
+    expect(session.phase).toBe("drawing");
     expect(events.some((event) => event._tag === "StrokeCompleted")).toBe(true);
+
+    const closed = endStroke(session, 200);
+
+    expect(closed.event._tag).toBe("ItemCompleted");
+    expect(closed.session.phase).toBe("completed");
   });
 
   test("reports off track points without covering segments", () => {
@@ -119,9 +142,27 @@ describe("tracePoint", () => {
   test("ignores input after completion", () => {
     const points = [10, 20, 30, 40, 50, 60, 70].map((x) => p(x, 50));
     const { session } = run([horizontalStroke()], points);
-    const step = tracePoint(session, p(50, 50), 999);
+    const completed = endStroke(session, 100).session;
+    const step = tracePoint(completed, p(50, 50), 999);
 
     expect(step.event._tag).toBe("Ignored");
-    expect(step.session).toBe(session);
+    expect(step.session).toBe(completed);
+  });
+});
+
+describe("traceAccuracy", () => {
+  test("a closed stroke scores one", () => {
+    const points = [10, 20, 30, 40, 50, 60, 70].map((x) => p(x, 50));
+    const { session } = run([horizontalStroke()], points);
+    const closed = endStroke(session, 100).session;
+
+    expect(closed.phase).toBe("completed");
+    expect(traceAccuracy(closed)).toBe(1);
+  });
+
+  test("an unfinished stroke is scored by what was traced", () => {
+    const { session } = run([horizontalStroke()], [p(10, 50), p(20, 50)]);
+
+    expect(traceAccuracy(session)).toBeLessThan(1);
   });
 });

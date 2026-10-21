@@ -9,6 +9,7 @@ import {
   currentStroke,
   designPerPx,
   designTransform,
+  endStroke,
   toDesignSpace,
   toScreenSpace,
   tracePoint,
@@ -227,6 +228,16 @@ export function TracingCanvas({
       activePointer = null;
       if (app.canvas.hasPointerCapture(event.pointerId)) {
         app.canvas.releasePointerCapture(event.pointerId);
+      }
+
+      // Lifting the finger closes the current stroke. The child does not have
+      // to trace the last few pixels of a curve — the stroke is accepted once
+      // the completion threshold is reached.
+      const step = endStroke(sessionRef.current, performance.now());
+      if (step.session !== sessionRef.current) {
+        sessionRef.current = step.session;
+        draw();
+        emit(step.event);
       }
     };
 

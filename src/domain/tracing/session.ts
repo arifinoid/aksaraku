@@ -1,7 +1,15 @@
 import { match } from "ts-pattern";
 import type { StrokePath, Vec2 } from "../types";
-import { segmentDistances } from "./geometry";
+import { distanceToPolyline, segmentDistances } from "./geometry";
 
+/**
+ * How much of a stroke counts as "drawn". Reaching it completes the stroke and
+ * moves the child on to the next one, so it is deliberately forgiving — the
+ * last few pixels of a curve are the hardest to trace.
+ *
+ * This is a completion rule, not a scoring rule. Accuracy is measured with
+ * `traceAccuracy`, which normalises a finished stroke to a full score.
+ */
 export const COMPLETION_THRESHOLD = 0.8;
 
 export type TracePhase = "idle" | "drawing" | "completed";
@@ -65,17 +73,38 @@ export const overallCoverage = (session: TraceSession): number => {
   return total === 0 ? 0 : coveredSegments(session) / total;
 };
 
+/**
+ * Accuracy used for scoring.
+ *
+ * A stroke the child has finished counts as fully drawn even though the
+ * completion threshold let them move on before the last few pixels were
+ * traced. Without that normalisation the raw coverage of a typical glyph
+ * tops out around 0.80-0.85, which made three stars unreachable for most
+ * of the catalogue.
+ */
+export const traceAccuracy = (session: TraceSession): number => {
+  const total = totalSegments(session);
+  if (total === 0) return 0;
+
+  let score = 0;
+  session.covered.forEach((covered, index) => {
+    const finished =
+      index < session.strokeIndex ||
+      (session.phase === "completed" && index === session.strokeIndex);
+    const ratio =
+      covered.length === 0 ? 1 : covered.filter(Boolean).length / covered.length;
+    score += finished ? 1 : ratio;
+  });
+
+  return score / session.covered.length;
+};
+
 export const strokeCoverage = (covered: readonly boolean[]): number =>
   covered.length === 0 ? 1 : covered.filter(Boolean).length / covered.length;
 
 export const currentStroke = (
   session: TraceSession,
 ): StrokePath | undefined => session.strokes[session.strokeIndex];
-
-const minOf = (values: readonly number[]): number =>
-  values.length === 0
-    ? Number.POSITIVE_INFINITY
-    : values.reduce((min, value) => (value < min ? value : min), Number.POSITIVE_INFINITY);
 
 const complete = (session: TraceSession, now: number): TraceStep => ({
   session: {
@@ -93,20 +122,62 @@ const applyPoint = (
   designPerPx: number,
 ): TraceStep => {
   const stroke = currentStroke(session);
-  const covered = session.covered[session.strokeIndex];
 
-  if (!stroke || !covered) return complete(session, now);
+  if (!stroke) return complete(session, now);
 
-  const tolerance = stroke.tolerance * designPerPx;
-  const distances = segmentDistances(point, stroke.points);
-  const minDistance = minOf(distances);
-  const deviationSum = session.deviationSum + minDistance;
+  // Every stroke up to the active one stays open for credit. The child often
+  // keeps drawing the tail of the stroke that just auto-advanced, and that
+  // tail must still count — otherwise the score is capped below the
+  // three-star threshold for most glyphs.
+  //
+  // Only the active stroke and the one before it are measured: those are the
+  // two the finger can plausibly be on, and measuring every stroke on every
+  // pointermove is too expensive for a tablet.
+  const measureFrom = Math.max(0, session.strokeIndex - 1);
+  const candidates: {
+    readonly distance: number;
+    readonly tolerance: number;
+  }[] = [];
+  for (let index = measureFrom; index <= session.strokeIndex; index += 1) {
+    const target = session.strokes[index];
+    if (!target) continue;
+    candidates.push({
+      distance: distanceToPolyline(point, target.points),
+      tolerance: target.tolerance * designPerPx,
+    });
+  }
+
+  const nearest = candidates.reduce(
+    (best, candidate) =>
+      candidate.distance < best.distance ? candidate : best,
+    {
+      distance: Number.POSITIVE_INFINITY,
+      tolerance: stroke.tolerance * designPerPx,
+    },
+  );
+
+  const deviationSum = session.deviationSum + nearest.distance;
   const deviationCount = session.deviationCount + 1;
 
-  if (minDistance > tolerance) {
+  const nextCovered = session.covered.map((entry, index) => {
+    if (index < measureFrom || index > session.strokeIndex) return entry;
+    const target = session.strokes[index];
+    if (!target) return entry;
+    const targetTolerance = target.tolerance * designPerPx;
+    const distances = segmentDistances(point, target.points);
+    return entry.map(
+      (was, segmentIndex) =>
+        was ||
+        (distances[segmentIndex] ?? Number.POSITIVE_INFINITY) <=
+          targetTolerance,
+    );
+  });
+
+  if (nearest.distance > nearest.tolerance) {
     return {
       session: {
         ...session,
+        covered: nextCovered,
         deviationSum,
         deviationCount,
         offTrackCount: session.offTrackCount + 1,
@@ -115,18 +186,15 @@ const applyPoint = (
     };
   }
 
-  const nextStrokeCovered = covered.map(
-    (was, index) =>
-      was || (distances[index] ?? Number.POSITIVE_INFINITY) <= tolerance,
-  );
-  const nextCovered = session.covered.map((entry, index) =>
-    index === session.strokeIndex ? nextStrokeCovered : entry,
-  );
-  const coverage = strokeCoverage(nextStrokeCovered);
+  const covered = nextCovered[session.strokeIndex];
+  const coverage = strokeCoverage(covered ?? []);
+  const isLastStroke = session.strokeIndex >= session.strokes.length - 1;
 
-  if (coverage >= COMPLETION_THRESHOLD) {
-    const isLastStroke = session.strokeIndex >= session.strokes.length - 1;
-    if (isLastStroke) {
+  if (isLastStroke) {
+    // The final stroke decides the score, so it is only closed once the child
+    // has traced all of it. A partial attempt is closed when the child lifts
+    // their finger — see `endStroke`.
+    if (coverage >= 1) {
       return {
         session: {
           ...session,
@@ -145,6 +213,18 @@ const applyPoint = (
         covered: nextCovered,
         deviationSum,
         deviationCount,
+      },
+      event: { _tag: "Progress", strokeIndex: session.strokeIndex, coverage },
+    };
+  }
+
+  if (coverage >= COMPLETION_THRESHOLD) {
+    return {
+      session: {
+        ...session,
+        covered: nextCovered,
+        deviationSum,
+        deviationCount,
         strokeIndex: session.strokeIndex + 1,
       },
       event: { _tag: "StrokeCompleted", strokeIndex: session.strokeIndex },
@@ -152,8 +232,57 @@ const applyPoint = (
   }
 
   return {
-    session: { ...session, covered: nextCovered, deviationSum, deviationCount },
+    session: {
+      ...session,
+      covered: nextCovered,
+      deviationSum,
+      deviationCount,
+    },
     event: { _tag: "Progress", strokeIndex: session.strokeIndex, coverage },
+  };
+};
+
+/**
+ * Called when the child lifts their finger.
+ *
+ * A stroke that reached the completion threshold is accepted: the item
+ * completes if it was the last stroke, otherwise the child moves on to the
+ * next one. Below the threshold nothing happens — the child keeps tracing
+ * the same stroke.
+ */
+export const endStroke = (
+  session: TraceSession,
+  now: number,
+): TraceStep => {
+  if (session.phase === "completed") {
+    return { session, event: { _tag: "Ignored" } };
+  }
+
+  const covered = session.covered[session.strokeIndex];
+  if (!covered) return complete(session, now);
+
+  const coverage = strokeCoverage(covered);
+  if (coverage < COMPLETION_THRESHOLD) {
+    return {
+      session,
+      event: { _tag: "Progress", strokeIndex: session.strokeIndex, coverage },
+    };
+  }
+
+  if (session.strokeIndex >= session.strokes.length - 1) {
+    return {
+      session: {
+        ...session,
+        phase: "completed",
+        completedAt: now,
+      },
+      event: { _tag: "ItemCompleted" },
+    };
+  }
+
+  return {
+    session: { ...session, strokeIndex: session.strokeIndex + 1 },
+    event: { _tag: "StrokeCompleted", strokeIndex: session.strokeIndex },
   };
 };
 

@@ -109,7 +109,8 @@ For more information, read the Bun API docs in `node_modules/bun-types/docs/**.m
 
 Aplikasi edukasi interaktif untuk balita (3+): tracing huruf/angka/shapes, mini-games,
 gamifikasi, dan parent dashboard. Bahasa target: id -> en -> ar (RTL).
-Referensi: `plans/features.md` (fitur), `plans/architecture.md` (arsitektur), `plans/roadmap.md` (detail plan).
+Referensi: `docs/specs/` (spesifikasi fitur), `docs/infra/architecture.md`
+(arsitektur), `docs/prd.md` (PRD).
 
 ### Platform
 
@@ -125,7 +126,8 @@ Referensi: `plans/features.md` (fitur), `plans/architecture.md` (arsitektur), `p
 - Domain logic: `fp-ts` (Either/TaskEither) + `ts-pattern` (state machine).
 - Tracing: PixiJS (canvas 2D, presisi) - BUKAN 3D.
 - Scene 3D (avatar/reward): `@react-three/fiber` + `three`.
-- Animasi UI: Motion (Framer Motion). Audio: Web Audio API + preload.
+- Animasi UI: CSS transitions/keyframes (belum ada library animasi JS).
+  Audio: Web Audio API + preload.
 - Client storage: IndexedDB (Dexie). Server/opsional sync: `bun:sqlite`.
 - i18n: `i18next`, locale id/en/ar, dukungan RTL untuk ar.
 - Test: `bun test`. Lint/typecheck: `bunx tsc --noEmit`.
@@ -164,6 +166,25 @@ Referensi: `plans/features.md` (fitur), `plans/architecture.md` (arsitektur), `p
   `src/data/phonemes.ts`; pakai `itemPhoneme(item, locale)`, jangan `item.phoneme`.
 - Ikon arah harus dicerminkan untuk RTL lewat `useDirection()` (`src/i18n`),
   jangan hardcode `←`/`➡️`.
+- **App shell WAJIB ada di precache** sebagai route `"/app/"`. Kalau `/app/` tidak
+  ada di `PRECACHE`, navigasi offline dilayani `caches.match("/")` yang berisi
+  landing page - aset landing berbasis path relatif jadi tidak resolve di
+  `/app/` dan anak melihat layar putih. `scripts/build-sw.ts` yang menambah
+  route ini; jangan dihapus.
+- **Batas waktu layar tidak boleh reset karena reload.** `PlaySession.spentMinutes`
+  adalah akumulator; `resumeSession`/`bankSession` hanya memindahkannya, tidak
+  pernah meng-nolkan. Hanya `restartSession` (di balik parental gate) yang boleh
+  memberi kuota baru. Kalau butuh reset, jangan tambah cabang "kalau idle
+  lama" di `resumeSession` - itu reintroduksi bypass.
+- **Waktu app tertutup bukan screen time.** `bankSession` mengakhiri stretch
+  (`activeSince = null`) saat app hidden; `resumeSession` memulai stretch baru.
+  Jangan hitung `now - startedAt` mentah - itu menagih waktu saat app mati.
+- **Skor tracing pakai `traceAccuracy`, bukan `overallCoverage`.** Stroke yang
+  sudah melewati `COMPLETION_THRESHOLD` dihitung penuh; kalau pakai raw coverage
+  puncaknya mentok di ~0.80 dan bintang 3 takkan pernah tercapai.
+  `COMPLETION_THRESHOLD` hanya aturan "lanjut ke stroke berikutnya", bukan
+  aturan penilaian. Item ditutup saat jari diangkat (`endStroke`), bukan saat
+  coverage penuh.
 
 ### Status fase
 

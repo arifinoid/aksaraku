@@ -27,8 +27,12 @@ Akses server di `http://localhost:3000`.
 ### Typecheck & Test
 ```bash
 bunx tsc --noEmit
-bun test
+bun test src
 ```
+
+> `bun test src`, bukan `bun test` polos — perintah polos ikut mem-glob
+> `tests/e2e/*.spec.ts` dan gagal, karena `test.describe()` milik Playwright
+> hanya jalan di runner-nya sendiri. Lihat [KAN-11](./docs/kanban.md).
 
 ### Build & Preview
 ```bash
@@ -45,4 +49,5 @@ bash deploy.sh
 
 - [AGENTS.md](./AGENTS.md) - Roster tim AI & instruksi workflow
 - [CLAUDE.md](./CLAUDE.md) - Konvensi kode, arsitektur, & aturan runtime
+- [docs/kanban.md](./docs/kanban.md) - Backlog terbuka hasil audit (P0–P2, siap dikerjakan)
 - [docs/infra/architecture.md](./docs/infra/architecture.md) - Arsitektur sistem & routing Cloudflare Pages

@@ -110,7 +110,7 @@ For more information, read the Bun API docs in `node_modules/bun-types/docs/**.m
 Aplikasi edukasi interaktif untuk balita (3+): tracing huruf/angka/shapes, mini-games,
 gamifikasi, dan parent dashboard. Bahasa target: id -> en -> ar (RTL).
 Referensi: `docs/specs/` (spesifikasi fitur), `docs/infra/architecture.md`
-(arsitektur), `docs/prd.md` (PRD).
+(arsitektur), `docs/prd.md` (PRD), `docs/kanban.md` (backlog terbuka P0-P2).
 
 ### Platform
 

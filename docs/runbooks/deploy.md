@@ -3,7 +3,7 @@
 ## Pre-deploy Checklist
 
 1. [ ] `bunx tsc --noEmit` passes
-2. [ ] `bun test` passes
+2. [ ] `bun test src` passes
 3. [ ] `NODE_ENV=production bun run build` succeeds
 4. [ ] `dist/index.html` exists
 5. [ ] Cloudflare auth available (wrangler login or `CLOUDFLARE_API_TOKEN`)

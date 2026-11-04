@@ -413,11 +413,13 @@ interface CharacterProps {
   readonly avatar: ResolvedAvatar;
   /** Whether the frame loop is running at all (false = reduce motion). */
   readonly animated: boolean;
+  /** Whether the character keeps turning. Off for the static home hero. */
+  readonly spin: boolean;
   /** Bumped whenever the avatar changes, to trigger the swap animation. */
   readonly version: number;
 }
 
-function Character({ avatar, animated, version }: CharacterProps) {
+function Character({ avatar, animated, spin, version }: CharacterProps) {
   const group = useRef<Group>(null);
   const body = useRef<Mesh>(null);
   const color = avatar.color?.value ?? FALLBACK_COLOR;
@@ -452,7 +454,7 @@ function Character({ avatar, animated, version }: CharacterProps) {
       }
     }
 
-    if (animated) {
+    if (animated && spin) {
       // A slow, constant turn reads as mechanical. Nudging the speed with
       // the clock gives the same motion a hand-made wobble.
       node.rotation.y +=
@@ -553,9 +555,12 @@ function useAvatarVersion(avatar: ResolvedAvatar): number {
 export default function Avatar3DScene({
   avatar,
   reduceMotion = false,
+  spin = true,
 }: {
   readonly avatar: ResolvedAvatar;
   readonly reduceMotion?: boolean;
+  /** Wraps the character in a static, front-facing pose when false. */
+  readonly spin?: boolean;
 }) {
   const color = avatar.color?.value ?? FALLBACK_COLOR;
   const version = useAvatarVersion(avatar);
@@ -584,6 +589,7 @@ export default function Avatar3DScene({
       <Character
         avatar={avatar}
         animated={!reduceMotion}
+        spin={spin}
         version={version}
       />
       <Ground color={color} />

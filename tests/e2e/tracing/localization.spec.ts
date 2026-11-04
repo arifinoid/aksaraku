@@ -18,7 +18,7 @@ test.describe('Localization & RTL', () => {
     
     // ponytail: Full language switching needs settings UI implementation
     // Verify app loads with default language
-    const homeScreen = page.locator('.tile-grid').first();
+    const homeScreen = page.locator('.home__grid').first();
     await expect(homeScreen).toBeVisible({ timeout: 10000 });
   });
 
@@ -41,7 +41,7 @@ test.describe('Localization & RTL', () => {
     await createProfile(page, 'CanvasRTLTest');
     await page.waitForTimeout(1000);
     
-    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    const tracingTile = page.locator('button.home-tile').filter({ hasText: /tracing|menulis/i }).first();
     await tracingTile.click();
     
     const firstTask = page.locator('.glyph-card').first();
@@ -80,7 +80,7 @@ test.describe('Localization & RTL', () => {
     await createProfile(page, 'RTLAlignTest');
     await page.waitForTimeout(1000);
     
-    const homeScreen = page.locator('.tile-grid').first();
+    const homeScreen = page.locator('.home__grid').first();
     await expect(homeScreen).toBeVisible({ timeout: 10000 });
   });
 
@@ -89,7 +89,7 @@ test.describe('Localization & RTL', () => {
     await createProfile(page, 'RTLButtonTest');
     await page.waitForTimeout(1000);
     
-    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    const tracingTile = page.locator('button.home-tile').filter({ hasText: /tracing|menulis/i }).first();
     await tracingTile.click();
     
     const firstTask = page.locator('.glyph-card').first();
@@ -107,7 +107,7 @@ test.describe('Localization & RTL', () => {
     await page.waitForTimeout(1000);
     
     // Check for directional icons (arrows)
-    const tiles = page.locator('button.tile');
+    const tiles = page.locator('button.home-tile');
     const count = await tiles.count();
     expect(count).toBeGreaterThan(0);
   });
@@ -117,7 +117,7 @@ test.describe('Localization & RTL', () => {
     await createProfile(page, 'RTLCanvasPos');
     await page.waitForTimeout(1000);
     
-    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    const tracingTile = page.locator('button.home-tile').filter({ hasText: /tracing|menulis/i }).first();
     await tracingTile.click();
     
     const firstTask = page.locator('.glyph-card').first();

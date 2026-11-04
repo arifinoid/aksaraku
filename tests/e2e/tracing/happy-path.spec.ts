@@ -67,7 +67,7 @@ test.describe('Happy Path - Session & Task Selection', () => {
     await startButton.click();
     
     // Should navigate to home screen - look for tiles
-    await expect(page.locator('.tile-grid, [class*="tile"]').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.home__grid, [class*="tile"]').first()).toBeVisible({ timeout: 10000 });
   });
 
   // TC-005: Session persists across page refresh
@@ -81,7 +81,7 @@ test.describe('Happy Path - Session & Task Selection', () => {
     await page.reload();
     
     // Should go directly to home (profile already exists)
-    await expect(page.locator('.tile-grid, [class*="tile"]').first()).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('.home__grid, [class*="tile"]').first()).toBeVisible({ timeout: 10000 });
     
     // Should NOT show profile creation form
     const nameInput = page.locator('.field__input').first();
@@ -98,7 +98,7 @@ test.describe('Happy Path - Session & Task Selection', () => {
     await page.goto('/app');
     
     // Should show home screen (profile auto-selected)
-    const tileGrid = page.locator('.tile-grid, [class*="tile"]').first();
+    const tileGrid = page.locator('.home__grid, [class*="tile"]').first();
     await expect(tileGrid).toBeVisible({ timeout: 10000 });
   });
 
@@ -108,7 +108,7 @@ test.describe('Happy Path - Session & Task Selection', () => {
     await page.waitForTimeout(1000);
     
     // Navigate to play screen - click first tile (tracing ✏️)
-    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    const tracingTile = page.locator('button.home-tile').filter({ hasText: /tracing|menulis/i }).first();
     await expect(tracingTile).toBeVisible({ timeout: 10000 });
     await tracingTile.click();
     
@@ -125,7 +125,7 @@ test.describe('Happy Path - Session & Task Selection', () => {
     await createProfile(page, 'TaskListTest');
     await page.waitForTimeout(1000);
     
-    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    const tracingTile = page.locator('button.home-tile').filter({ hasText: /tracing|menulis/i }).first();
     await tracingTile.click();
     
     await expect(page.locator('.glyph-card').first()).toBeVisible({ timeout: 10000 });
@@ -150,7 +150,7 @@ test.describe('Happy Path - Session & Task Selection', () => {
     await createProfile(page, 'CanvasTest');
     await page.waitForTimeout(1000);
     
-    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    const tracingTile = page.locator('button.home-tile').filter({ hasText: /tracing|menulis/i }).first();
     await tracingTile.click();
     
     const firstTask = page.locator('.glyph-card').first();

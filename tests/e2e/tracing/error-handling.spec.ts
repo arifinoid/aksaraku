@@ -51,7 +51,7 @@ test.describe('Error Handling', () => {
     await createProfile(page, 'PixiTest');
     await page.waitForTimeout(1000);
     
-    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    const tracingTile = page.locator('button.home-tile').filter({ hasText: /tracing|menulis/i }).first();
     await tracingTile.click();
     
     const firstTask = page.locator('.glyph-card').first();
@@ -81,7 +81,7 @@ test.describe('Error Handling', () => {
     await createProfile(page, 'MountTest');
     await page.waitForTimeout(1000);
     
-    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    const tracingTile = page.locator('button.home-tile').filter({ hasText: /tracing|menulis/i }).first();
     await tracingTile.click();
     
     const firstTask = page.locator('.glyph-card').first();
@@ -104,7 +104,7 @@ test.describe('Error Handling', () => {
     await page.waitForTimeout(1000);
     
     // Should stay on valid screen (home or play)
-    const homeElement = page.locator('.tile-grid, .play__tabs').first();
+    const homeElement = page.locator('.home__grid, .play__tabs').first();
     await expect(homeElement).toBeVisible({ timeout: 10000 });
   });
 
@@ -116,7 +116,7 @@ test.describe('Error Handling', () => {
     // App should function even if storage is constrained
     await page.waitForTimeout(1000);
     
-    const homeScreen = page.locator('.tile-grid').first();
+    const homeScreen = page.locator('.home__grid').first();
     await expect(homeScreen).toBeVisible({ timeout: 10000 });
   });
 
@@ -135,7 +135,7 @@ test.describe('Error Handling', () => {
     
     // Should navigate even without persistent storage
     await page.waitForTimeout(1000);
-    const homeScreen = page.locator('.tile-grid').first();
+    const homeScreen = page.locator('.home__grid').first();
     await expect(homeScreen).toBeVisible({ timeout: 10000 });
   });
 

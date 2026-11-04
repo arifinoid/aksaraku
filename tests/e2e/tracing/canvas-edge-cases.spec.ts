@@ -7,7 +7,7 @@ test.describe('Canvas Edge Cases', () => {
     await page.waitForTimeout(1000);
     
     // Navigate to tracing screen
-    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    const tracingTile = page.locator('button.home-tile').filter({ hasText: /tracing|menulis/i }).first();
     await tracingTile.click();
     
     const firstTask = page.locator('.glyph-card').first();

@@ -1,0 +1,230 @@
+/*
+ * Desktop shell.
+ *
+ * The sidebar mirrors the pen.dev design: 236px, cream-on-cream, grouped by
+ * audience (child vs parent) so an adult can find the reporting screens
+ * without exposing them to the child.
+ */
+.shell {
+  display: flex;
+  min-height: 100dvh;
+  background: var(--c-bg);
+}
+
+.sidebar {
+  display: none;
+}
+
+.shell__main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100dvh;
+}
+
+/* Screens built before the revamp still rely on the old `.app-shell`
+   padding; give them the same breathing room inside the new frame. */
+.shell__main > .screen {
+  width: 100%;
+  padding: 16px;
+}
+
+@media (min-width: 900px) {
+  .sidebar {
+    position: sticky;
+    inset-block-start: 0;
+    display: flex;
+    flex: 0 0 var(--shell-sidebar);
+    flex-direction: column;
+    width: var(--shell-sidebar);
+    height: 100dvh;
+    padding: 24px 14px;
+    gap: 4px;
+    background: var(--c-sidebar);
+  }
+
+  .shell__main > .screen {
+    max-width: 1200px;
+    margin-inline: auto;
+    padding: 28px var(--shell-gutter) 36px;
+  }
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 6px 14px;
+}
+
+.sidebar__logo {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: var(--c-primary);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sidebar__wordmark {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 700;
+  color: var(--c-ink);
+}
+
+.sidebar__group {
+  margin: 0;
+  padding: 12px 12px 4px;
+  color: var(--c-muted);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sidebar__nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding-inline: 12px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--c-muted);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 800;
+  text-align: start;
+  cursor: pointer;
+  transition: background var(--motion-fast) var(--motion-out);
+}
+
+.sidebar__nav:hover {
+  background: #fff3e6;
+}
+
+.sidebar__nav--active,
+.sidebar__nav--active:hover {
+  background: var(--c-coral-soft);
+  color: #d9481f;
+}
+
+.sidebar__nav-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar__divider {
+  height: 1px;
+  margin: 8px;
+  background: var(--c-line);
+}
+
+.sidebar__spacer {
+  flex: 1;
+}
+
+.sidebar__online {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 8px 12px;
+  color: #147f73;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.sidebar__online--off {
+  color: var(--c-muted);
+}
+
+.sidebar__dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 7px;
+  border-radius: 50%;
+  background: #2bb673;
+}
+
+.sidebar__online--off .sidebar__dot {
+  background: var(--c-label);
+}
+
+.sidebar__child {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 10px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--c-surface);
+  font-family: var(--font-sans);
+  text-align: start;
+  cursor: pointer;
+}
+
+.sidebar__child-avatar {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  border-radius: 50%;
+  background: var(--c-mango-soft);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.sidebar__child-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.sidebar__child-name {
+  overflow: hidden;
+  color: var(--c-ink);
+  font-size: 12px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar__child-meta {
+  color: var(--c-muted);
+  font-size: 9.5px;
+  font-weight: 600;
+}
+
+.sidebar__chevron {
+  flex: 0 0 auto;
+  color: var(--c-label);
+}
+
+:dir(rtl) .sidebar__chevron {
+  transform: scaleX(-1);
+}
+
+.sidebar__switch {
+  padding: 6px 0 0;
+  border: 0;
+  background: none;
+  color: var(--c-muted);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+  cursor: pointer;
+}

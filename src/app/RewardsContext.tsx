@@ -12,6 +12,7 @@ import {
   emptyStats,
   newlyUnlocked,
   statsFromMastery,
+  type MasteryScore,
   type ModuleKind,
   type ProfileId,
   type ProgressStats,
@@ -24,6 +25,8 @@ import { listMastery, listRewards, saveRewards } from "../storage";
 
 export interface RewardsValue {
   readonly stats: ProgressStats;
+  /** Raw mastery rows, so screens can look up a single item or a streak. */
+  readonly mastery: readonly MasteryScore[];
   readonly unlockedIds: readonly RewardId[];
   readonly definitions: readonly RewardDefinition[];
   readonly celebration: readonly RewardDefinition[];
@@ -45,6 +48,7 @@ export interface RewardsProviderProps {
 
 export function RewardsProvider({ profileId, children }: RewardsProviderProps) {
   const [stats, setStats] = useState<ProgressStats>(emptyStats);
+  const [mastery, setMastery] = useState<readonly MasteryScore[]>([]);
   const [unlocked, setUnlocked] = useState<readonly Reward[]>([]);
   const [celebration, setCelebration] = useState<readonly RewardDefinition[]>(
     [],
@@ -67,6 +71,7 @@ export function RewardsProvider({ profileId, children }: RewardsProviderProps) {
     );
 
     setStats(nextStats);
+    setMastery(masteryResult.right);
     setUnlocked(owned);
 
     if (fresh.length === 0) return;
@@ -95,6 +100,7 @@ export function RewardsProvider({ profileId, children }: RewardsProviderProps) {
   const value = useMemo<RewardsValue>(
     () => ({
       stats,
+      mastery,
       unlockedIds: unlocked.map((reward) => reward.id),
       definitions: REWARDS,
       celebration,
@@ -102,7 +108,7 @@ export function RewardsProvider({ profileId, children }: RewardsProviderProps) {
       refresh,
       dismissCelebration,
     }),
-    [stats, unlocked, celebration, refresh, dismissCelebration],
+    [stats, mastery, unlocked, celebration, refresh, dismissCelebration],
   );
 
   return (

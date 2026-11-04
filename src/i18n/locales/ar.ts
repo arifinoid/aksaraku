@@ -301,6 +301,7 @@ export const ar: Dict = {
       subtitle: "تطبيق تعليمي تفاعلي للصغار من 3 سنوات. كتابة ولعب وتعلّم — دون إنترنت ودون إعلانات.",
       ctaInstall: "ثبّت الآن",
       ctaHow: "شاهد كيف يعمل",
+      mascotGreeting: "أهلاً!",
     },
     features: {
       title: "ماذا يوجد في أكساراكو؟",

@@ -300,6 +300,7 @@ export const id = {
       subtitle: "Aplikasi edukasi interaktif untuk balita 3+. Menulis, bermain, dan belajar — tanpa internet, tanpa iklan.",
       ctaInstall: "Pasang Sekarang",
       ctaHow: "Lihat cara kerjanya",
+      mascotGreeting: "Halo!",
     },
     features: {
       title: "Apa yang ada di Aksaraku?",

@@ -302,6 +302,7 @@ export const en: Dict = {
       subtitle: "Interactive education app for toddlers 3+. Write, play, and learn — no internet, no ads.",
       ctaInstall: "Install Now",
       ctaHow: "See how it works",
+      mascotGreeting: "Hello!",
     },
     features: {
       title: "What's in Aksaraku?",

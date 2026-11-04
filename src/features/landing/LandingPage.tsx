@@ -255,13 +255,10 @@ export function LandingPage() {
             </button>
           </div>
           <div className="landing__hero-visual" aria-hidden="true">
-            <img
-              src="/icon.svg"
-              alt=""
-              width="200"
-              height="200"
-              style={{ width: "100%", maxWidth: "200px", borderRadius: "28px" }}
-            />
+            <div className="landing__mascot-bubble">
+              {t("landing.hero.mascotGreeting")}
+            </div>
+            <Fox />
           </div>
         </section>
 
@@ -402,5 +399,64 @@ export function LandingPage() {
         </div>
       ) : null}
     </div>
+  );
+}
+
+const FOX_ORANGE = "#f97150";
+const FOX_DARK = "#c9482d";
+const FOX_WHITE = "#ffffff";
+const FOX_BLUSH = "#ff8db5";
+const FOX_EYE = "#2b1e3a";
+
+/**
+ * Cute fox mascot drawn inline with the pen.dev palette, so the landing page
+ * keeps the same character the child sees inside the app.
+ */
+function Fox() {
+  return (
+    <svg
+      className="landing__fox"
+      viewBox="0 0 200 200"
+      width="200"
+      height="200"
+      role="img"
+      aria-label="Kara, kodomo mascot"
+    >
+      {/* Soft glow behind the fox */}
+      <circle cx="100" cy="100" r="92" fill="#ffe9e2" />
+      {/* Tail */}
+      <path
+        d="M 28 140 Q 12 150 22 170 Q 34 162 48 152 Q 60 142 60 122 Q 52 110 44 102"
+        fill={FOX_ORANGE}
+        stroke="none"
+      />
+      {/* Body */}
+      <ellipse cx="100" cy="112" rx="46" ry="42" fill={FOX_ORANGE} />
+      {/* Head */}
+      <circle cx="100" cy="66" r="36" fill={FOX_ORANGE} />
+      {/* Ears */}
+      <path d="M 70 50 Q 62 26 84 44 Q 100 62 116 44 Q 138 26 130 50" fill={FOX_ORANGE} />
+      <path d="M 80 52 Q 78 36 92 48 Q 100 58 108 48 Q 122 36 120 52" fill="#ffe4db" />
+      {/* Face mask / white muzzle */}
+      <path d="M 74 78 Q 68 86 78 94 Q 88 100 100 92 Q 112 100 122 94 Q 132 86 126 78 Q 120 72 100 74 Q 80 72 74 78 Z" fill={FOX_WHITE} />
+      {/* Cheeks */}
+      <ellipse cx="78" cy="82" rx="7" ry="5" fill={FOX_BLUSH} opacity="0.7" />
+      <ellipse cx="122" cy="82" rx="7" ry="5" fill={FOX_BLUSH} opacity="0.7" />
+      {/* Eyes */}
+      <circle cx="86" cy="60" r="4" fill={FOX_EYE} />
+      <circle cx="114" cy="60" r="4" fill={FOX_EYE} />
+      {/* Eye shine */}
+      <circle cx="87" cy="59" r="1.2" fill={FOX_WHITE} />
+      <circle cx="115" cy="59" r="1.2" fill={FOX_WHITE} />
+      {/* Nose */}
+      <ellipse cx="100" cy="76" rx="5" ry="3" fill={FOX_DARK} />
+      {/* Mouth */}
+      <path d="M 95 80 Q 100 86 105 80" fill="none" stroke={FOX_DARK} strokeWidth="2" strokeLinecap="round" />
+      {/* Belly */}
+      <ellipse cx="100" cy="116" rx="26" ry="20" fill={FOX_WHITE} />
+      {/* Legs */}
+      <ellipse cx="82" cy="132" rx="10" ry="9" fill={FOX_ORANGE} />
+      <ellipse cx="118" cy="132" rx="10" ry="9" fill={FOX_ORANGE} />
+    </svg>
   );
 }

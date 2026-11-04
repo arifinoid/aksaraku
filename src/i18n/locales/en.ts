@@ -171,6 +171,9 @@ export const en: Dict = {
   },
   rewards: {
     title: "Reward Collection",
+    pick: "Stickers, trophies and characters",
+    summary: "{{unlocked}} of {{total}} rewards unlocked",
+    footer: "Finish activities to unlock new rewards.",
     kind: {
       sticker: "Stickers",
       trophy: "Trophies",
@@ -190,6 +193,8 @@ export const en: Dict = {
   },
   avatar: {
     title: "My Character",
+    pick: "Customise your friend",
+    footer: "Unlock new parts by collecting rewards.",
     slot: {
       color: "Color",
       ears: "Ears",

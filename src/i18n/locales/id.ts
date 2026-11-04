@@ -169,6 +169,9 @@ export const id = {
   },
   rewards: {
     title: "Koleksi Hadiah",
+    pick: "Koleksi stiker, piala, dan karakter",
+    summary: "{{unlocked}} dari {{total}} hadiah terbuka",
+    footer: "Selesaikan aktivitas untuk membuka hadiah baru.",
     kind: {
       sticker: "Stiker",
       trophy: "Piala",
@@ -188,6 +191,8 @@ export const id = {
   },
   avatar: {
     title: "Karakterku",
+    pick: "Kustomisasi temanmu",
+    footer: "Buka bagian baru dengan mengumpulkan hadiah.",
     slot: {
       color: "Warna",
       ears: "Telinga",

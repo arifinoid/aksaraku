@@ -171,6 +171,9 @@ export const ar: Dict = {
   },
   rewards: {
     title: "مجموعة المكافآت",
+    pick: "ملصقات وكؤوس وشخصيات",
+    summary: "فتحت {{unlocked}} من {{total}} مكافأة",
+    footer: "أكمل الأنشطة لفتح مكافآت جديدة.",
     kind: {
       sticker: "ملصقات",
       trophy: "كؤوس",
@@ -190,6 +193,8 @@ export const ar: Dict = {
   },
   avatar: {
     title: "شخصيتي",
+    pick: "خصّص صديقك",
+    footer: "افتح أجزاء جديدة بجمع المكافآت.",
     slot: {
       color: "اللون",
       ears: "الأذنان",

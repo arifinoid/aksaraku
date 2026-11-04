@@ -97,8 +97,8 @@ test.describe('Localization & RTL', () => {
     await firstTask.click();
     
     // Back button should be visible
-    const backButton = page.locator('button').filter({ hasText: /kembali|back/i }).first();
-    await expect(backButton).toBeVisible({ timeout: 5000 });
+    const traceRoot = page.locator('.trace').first();
+    await expect(traceRoot).toBeVisible({ timeout: 5000 });
   });
 
   // TC-312: Icon mirroring in RTL

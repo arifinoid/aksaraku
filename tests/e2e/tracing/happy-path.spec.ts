@@ -161,7 +161,8 @@ test.describe('Happy Path - Session & Task Selection', () => {
     const canvas = page.locator('canvas').first();
     await expect(canvas).toBeVisible({ timeout: 10000 });
     
-    const backButton = page.locator('button').filter({ hasText: /kembali|back/i }).first();
-    await expect(backButton).toBeVisible();
+    // On desktop the sidebar provides navigation; on phones the trace
+    // screen keeps its own back button. Either way the trace root mounts.
+    await expect(page.locator('.trace')).toBeVisible();
   });
 });

@@ -35,7 +35,7 @@ import {
   saveProfile,
   saveSettings,
 } from "./storage";
-import { Button, Screen } from "./ui";
+import { Button, Screen, AppShell } from "./ui";
 
 type Status = "loading" | "ready" | "error";
 
@@ -260,6 +260,7 @@ export function App() {
       return (
         <HomeScreen
           profile={current}
+          reduceMotion={settings.reduceMotion}
           onNavigate={setRoute}
           onParent={() => openParent("menu")}
           onSwitchProfile={() => openParent("children")}
@@ -349,7 +350,17 @@ export function App() {
   return (
     <RewardsProvider profileId={current.id}>
       <SessionProvider profileId={current.id}>
-        <main className="app-shell">{guarded}</main>
+        <AppShell
+          profile={current}
+          active={route.name}
+          parentView={parentView}
+          onNavigate={setRoute}
+          onParent={() => openParent("menu")}
+          onReport={() => openParent("report")}
+          onSwitchProfile={() => openParent("children")}
+        >
+          {guarded}
+        </AppShell>
         <RewardCelebration
           audioEnabled={settings.audioEnabled}
           hapticsEnabled={settings.hapticsEnabled}

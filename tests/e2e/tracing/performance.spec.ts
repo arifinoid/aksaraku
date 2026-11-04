@@ -8,7 +8,7 @@ test.describe('Performance', () => {
     await createProfile(page, 'PerfTest');
     await page.waitForTimeout(1000);
     
-    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    const tracingTile = page.locator('button.home-tile').filter({ hasText: /tracing|menulis/i }).first();
     await tracingTile.click();
     
     const firstTask = page.locator('.glyph-card').first();
@@ -65,7 +65,7 @@ test.describe('Performance', () => {
     await createProfile(page, 'MemoryTest');
     await page.waitForTimeout(1000);
     
-    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    const tracingTile = page.locator('button.home-tile').filter({ hasText: /tracing|menulis/i }).first();
     await tracingTile.click();
     
     // Navigate through multiple tasks
@@ -108,7 +108,7 @@ test.describe('Performance', () => {
     await createProfile(page, 'LeakTest');
     await page.waitForTimeout(1000);
     
-    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    const tracingTile = page.locator('button.home-tile').filter({ hasText: /tracing|menulis/i }).first();
     await tracingTile.click();
     
     const initialMetrics = await page.evaluate(() => {

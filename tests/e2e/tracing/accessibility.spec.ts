@@ -31,7 +31,7 @@ test.describe('Accessibility', () => {
     await page.waitForTimeout(1000);
     
     // Should navigate to home
-    const homeScreen = page.locator('.tile-grid').first();
+    const homeScreen = page.locator('.home__grid').first();
     await expect(homeScreen).toBeVisible({ timeout: 10000 });
   });
 
@@ -40,7 +40,7 @@ test.describe('Accessibility', () => {
     await createProfile(page, 'ScreenReaderTest');
     await page.waitForTimeout(1000);
     
-    const tracingTile = page.locator('button.tile').filter({ hasText: /tracing|menulis/i }).first();
+    const tracingTile = page.locator('button.home-tile').filter({ hasText: /tracing|menulis/i }).first();
     
     // Check for ARIA attributes
     const ariaLabel = await tracingTile.getAttribute('aria-label');
@@ -96,7 +96,7 @@ test.describe('Accessibility', () => {
     await page.waitForTimeout(1000);
     
     // Check button contrast
-    const tile = page.locator('button.tile').first();
+    const tile = page.locator('button.home-tile').first();
     await expect(tile).toBeVisible({ timeout: 10000 });
     
     const styles = await tile.evaluate((el) => {
@@ -119,7 +119,7 @@ test.describe('Accessibility', () => {
     await createProfile(page, 'TouchTargetTest');
     await page.waitForTimeout(1000);
     
-    const tiles = page.locator('button.tile');
+    const tiles = page.locator('button.home-tile');
     const firstTile = tiles.first();
     await expect(firstTile).toBeVisible({ timeout: 10000 });
     

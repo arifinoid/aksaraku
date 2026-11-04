@@ -8,6 +8,8 @@ export type Route =
   | { readonly name: "parent" }
   | { readonly name: "preview" };
 
+export type RouteName = Route["name"];
+
 export const routes = {
   profiles: { name: "profiles" },
   home: { name: "home" },

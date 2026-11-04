@@ -1,15 +1,45 @@
 :root {
-  --c-bg: #fff7e6;
-  --c-bg-2: #ffeccf;
+  /*
+   * Palette.
+   *
+   * These are the pen.dev tokens from the 2026 UI revamp: a warm cream
+   * canvas, plum ink instead of brown, and one saturated hue per learning
+   * area so a child can find "their" tile by colour alone.
+   */
+  --c-bg: #fff7ec;
+  --c-bg-2: #ffeedb;
   --c-surface: #ffffff;
-  --c-ink: #3d2b1f;
-  --c-muted: #8a7663;
-  --c-primary: #ff7a45;
-  --c-primary-dark: #e85f2b;
-  --c-accent: #ffd166;
-  --c-secondary: #4cc9f0;
-  --c-success: #57cc99;
+  --c-ink: #2b1e3a;
+  --c-muted: #7b6d8c;
+  --c-line: #f2e5d3;
+  --c-primary: #ff7455;
+  --c-primary-dark: #c9482d;
+  --c-accent: #ffc24b;
+  --c-secondary: #4cb8e8;
+  --c-success: #4cc38a;
   --c-danger: #ef476f;
+
+  /* Named tones. `-soft` is the badge behind the icon, `-ink` the icon
+     colour on that badge. Keeping them together stops hand-picked
+     one-off colours from creeping back into the screens. */
+  --c-coral: #f97150;
+  --c-coral-soft: #ffe9e2;
+  --c-mango: #f7ce5b;
+  --c-mango-soft: #fff3d6;
+  --c-mango-ink: #96660a;
+  --c-sky: #4cb8e8;
+  --c-sky-soft: #dff3fd;
+  --c-sky-ink: #1b7fa5;
+  --c-leaf: #4cc38a;
+  --c-leaf-soft: #dff6ea;
+  --c-leaf-ink: #157a50;
+  --c-grape: #8a7cf8;
+  --c-grape-soft: #ede9ff;
+  --c-grape-ink: #5b4bcf;
+  --c-teal: #23c4af;
+  --c-pink: #ff8db5;
+  --c-sidebar: #fffbf3;
+  --c-label: #b0a292;
 
   --radius-sm: 12px;
   --radius-md: 20px;
@@ -23,10 +53,14 @@
   --space-4: 1.5rem;
   --space-5: 2rem;
 
-  --shadow-soft: 0 4px 0 rgba(61, 43, 31, 0.12);
-  --shadow-pop: 0 8px 24px rgba(61, 43, 31, 0.16);
+  --shadow-soft: 0 1px 2px rgba(43, 30, 58, 0.06);
+  --shadow-pop: 0 8px 24px rgba(43, 30, 58, 0.14);
   /* A lifted, softer shadow for elements that are "popping" off the page. */
-  --shadow-lift: 0 12px 32px rgba(61, 43, 31, 0.22);
+  --shadow-lift: 0 12px 32px rgba(43, 30, 58, 0.2);
+
+  /* Desktop shell: the sidebar is fixed width, the page breathes at 36px. */
+  --shell-sidebar: 236px;
+  --shell-gutter: 36px;
 
   /*
    * Typography.
@@ -76,7 +110,7 @@ body {
   margin: 0;
   font-family: var(--font-sans);
   color: var(--c-ink);
-  background: radial-gradient(circle at 20% 0%, var(--c-bg-2), var(--c-bg) 60%);
+  background: var(--c-bg);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
 }

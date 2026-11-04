@@ -1,3 +1,4 @@
+import { ArrowLeft, Paintbrush } from "lucide-react";
 import { useState, type PointerEvent as ReactPointerEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useDirection } from "../../i18n";
@@ -21,7 +22,7 @@ import { HAPTIC, vibrate } from "../../platform/haptics";
 import { newId } from "../../platform/ids";
 import { runTask } from "../../platform/task";
 import { recordAttempt } from "../../storage";
-import { Button, Screen } from "../../ui";
+import { Button, Icon } from "../../ui";
 import { GameSummary } from "./GameSummary";
 import "./games.css";
 
@@ -91,8 +92,26 @@ export function ColoringGameScreen({
   };
 
   return (
-    <Screen title={t("games.coloring")} onBack={onBack}>
-      <p className="games__prompt-text">{t("games.colorHint")}</p>
+    <div className="coloring-game">
+      <header className="coloring-game__top">
+        <button type="button" className="coloring-game__back" onClick={onBack}>
+          <Icon glyph={ArrowLeft} size={16} />
+          <span>{t("common.back")}</span>
+        </button>
+
+        <div className="coloring-game__titles">
+          <h1 className="coloring-game__title">{t("games.coloring")}</h1>
+          <p className="coloring-game__sub">{t("games.coloringSub")}</p>
+        </div>
+
+        <div className="coloring-game__meta">
+          <span className="coloring-game__chip">
+            {t("play.ratio", { current: painted, total: item.strokes.length })}
+          </span>
+        </div>
+      </header>
+
+      <p className="coloring-game__hint">{t("games.colorHint")}</p>
 
       <div className="coloring__stage">
         <svg
@@ -155,7 +174,7 @@ export function ColoringGameScreen({
         ))}
       </div>
 
-      <div className="games__actions">
+      <div className="coloring__actions">
         <Button
           label={t("games.clear")}
           variant="secondary"
@@ -191,6 +210,6 @@ export function ColoringGameScreen({
           onBack={onBack}
         />
       ) : null}
-    </Screen>
+    </div>
   );
 }

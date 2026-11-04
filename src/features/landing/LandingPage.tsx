@@ -1,25 +1,25 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { ArrowRight, Check, CloudOff, Languages, ShieldCheck } from "lucide-react";
 import { changeLocale, LOCALE_OPTIONS, useActiveLocale } from "../../i18n";
-import { isLocale } from "../../domain/locale";
-import { LOCALE_FLAG } from "../../i18n";
 import type { Locale } from "../../domain/types";
 import {
-  classifyInstall,
   detectPlatform,
   resolveInstallClick,
   type InstallAction,
 } from "./install";
 import { pickInitialLocale } from "./locale";
+import { FoxMascot } from "./FoxMascot";
 import "./landing.css";
 
 const STORAGE_KEY = "aksaraku:locale";
+
+/** Chip copy per locale, so each chip reads in the language it selects. */
+const CHIP_LABEL = {
+  id: "landing.languages.id",
+  en: "landing.languages.en",
+  ar: "landing.languages.ar",
+} as const satisfies Record<Locale, string>;
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -79,13 +79,15 @@ const useInstall = () => {
   return { action, triggerInstall, hasDeferredPrompt: deferredRef };
 };
 
+/**
+ * Public landing page, laid out as the pen.dev "01 · Onboarding & Bahasa"
+ * screen: brand row, mascot, one headline, the three promises, the language
+ * picker and a single primary action.
+ */
 export function LandingPage() {
   const { t } = useTranslation();
   const activeLocale = useActiveLocale();
   const [showInstructions, setShowInstructions] = useState(false);
-  const [showLangMenu, setShowLangMenu] = useState(false);
-  const langMenuRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
   const { action, triggerInstall, hasDeferredPrompt } = useInstall();
 
   useEffect(() => {
@@ -97,26 +99,6 @@ export function LandingPage() {
   const handleLocaleChange = useCallback((locale: Locale) => {
     localStorage.setItem(STORAGE_KEY, locale);
     void changeLocale(locale);
-    setShowLangMenu(false);
-  }, []);
-
-  const handleLangTriggerClick = useCallback(() => {
-    setShowLangMenu((prev) => !prev);
-  }, []);
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        langMenuRef.current &&
-        !langMenuRef.current.contains(e.target as Node) &&
-        triggerRef.current &&
-        !triggerRef.current.contains(e.target as Node)
-      ) {
-        setShowLangMenu(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleInstallClick = useCallback(() => {
@@ -133,20 +115,13 @@ export function LandingPage() {
     }
   }, [action, triggerInstall, hasDeferredPrompt]);
 
-  const scrollToHow = useCallback(() => {
-    const reduceMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-    document
-      .getElementById("how-it-works")
-      ?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
-  }, []);
-
-  const installLabel = useMemo(() => {
-    if (action.action === "open") return t("landing.install.openApp");
-    if (action.action === "instructions") return t("landing.nav.install");
-    return t("landing.hero.ctaInstall");
-  }, [action, t]);
+  const ctaLabel = useMemo(
+    () =>
+      action.action === "open"
+        ? t("landing.install.openApp")
+        : t("landing.onboarding.cta"),
+    [action, t],
+  );
 
   const instructionsKey = useMemo(() => {
     const platform =
@@ -160,225 +135,123 @@ export function LandingPage() {
       : "landing.install.desktop";
   }, [action]);
 
-  const currentLocale = useActiveLocale();
-
   return (
     <div className="landing">
       <a href="#main" className="landing__skip">
         {t("landing.nav.skip")}
       </a>
 
-      <header>
-        <nav className="landing__nav" aria-label="primary">
+      <main id="main" className="landing__screen">
+        <header className="landing__brand-row">
           <a href="/" className="landing__brand">
-            <img src="/icon.svg" alt="" width="44" height="44" />
-            <span>{t("app.name")}</span>
+            <span className="landing__logo-tile" aria-hidden="true">
+              A
+            </span>
+            <span className="landing__wordmark">{t("app.name")}</span>
           </a>
-          <div className="landing__nav-actions">
-            <div
-              className="landing__lang-wrapper"
-              role="combobox"
-              aria-expanded={showLangMenu}
-              aria-haspopup="listbox"
-              aria-label={t("parent.language")}
-            >
-              <button
-                ref={triggerRef}
-                type="button"
-                className="landing__lang-trigger"
-                onClick={handleLangTriggerClick}
-                aria-label={t("parent.language")}
-                aria-expanded={showLangMenu}
-                aria-haspopup="listbox"
-              >
-                <span className="landing__lang-flag" aria-hidden="true">
-                  {LOCALE_FLAG[activeLocale]}
-                </span>
-                <span className="landing__lang-chevron" aria-hidden="true">
-                  ▼
-                </span>
-              </button>
-              {showLangMenu && (
-                <div
-                  ref={langMenuRef}
-                  className="landing__lang-menu"
-                  role="listbox"
-                  aria-label={t("parent.language")}
+          <span className="landing__age-pill">{t("landing.onboarding.age")}</span>
+        </header>
+
+        <div className="landing__mascot">
+          <span className="landing__blob" aria-hidden="true" />
+          <span
+            className="landing__dot landing__dot--mango"
+            aria-hidden="true"
+          />
+          <span className="landing__dot landing__dot--mint" aria-hidden="true" />
+          <span className="landing__dot landing__dot--pink" aria-hidden="true" />
+          <span
+            className="landing__dot landing__dot--grape"
+            aria-hidden="true"
+          />
+          <FoxMascot className="landing__fox" />
+          <span className="landing__bubble">
+            {t("landing.hero.mascotGreeting")}
+          </span>
+        </div>
+
+        <h1 className="landing__headline">{t("landing.hero.tagline")}</h1>
+        <p className="landing__subhead">{t("landing.hero.subtitle")}</p>
+
+        <ul className="landing__features">
+          <li className="landing__feature">
+            <span className="landing__feature-icon landing__feature-icon--mint">
+              <CloudOff size={20} strokeWidth={2} aria-hidden="true" />
+            </span>
+            <span className="landing__feature-label">
+              {t("landing.onboarding.offline")}
+            </span>
+          </li>
+          <li className="landing__feature">
+            <span className="landing__feature-icon landing__feature-icon--grape">
+              <Languages size={20} strokeWidth={2} aria-hidden="true" />
+            </span>
+            <span className="landing__feature-label">
+              {t("landing.onboarding.languages")}
+            </span>
+          </li>
+          <li className="landing__feature">
+            <span className="landing__feature-icon landing__feature-icon--mango">
+              <ShieldCheck size={20} strokeWidth={2} aria-hidden="true" />
+            </span>
+            <span className="landing__feature-label">
+              {t("landing.onboarding.safe")}
+            </span>
+          </li>
+        </ul>
+
+        <section className="landing__language">
+          <h2 id="landing-language-label" className="landing__label">
+            {t("landing.onboarding.languageLabel")}
+          </h2>
+          <div
+            className="landing__chips"
+            role="group"
+            aria-labelledby="landing-language-label"
+          >
+            {LOCALE_OPTIONS.map((option) => {
+              const isActive = activeLocale === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={`landing__chip${
+                    isActive ? " is-active" : ""
+                  }${option.value === "ar" ? " landing__chip--arabic" : ""}`}
+                  onClick={() => handleLocaleChange(option.value)}
+                  aria-pressed={isActive}
+                  lang={option.value}
                 >
-                  {LOCALE_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      role="option"
-                      className={`landing__lang-option ${activeLocale === opt.value ? "is-active" : ""}`}
-                      onClick={() => handleLocaleChange(opt.value)}
-                      aria-selected={activeLocale === opt.value}
-                    >
-                      <span className="landing__lang-option-flag" aria-hidden="true">
-                        {LOCALE_FLAG[opt.value]}
-                      </span>
-                      <span className="landing__lang-option-label">{opt.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-            <button
-              type="button"
-              className="landing__install-btn"
-              onClick={handleInstallClick}
-            >
-              {installLabel}
-            </button>
-          </div>
-        </nav>
-      </header>
-
-      <main id="main">
-        {/* Hero */}
-        <section className="landing__hero" aria-labelledby="hero-heading">
-          <h1 id="hero-heading">{t("landing.hero.tagline")}</h1>
-          <p>{t("landing.hero.subtitle")}</p>
-          <div className="landing__hero-actions">
-            <button
-              type="button"
-              className="landing__install-btn"
-              onClick={handleInstallClick}
-            >
-              {t("landing.hero.ctaInstall")}
-            </button>
-            <button
-              type="button"
-              className="landing__install-btn landing__install-btn--ghost"
-              onClick={scrollToHow}
-            >
-              {t("landing.hero.ctaHow")}
-            </button>
-          </div>
-          <div className="landing__hero-visual" aria-hidden="true">
-            <img
-              src="/icon.svg"
-              alt=""
-              width="200"
-              height="200"
-              style={{ width: "100%", maxWidth: "200px", borderRadius: "28px" }}
-            />
+                  <span>{t(CHIP_LABEL[option.value])}</span>
+                  {isActive ? (
+                    <Check size={14} strokeWidth={3} aria-hidden="true" />
+                  ) : null}
+                </button>
+              );
+            })}
           </div>
         </section>
 
-        {/* Features */}
-        <section className="landing__features" aria-labelledby="features-heading">
-          <h2 id="features-heading" className="landing__section-title">
-            {t("landing.features.title")}
-          </h2>
-          <div className="landing__feature-grid">
-            <article className="landing__feature-card">
-              <span className="icon" aria-hidden="true">✍️</span>
-              <h3>{t("landing.features.writing.title")}</h3>
-              <p>{t("landing.features.writing.desc")}</p>
-            </article>
-            <article className="landing__feature-card">
-              <span className="icon" aria-hidden="true">🎮</span>
-              <h3>{t("landing.features.games.title")}</h3>
-              <p>{t("landing.features.games.desc")}</p>
-            </article>
-            <article className="landing__feature-card">
-              <span className="icon" aria-hidden="true">⭐</span>
-              <h3>{t("landing.features.rewards.title")}</h3>
-              <p>{t("landing.features.rewards.desc")}</p>
-            </article>
-            <article className="landing__feature-card">
-              <span className="icon" aria-hidden="true">👤</span>
-              <h3>{t("landing.features.parent.title")}</h3>
-              <p>{t("landing.features.parent.desc")}</p>
-            </article>
-          </div>
-        </section>
-
-        {/* How it works */}
-        <section
-          className="landing__how"
-          aria-labelledby="how-heading"
-          id="how-it-works"
+        <button
+          type="button"
+          className="landing__cta"
+          onClick={handleInstallClick}
         >
-          <h2 id="how-heading" className="landing__section-title">
-            {t("landing.how.title")}
-          </h2>
-          <div className="landing__steps">
-            <div className="landing__step">
-              <span className="number">1</span>
-              <h3>{t("landing.how.step1.title")}</h3>
-              <p>{t("landing.how.step1.desc")}</p>
-            </div>
-            <div className="landing__step">
-              <span className="number">2</span>
-              <h3>{t("landing.how.step2.title")}</h3>
-              <p>{t("landing.how.step2.desc")}</p>
-            </div>
-            <div className="landing__step">
-              <span className="number">3</span>
-              <h3>{t("landing.how.step3.title")}</h3>
-              <p>{t("landing.how.step3.desc")}</p>
-            </div>
-          </div>
-        </section>
+          <span>{ctaLabel}</span>
+          <ArrowRight
+            className="landing__cta-icon"
+            size={19}
+            strokeWidth={2.5}
+            aria-hidden="true"
+          />
+        </button>
 
-        {/* Trust */}
-        <section className="landing__trust" aria-labelledby="trust-heading">
-          <h2 id="trust-heading" className="landing__section-title">
-            {t("landing.trust.title")}
-          </h2>
-          <div className="landing__badges">
-            <div className="landing__badge">
-              <span className="icon" aria-hidden="true">📴</span>
-              <span>{t("landing.trust.offline")}</span>
-            </div>
-            <div className="landing__badge">
-              <span className="icon" aria-hidden="true">🚫</span>
-              <span>{t("landing.trust.noAds")}</span>
-            </div>
-            <div className="landing__badge">
-              <span className="icon" aria-hidden="true">🔒</span>
-              <span>{t("landing.trust.private")}</span>
-            </div>
-            <div className="landing__badge">
-              <span className="icon" aria-hidden="true">👨‍👩‍👧</span>
-              <span>{t("landing.trust.multiChild")}</span>
-            </div>
-          </div>
-        </section>
-
-        {/* Languages */}
-        <section
-          className="landing__languages"
-          aria-labelledby="languages-heading"
-        >
-          <h2 id="languages-heading" className="landing__section-title">
-            {t("landing.languages.title")}
-          </h2>
-          <div className="landing__lang-pills">
-            <span className="landing__lang-pill">🇮🇩 {t("landing.languages.id")}</span>
-            <span className="landing__lang-pill">🇬🇧 {t("landing.languages.en")}</span>
-            <span className="landing__lang-pill">🇸🇦 {t("landing.languages.ar")}</span>
-          </div>
-        </section>
+        <p className="landing__parent-link">
+          {t("landing.onboarding.parentLink")}
+        </p>
       </main>
 
-      {/* Footer */}
-      <footer className="landing__footer">
-        <div className="landing__footer-cta">
-          <button
-            type="button"
-            className="landing__install-btn"
-            onClick={handleInstallClick}
-          >
-            {t("landing.footer.cta")}
-          </button>
-        </div>
-        <p>{t("landing.footer.madeBy")}</p>
-      </footer>
-
-      {/* Install instructions modal */}
-      {showInstructions && instructionsKey ? (
+      {showInstructions ? (
         <div
           className="landing__modal-overlay"
           role="dialog"

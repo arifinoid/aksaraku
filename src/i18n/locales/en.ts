@@ -294,44 +294,26 @@ export const en: Dict = {
   },
   landing: {
     nav: {
-      install: "Install App",
       skip: "Skip to content",
     },
     hero: {
-      tagline: "Learn while playing",
-      subtitle: "Interactive education app for toddlers 3+. Write, play, and learn — no internet, no ads.",
-      ctaInstall: "Install Now",
-      ctaHow: "See how it works",
-    },
-    features: {
-      title: "What's in Aksaraku?",
-      writing: { title: "Writing", desc: "Trace letters, numbers, and shapes with step-by-step guidance." },
-      games: { title: "Games", desc: "Match, pop balloons, and color while learning." },
-      rewards: { title: "Rewards", desc: "Collect stickers, trophies, and characters with every practice." },
-      parent: { title: "Parent Dashboard", desc: "Track progress, set time limits, and manage child profiles." },
-    },
-    how: {
-      title: "How to Start",
-      step1: { title: "Install", desc: "Add to home screen" },
-      step2: { title: "Choose Child", desc: "Create a profile for your little one" },
-      step3: { title: "Start Learning", desc: "Pick a letter, number, or game" },
-    },
-    trust: {
-      title: "Why Aksaraku?",
-      offline: "Works without internet",
-      noAds: "No ads, no interruptions",
-      private: "Data stays on your device",
-      multiChild: "Profiles for each child",
+      tagline: "Learn letters while playing",
+      subtitle: "Trace letters, numbers and shapes for ages 3+. It keeps working without internet.",
+      mascotGreeting: "Hello!",
     },
     languages: {
-      title: "Three Languages",
-      id: "Bahasa Indonesia",
+      id: "Indonesia",
       en: "English",
-      ar: "العربية (RTL)",
+      ar: "العربية",
     },
-    footer: {
-      cta: "Get Started",
-      madeBy: "Made with ❤️ by Rohmad's AI Engineering Team",
+    onboarding: {
+      age: "Ages 3+",
+      offline: "Works offline",
+      languages: "3 languages",
+      safe: "Kid-safe",
+      languageLabel: "CHOOSE LANGUAGE · BAHASA",
+      cta: "Start learning",
+      parentLink: "For parents · manage profiles & screen time",
     },
     install: {
       instructions: "How to Install",

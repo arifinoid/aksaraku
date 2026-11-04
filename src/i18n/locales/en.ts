@@ -216,6 +216,7 @@ export const en: Dict = {
   },
   parent: {
     title: "Parent Area",
+    subtitle: "Track progress and manage the app",
     gateTitle: "Parents Only",
     gate: {
       question: "What is {{a}} + {{b}}?",

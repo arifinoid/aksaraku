@@ -216,6 +216,7 @@ export const ar: Dict = {
   },
   parent: {
     title: "منطقة الوالدين",
+    subtitle: "تابع التقدّم وأدر التطبيق",
     gateTitle: "للوالدين فقط",
     gate: {
       question: "كم يساوي {{a}} + {{b}}؟",

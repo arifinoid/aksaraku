@@ -1,3 +1,4 @@
+import { ArrowLeft, BarChart3, Eye, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSession } from "../../app/SessionContext";
@@ -12,7 +13,7 @@ import {
   type Profile,
 } from "../../domain";
 import { LOCALE_OPTIONS } from "../../i18n";
-import { Button, Screen, Switch } from "../../ui";
+import { Button, Icon, Screen, Switch } from "../../ui";
 import { ParentChildren } from "./ParentChildren";
 import { ParentGate } from "./ParentGate";
 import { ParentReport } from "./ParentReport";
@@ -84,9 +85,9 @@ export function ParentScreen({
 
   if (!unlocked) {
     return (
-      <Screen title={t("parent.gateTitle")} center>
+      <div className="parent-gate">
         <ParentGate onUnlock={() => setUnlocked(true)} onCancel={onClose} />
-      </Screen>
+      </div>
     );
   }
 
@@ -110,7 +111,19 @@ export function ParentScreen({
   }
 
   return (
-    <Screen title={t("parent.title")} onBack={onClose}>
+    <div className="parent">
+      <header className="parent__top">
+        <button type="button" className="parent__back" onClick={onClose}>
+          <Icon glyph={ArrowLeft} size={16} />
+          <span>{t("common.back")}</span>
+        </button>
+        <div className="parent__titles">
+          <h1 className="parent__title">{t("parent.title")}</h1>
+          <p className="parent__sub">{t("parent.subtitle")}</p>
+        </div>
+        <div className="parent__meta" />
+      </header>
+
       <section className="panel">
         <h2 className="panel__title">
           {t("parent.progressFor", { name: profile.name })}
@@ -125,7 +138,7 @@ export function ParentScreen({
         <Button
           label={t("parent.report")}
           variant="secondary"
-          icon="📊"
+          icon={<Icon glyph={BarChart3} size={14} />}
           onClick={() => onViewChange("report")}
         />
       </section>
@@ -209,22 +222,23 @@ export function ParentScreen({
       <Button
         label={t("parent.manageChildren")}
         variant="secondary"
-        icon="👧"
+        icon={<Icon glyph={Users} size={14} />}
         onClick={() => onViewChange("children")}
       />
 
       <Button
         label={t("parent.preview")}
         variant="secondary"
-        icon="🔍"
+        icon={<Icon glyph={Eye} size={14} />}
         onClick={onPreview}
       />
 
       <Button
         label={t("parent.switchProfile")}
         variant="ghost"
+        icon={<Icon glyph={Users} size={14} />}
         onClick={() => onViewChange("children")}
       />
-    </Screen>
+    </div>
   );
 }

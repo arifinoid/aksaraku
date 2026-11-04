@@ -26,3 +26,66 @@
   color: var(--c-muted);
   text-align: center;
 }
+
+/* Phase 5 revamp — preview wrapper */
+.preview {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 20px
+    calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+.preview__top {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+}
+
+.preview__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding-inline: 10px 13px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-size: 10.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.preview__titles { min-width: 0; text-align: center; }
+
+.preview__title {
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.preview__sub { display: none; }
+
+.preview__meta { display: none; }
+
+.preview__section { display: flex; flex-direction: column; gap: 8px; }
+
+.preview__section-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+@media (min-width: 900px) {
+  .preview { gap: 18px; padding: 28px var(--shell-gutter) 36px; }
+  .preview__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
+  .preview__back { display: none; }
+  .preview__titles { text-align: start; }
+  .preview__title { font-size: 31px; }
+  .preview__sub { display: block; margin-block-start: 4px; color: var(--c-muted); font-size: 12.5px; font-weight: 600; }
+  .preview__meta { display: flex; flex: 0 0 auto; align-items: center; gap: 10px; }
+}

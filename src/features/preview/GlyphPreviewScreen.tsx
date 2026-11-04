@@ -1,14 +1,15 @@
+import { ArrowLeft } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { GLYPH_CATEGORIES, itemPhoneme } from "../../data";
 import { useActiveLocale } from "../../i18n";
 import type { ModuleItem, Vec2 } from "../../domain";
-import { Screen } from "../../ui";
+import { Icon } from "../../ui";
 import "./preview.css";
 
 const toPolylinePoints = (points: readonly Vec2[]): string =>
   points.map((point) => `${point.x},${point.y}`).join(" ");
 
-const STROKE_COLORS = ["#ff7a45", "#4cc9f0", "#57cc99", "#ffd166", "#ef476f"];
+const STROKE_COLORS = ["#ff7a45", "#4cb8e8", "#4cc38a", "#f7ce5b", "#ef476f"];
 
 function GlyphSvg({ item }: { readonly item: ModuleItem }) {
   return (
@@ -55,11 +56,21 @@ export function GlyphPreviewScreen({ onBack }: GlyphPreviewScreenProps) {
   const locale = useActiveLocale();
 
   return (
-    <Screen title={t("preview.title")} onBack={onBack}>
-      <p className="panel__hint">{t("preview.hint")}</p>
+    <div className="preview">
+      <header className="preview__top">
+        <button type="button" className="preview__back" onClick={onBack}>
+          <Icon glyph={ArrowLeft} size={16} />
+          <span>{t("common.back")}</span>
+        </button>
+        <div className="preview__titles">
+          <h1 className="preview__title">{t("preview.title")}</h1>
+          <p className="preview__sub">{t("preview.hint")}</p>
+        </div>
+        <div className="preview__meta" />
+      </header>
       {GLYPH_CATEGORIES.map((category) => (
-        <section key={category.kind} className="panel">
-          <h2 className="panel__title">{t(category.labelKey)}</h2>
+        <section key={category.kind} className="preview__section">
+          <h2 className="preview__section-title">{t(category.labelKey)}</h2>
           <div className="preview__grid">
             {category.items.map((item) => (
               <figure key={item.id} className="preview__cell">
@@ -72,6 +83,6 @@ export function GlyphPreviewScreen({ onBack }: GlyphPreviewScreenProps) {
           </div>
         </section>
       ))}
-    </Screen>
+    </div>
   );
 }

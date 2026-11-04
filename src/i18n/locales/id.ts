@@ -214,6 +214,7 @@ export const id = {
   },
   parent: {
     title: "Area Orang Tua",
+    subtitle: "Pantau perkembangan dan atur aplikasi",
     gateTitle: "Khusus Orang Tua",
     gate: {
       question: "Berapa hasil dari {{a}} + {{b}}?",

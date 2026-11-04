@@ -272,22 +272,22 @@ export function LandingPage() {
           </h2>
           <div className="landing__feature-grid">
             <article className="landing__feature-card">
-              <span className="icon" aria-hidden="true">✍️</span>
+              <span className="icon" aria-hidden="true">✏️</span>
               <h3>{t("landing.features.writing.title")}</h3>
               <p>{t("landing.features.writing.desc")}</p>
             </article>
             <article className="landing__feature-card">
-              <span className="icon" aria-hidden="true">🎮</span>
+              <span className="icon" aria-hidden="true">🎈</span>
               <h3>{t("landing.features.games.title")}</h3>
               <p>{t("landing.features.games.desc")}</p>
             </article>
             <article className="landing__feature-card">
-              <span className="icon" aria-hidden="true">⭐</span>
+              <span className="icon" aria-hidden="true">🏆</span>
               <h3>{t("landing.features.rewards.title")}</h3>
               <p>{t("landing.features.rewards.desc")}</p>
             </article>
             <article className="landing__feature-card">
-              <span className="icon" aria-hidden="true">👤</span>
+              <span className="icon" aria-hidden="true">👨‍👩‍👧</span>
               <h3>{t("landing.features.parent.title")}</h3>
               <p>{t("landing.features.parent.desc")}</p>
             </article>
@@ -329,7 +329,7 @@ export function LandingPage() {
           </h2>
           <div className="landing__badges">
             <div className="landing__badge">
-              <span className="icon" aria-hidden="true">📴</span>
+              <span className="icon" aria-hidden="true">📶</span>
               <span>{t("landing.trust.offline")}</span>
             </div>
             <div className="landing__badge">
@@ -341,7 +341,7 @@ export function LandingPage() {
               <span>{t("landing.trust.private")}</span>
             </div>
             <div className="landing__badge">
-              <span className="icon" aria-hidden="true">👨‍👩‍👧</span>
+              <span className="icon" aria-hidden="true">👪</span>
               <span>{t("landing.trust.multiChild")}</span>
             </div>
           </div>

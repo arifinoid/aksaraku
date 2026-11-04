@@ -1,3 +1,4 @@
+import { ArrowLeft, Star, Volume2 } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useRewards } from "../../app/RewardsContext";
@@ -6,7 +7,7 @@ import { findGlyphItem, GLYPH_ITEMS, itemPhoneme } from "../../data";
 import { playOffTrack, playPop, playStrokeComplete } from "../../game";
 import { useActiveLocale } from "../../i18n";
 import { speakPhoneme, supportsSpeech } from "../../platform/speech";
-import { Button, Screen } from "../../ui";
+import { Button, Icon } from "../../ui";
 import { GameSummary } from "./GameSummary";
 import { useChoiceGame } from "./useChoiceGame";
 import "./games.css";
@@ -82,16 +83,42 @@ export function BalloonGameScreen({
   };
 
   return (
-    <Screen title={t("games.balloon")} onBack={onBack}>
-      <div className="games__prompt">
+    <div className="balloon-game">
+      <header className="balloon-game__top">
+        <button type="button" className="balloon-game__back" onClick={onBack}>
+          <Icon glyph={ArrowLeft} size={16} />
+          <span>{t("common.back")}</span>
+        </button>
+
+        <div className="balloon-game__titles">
+          <h1 className="balloon-game__title">{t("games.balloon")}</h1>
+          <p className="balloon-game__sub">{t("games.balloonSub")}</p>
+        </div>
+
+        <div className="balloon-game__meta">
+          <span className="balloon-game__chip">
+            {t("play.ratio", {
+              current: game.session.index + 1,
+              total: ROUNDS,
+            })}
+          </span>
+        </div>
+      </header>
+
+      <div className="balloon-game__prompt">
         {canSpeak ? (
-          <Button label={t("games.repeat")} icon="🔊" onClick={repeat} />
+          <button type="button" className="balloon-game__listen" onClick={repeat}>
+            <Icon glyph={Volume2} size={14} />
+            <span>{t("games.repeat")}</span>
+          </button>
         ) : (
           <span className="games__prompt-label">
             {game.round?.promptLabel ?? ""}
           </span>
         )}
-        <span className="games__prompt-text">{t("games.balloon")}</span>
+        <span className="balloon-game__prompt-text">
+          {t("games.balloonPrompt", { letter: game.round?.promptLabel ?? "" })}
+        </span>
       </div>
 
       <div className="balloon-grid">
@@ -109,6 +136,16 @@ export function BalloonGameScreen({
         ))}
       </div>
 
+      <div className="balloon-game__score">
+        <Icon glyph={Star} size={16} className="balloon-game__score-icon" />
+        <span>
+          {t("games.score", {
+            correct: game.correct,
+            total: game.total,
+          })}
+        </span>
+      </div>
+
       {game.finished ? (
         <GameSummary
           stars={starsForAccuracy(game.accuracy)}
@@ -118,6 +155,6 @@ export function BalloonGameScreen({
           onBack={onBack}
         />
       ) : null}
-    </Screen>
+    </div>
   );
 }

@@ -1,3 +1,4 @@
+import { ArrowLeft, ArrowRight, Check, Flame, Star, Volume2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRewards } from "../../app/RewardsContext";
@@ -10,7 +11,8 @@ import {
   type Profile,
 } from "../../domain";
 import { playOffTrack, playStrokeComplete } from "../../game";
-import { Button, Screen } from "../../ui";
+import { useActiveLocale } from "../../i18n";
+import { Icon } from "../../ui";
 import { GameSummary } from "./GameSummary";
 import { useChoiceGame } from "./useChoiceGame";
 import "./games.css";
@@ -32,7 +34,8 @@ export function MatchingGameScreen({
   onBack,
 }: MatchingGameScreenProps) {
   const { t } = useTranslation();
-  const { refresh } = useRewards();
+  const locale = useActiveLocale();
+  const { refresh, mastery } = useRewards();
   const [mode, setMode] = useState<MatchingMode>("case");
 
   const candidates = useMemo(
@@ -73,33 +76,56 @@ export function MatchingGameScreen({
     return "";
   };
 
+  const streak = 0;
+
   return (
-    <Screen title={t("games.matching")} onBack={onBack}>
-      <div className="games__modes">
-        <Button
-          label={t("games.modeCase")}
-          variant={mode === "case" ? "primary" : "secondary"}
-          size="sm"
+    <div className="match">
+      <header className="match__top">
+        <button type="button" className="match__back" onClick={onBack}>
+          <Icon glyph={ArrowLeft} size={16} />
+          <span>{t("common.back")}</span>
+        </button>
+
+        <div className="match__titles">
+          <h1 className="match__title">{t("games.matching")}</h1>
+          <p className="match__sub">{t("games.matchingSub")}</p>
+        </div>
+
+        <div className="match__meta">
+          <span className="match__chip">
+            {t("play.ratio", {
+              current: game.session.index + 1,
+              total: ROUNDS,
+            })}
+          </span>
+        </div>
+      </header>
+
+      <div className="match__modes">
+        <button
+          type="button"
+          className={`match__mode${mode === "case" ? " is-active" : ""}`}
           onClick={() => setMode("case")}
-        />
-        <Button
-          label={t("games.modeObject")}
-          variant={mode === "object" ? "primary" : "secondary"}
-          size="sm"
+        >
+          {t("games.modeCase")}
+        </button>
+        <button
+          type="button"
+          className={`match__mode${mode === "object" ? " is-active" : ""}`}
           onClick={() => setMode("object")}
-        />
+        >
+          {t("games.modeObject")}
+        </button>
       </div>
 
-      <div className="games__prompt">
-        <span className="games__prompt-label">
-          {game.round?.promptLabel ?? ""}
-        </span>
-        <span className="games__prompt-text">
+      <div className="match__prompt">
+        <span className="match__prompt-label">{game.round?.promptLabel ?? ""}</span>
+        <span className="match__prompt-text">
           {mode === "case" ? t("games.casePrompt") : t("games.objectPrompt")}
         </span>
       </div>
 
-      <div className="games__options">
+      <div className="match__options">
         {game.round?.options.map((option) => (
           <button
             key={option.id}
@@ -112,6 +138,17 @@ export function MatchingGameScreen({
         ))}
       </div>
 
+      {game.feedback === "correct" ? (
+        <div className="match__feedback match__feedback--ok">
+          <Icon glyph={Check} size={16} />
+          <span>{t("games.correct")}</span>
+        </div>
+      ) : game.feedback === "wrong" ? (
+        <div className="match__feedback match__feedback--bad">
+          <span>{t("games.wrong")}</span>
+        </div>
+      ) : null}
+
       {game.finished ? (
         <GameSummary
           stars={starsForAccuracy(game.accuracy)}
@@ -121,6 +158,6 @@ export function MatchingGameScreen({
           onBack={onBack}
         />
       ) : null}
-    </Screen>
+    </div>
   );
 }

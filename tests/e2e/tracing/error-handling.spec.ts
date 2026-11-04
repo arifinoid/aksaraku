@@ -90,8 +90,8 @@ test.describe('Error Handling', () => {
     
     // Should not crash - either canvas appears or back button works
     await page.waitForTimeout(1000);
-    const backButton = page.locator('button').filter({ hasText: /kembali|back/i }).first();
-    await expect(backButton).toBeVisible({ timeout: 5000 });
+    const traceRoot = page.locator('.trace').first();
+    await expect(traceRoot).toBeVisible({ timeout: 5000 });
   });
 
   // TC-212: Invalid task ID redirects or shows 404

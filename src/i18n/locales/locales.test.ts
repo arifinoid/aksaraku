@@ -28,6 +28,7 @@ const sorted = (value: Flat): string[] => Object.keys(value).sort();
 const LANGUAGE_NEUTRAL = new Set([
   "app.name",
   "home.reward.count",
+  "play.ratio",
   "landing.languages.id",
   "landing.languages.en",
   "landing.languages.ar",

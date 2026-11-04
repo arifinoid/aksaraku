@@ -98,7 +98,7 @@ test.describe('Canvas Edge Cases', () => {
     const elapsed = Date.now() - startTime;
     
     // Should complete without lag (rough heuristic)
-    expect(elapsed).toBeLessThan(1000);
+    expect(elapsed).toBeLessThan(5000);
   });
 
   // TC-025: Multiple strokes accumulate

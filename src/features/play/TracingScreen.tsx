@@ -91,11 +91,13 @@ export function TracingScreen({
   const object = objectEntry(item.glyph);
   const objectName = object ? (object.names[locale] ?? object.names.id) : undefined;
 
+  /* The pen's letter screen titles the bar with the glyph alone — the word row
+     and the stroke label below the canvas already carry the context. */
   const title = isDigit
     ? t("play.digitTitle", { glyph: item.glyph })
     : isShape
       ? t("play.shapeTitle")
-      : t("play.letterTitle", { glyph: item.glyph });
+      : item.glyph;
 
   const strokeText = t("play.strokeProgress", {
     current: Math.min(strokeIndex + 1, totalStrokes),
@@ -106,9 +108,7 @@ export function TracingScreen({
     ? t("play.digitSub")
     : isShape
       ? t("play.shapeSub", { current: position, total: siblings.length })
-      : objectName
-        ? `${t("play.objectHint", { glyph: item.glyph, object: objectName })} · ${strokeText}`
-        : strokeText;
+      : "";
 
   const canvasLabel = `${t(categoryLabelKey(item.kind))} · ${
     isShape ? shapeName : item.glyph

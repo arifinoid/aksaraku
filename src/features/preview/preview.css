@@ -1,39 +1,10 @@
-.preview__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
-  gap: var(--space-2);
-}
-
-.preview__cell {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  padding: var(--space-1);
-  background: var(--c-bg);
-  border-radius: var(--radius-md);
-}
-
-.preview__svg {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-}
-
-.preview__caption {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--c-muted);
-  text-align: center;
-}
-
-/* Phase 5 revamp — preview wrapper */
+/* Pen.dev "23 · Pratinjau Konten": category cards with a counter and a row
+   of glyph chips. */
 .preview {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: calc(10px + env(safe-area-inset-top, 0px)) 20px
-    calc(24px + env(safe-area-inset-bottom, 0px));
+  gap: 16px;
+  padding: 8px 20px calc(24px + env(safe-area-inset-bottom, 0px));
 }
 
 .preview__top {
@@ -50,42 +21,157 @@
   gap: 6px;
   height: 30px;
   padding-inline: 10px 13px;
-  border: 0;
+  border: 1px solid var(--c-line);
   border-radius: var(--radius-pill);
   background: var(--c-surface);
   color: var(--c-ink);
+  font-family: var(--font-sans);
   font-size: 10.5px;
   font-weight: 800;
   cursor: pointer;
 }
 
-.preview__titles { min-width: 0; text-align: center; }
-
 .preview__title {
+  grid-column: 2;
   font-family: var(--font-display);
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 700;
   line-height: 1.1;
+  text-align: center;
 }
 
-.preview__sub { display: none; }
+.preview__content {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-.preview__meta { display: none; }
+.preview__lead {
+  color: var(--c-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.45;
+  text-wrap: pretty;
+}
 
-.preview__section { display: flex; flex-direction: column; gap: 8px; }
+.preview__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--c-line);
+  border-radius: 22px;
+  background: var(--c-surface);
+}
+
+.preview__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
 
 .preview__section-title {
   font-family: var(--font-display);
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
+  line-height: 1.2;
+}
+
+.preview__count {
+  color: var(--c-muted);
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.preview__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.preview__chip {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #f1e5d5;
+  border-radius: 10px;
+  background: #fffcf6;
+  color: var(--c-ink);
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.preview__note {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 13px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--c-muted);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.preview__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 52px;
+  border: 1px solid var(--c-line);
+  border-radius: 18px;
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.preview__close:active {
+  transform: scale(0.99);
 }
 
 @media (min-width: 900px) {
-  .preview { gap: 18px; padding: 28px var(--shell-gutter) 36px; }
-  .preview__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
-  .preview__back { display: none; }
-  .preview__titles { text-align: start; }
-  .preview__title { font-size: 31px; }
-  .preview__sub { display: block; margin-block-start: 4px; color: var(--c-muted); font-size: 12.5px; font-weight: 600; }
-  .preview__meta { display: flex; flex: 0 0 auto; align-items: center; gap: 10px; }
+  .preview {
+    gap: 18px;
+    padding: 28px var(--shell-gutter) 36px;
+  }
+
+  .preview__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .preview__back {
+    display: none;
+  }
+
+  .preview__title {
+    font-size: 31px;
+    text-align: start;
+  }
+
+  .preview__content {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .preview__lead,
+  .preview__note,
+  .preview__close {
+    grid-column: 1 / -1;
+  }
 }

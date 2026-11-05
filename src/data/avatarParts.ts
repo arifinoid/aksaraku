@@ -29,6 +29,8 @@ export const AVATAR_PARTS: readonly AvatarPart[] = [
   part("color-orange", "color", "#ff7a45", names("Oranye", "Orange", "برتقالي")),
   part("color-blue", "color", "#4cc9f0", names("Biru", "Blue", "أزرق")),
   part("color-green", "color", "#57cc99", names("Hijau", "Green", "أخضر")),
+  part("color-cream", "color", "#f6f1e8", names("Krem", "Cream", "كريمي")),
+  part("color-brown", "color", "#b07d4f", names("Cokelat", "Brown", "بني")),
   part(
     "color-pink",
     "color",
@@ -53,6 +55,8 @@ export const AVATAR_PARTS: readonly AvatarPart[] = [
 
   part("ears-round", "ears", "round", names("Bulat", "Round", "دائري")),
   part("ears-pointy", "ears", "pointy", names("Runcing", "Pointy", "مدبّب")),
+  part("ears-long", "ears", "long", names("Panjang", "Long", "طويل")),
+  part("ears-none", "ears", "none", names("Tanpa Telinga", "No Ears", "بلا آذان")),
   part(
     "ears-floppy",
     "ears",

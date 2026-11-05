@@ -1,20 +1,25 @@
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  CatmullRomCurve3,
   CanvasTexture,
   type Group,
   type Mesh,
   MeshBasicMaterial,
   PMREMGenerator,
-  Quaternion,
   SRGBColorSpace,
-  TubeGeometry,
-  Vector3,
 } from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import type { ResolvedAvatar } from "../../domain";
 import {
+  DEFAULT_SPECIES,
+  speciesLook,
+  type SpeciesLook,
+} from "../../data/species";
+import type { ResolvedAvatar } from "../../domain";
+import { SpeciesFeatures } from "./AvatarSpecies";
+import { faceQuaternion } from "./faceOrientation";
+import {
+  BODY_RADIUS,
+  BODY_Y,
   catchlightPosition,
   CHEEK_RADIUS,
   CHEEK_Z_SCALE,
@@ -24,48 +29,34 @@ import {
   eyePosition,
   glassesBridgePosition,
   glassesPosition,
-  headNormal as headNormalAt,
   HEAD_RADIUS,
   HEAD_SCALE,
   HEAD_Y,
   HEAD_Z,
-  MOUTH_TUBE_RADIUS,
-  mouthPoint,
+  MOUTH_BASE_Y,
+  MOUTH_DIP,
+  MOUTH_HALF_WIDTH,
 } from "./avatarGeometry";
+import { buildMouth } from "./mouthTube";
 
-const FALLBACK_COLOR = "#ff7a45";
 const INK = "#3d2b1f";
 const CHEEK = "#ff9e9e";
-
-const BODY_Y = -0.42;
-const BODY_RADIUS = 0.5;
-
-/**
- * The outward normal of the head at a given (x, y).
- *
- * Face pieces are rotated to this normal so they sit flush on the curved
- * surface instead of being flat discs pasted onto a sphere.
- */
-const headNormal = (x: number, y: number): Vector3 => {
-  const [nx, ny, nz] = headNormalAt(x, y);
-  return new Vector3(nx, ny, nz);
-};
-
-/**
- * A rotation that turns the +Z axis onto the head normal at (x, y).
- *
- * The result is applied to each eye so its flat face points outwards and its
- * "up" stays up.
- */
-const faceQuaternion = (x: number, y: number): Quaternion =>
-  new Quaternion().setFromUnitVectors(new Vector3(0, 0, 1), headNormal(x, y));
 
 interface EarsProps {
   readonly kind: string;
   readonly color: string;
+  /** Inner-ear colour; null hides it, which is right for pointed ears. */
+  readonly inner: string | null;
 }
 
-function Ears({ kind, color }: EarsProps) {
+/**
+ * Ear shapes. The species picks the starting shape, but the slot still lets
+ * the child swap it for a horn or floppy ears, so every shape has to stand
+ * on its own.
+ */
+function Ears({ kind, color, inner }: EarsProps) {
+  if (kind === "none") return null;
+
   if (kind === "horn") {
     return (
       <>
@@ -77,6 +68,31 @@ function Ears({ kind, color }: EarsProps) {
           <coneGeometry args={[0.13, 0.34, 20]} />
           <meshStandardMaterial color="#ffd166" roughness={0.5} />
         </mesh>
+      </>
+    );
+  }
+
+  if (kind === "long") {
+    return (
+      <>
+        {[-1, 1].map((side) => (
+          <group
+            key={side}
+            position={[side * 0.2, 1.06, 0]}
+            rotation={[0, 0, side * -0.12]}
+          >
+            <mesh>
+              <capsuleGeometry args={[0.09, 0.34, 10, 20]} />
+              <meshStandardMaterial color={color} roughness={0.6} />
+            </mesh>
+            {inner ? (
+              <mesh position={[0, 0, 0.05]} scale={[0.55, 0.82, 0.5]}>
+                <capsuleGeometry args={[0.09, 0.34, 10, 20]} />
+                <meshStandardMaterial color={inner} roughness={0.6} />
+              </mesh>
+            ) : null}
+          </group>
+        ))}
       </>
     );
   }
@@ -113,14 +129,20 @@ function Ears({ kind, color }: EarsProps) {
 
   return (
     <>
-      <mesh position={[-0.42, 0.78, 0]}>
-        <sphereGeometry args={[0.17, 24, 24]} />
-        <meshStandardMaterial color={color} roughness={0.6} />
-      </mesh>
-      <mesh position={[0.42, 0.78, 0]}>
-        <sphereGeometry args={[0.17, 24, 24]} />
-        <meshStandardMaterial color={color} roughness={0.6} />
-      </mesh>
+      {[-1, 1].map((side) => (
+        <group key={side} position={[side * 0.42, 0.78, 0]}>
+          <mesh>
+            <sphereGeometry args={[0.17, 24, 24]} />
+            <meshStandardMaterial color={color} roughness={0.6} />
+          </mesh>
+          {inner ? (
+            <mesh position={[0, 0, 0.12]} scale={[0.62, 0.62, 0.35]}>
+              <sphereGeometry args={[0.17, 20, 20]} />
+              <meshStandardMaterial color={inner} roughness={0.6} />
+            </mesh>
+          ) : null}
+        </group>
+      ))}
     </>
   );
 }
@@ -185,25 +207,10 @@ function Eyes({ kind }: EyesProps) {
  * the surface directly and dips in the middle.
  */
 function Smile() {
-  const { geometry, center } = useMemo(() => {
-    const world: Vector3[] = [];
-    for (let index = 0; index <= 8; index += 1) {
-      const [x, y, z] = mouthPoint((index / 8) * 2 - 1);
-      world.push(new Vector3(x, y, z));
-    }
-    // The tube is built around the origin and the mesh carries the offset.
-    // Building the curve from world-space points *and* positioning the mesh
-    // at the centre would apply the offset twice, throwing the mouth off
-    // the face.
-    const origin = world[4]!;
-    const curve = new CatmullRomCurve3(
-      world.map((point) => point.clone().sub(origin)),
-    );
-    return {
-      geometry: new TubeGeometry(curve, 24, MOUTH_TUBE_RADIUS, 8, false),
-      center: origin,
-    };
-  }, []);
+  const { geometry, center } = useMemo(
+    () => buildMouth(MOUTH_HALF_WIDTH, MOUTH_BASE_Y, MOUTH_DIP),
+    [],
+  );
 
   useEffect(() => () => geometry.dispose(), [geometry]);
 
@@ -411,6 +418,8 @@ function ContactShadow() {
 
 interface CharacterProps {
   readonly avatar: ResolvedAvatar;
+  /** The creature behind the child's avatar emoji. */
+  readonly look: SpeciesLook;
   /** Whether the frame loop is running at all (false = reduce motion). */
   readonly animated: boolean;
   /** Whether the character keeps turning. Off for the static home hero. */
@@ -419,10 +428,16 @@ interface CharacterProps {
   readonly version: number;
 }
 
-function Character({ avatar, animated, spin, version }: CharacterProps) {
+function Character({
+  avatar,
+  look,
+  animated,
+  spin,
+  version,
+}: CharacterProps) {
   const group = useRef<Group>(null);
   const body = useRef<Mesh>(null);
-  const color = avatar.color?.value ?? FALLBACK_COLOR;
+  const color = avatar.color?.value ?? look.fur;
 
   // The scale that plays the swap animation, and the value it eases back
   // from. Both live in refs so the animation itself never triggers a
@@ -498,7 +513,12 @@ function Character({ avatar, animated, spin, version }: CharacterProps) {
         <sphereGeometry args={[HEAD_RADIUS, 40, 40]} />
         <meshStandardMaterial color={color} roughness={0.62} />
       </mesh>
-      <Ears kind={avatar.ears?.value ?? "round"} color={color} />
+      <Ears
+        kind={avatar.ears?.value ?? "round"}
+        color={look.earColor ?? color}
+        inner={look.innerEar}
+      />
+      <SpeciesFeatures look={look} fur={color} />
       <Eyes kind={avatar.eyes?.value ?? "dot"} />
       <Cheeks />
       <Accessory kind={avatar.accessory?.value ?? "none"} />
@@ -554,15 +574,19 @@ function useAvatarVersion(avatar: ResolvedAvatar): number {
 
 export default function Avatar3DScene({
   avatar,
+  species = DEFAULT_SPECIES,
   reduceMotion = false,
   spin = true,
 }: {
   readonly avatar: ResolvedAvatar;
+  /** AvatarId of the child's profile: it decides the creature. */
+  readonly species?: string;
   readonly reduceMotion?: boolean;
   /** Wraps the character in a static, front-facing pose when false. */
   readonly spin?: boolean;
 }) {
-  const color = avatar.color?.value ?? FALLBACK_COLOR;
+  const look = speciesLook(species);
+  const color = avatar.color?.value ?? look.fur;
   const version = useAvatarVersion(avatar);
 
   return (
@@ -588,6 +612,7 @@ export default function Avatar3DScene({
       <directionalLight position={[0, 2.4, -3]} intensity={0.9} color="#ffd9b8" />
       <Character
         avatar={avatar}
+        look={look}
         animated={!reduceMotion}
         spin={spin}
         version={version}

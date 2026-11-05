@@ -3,10 +3,11 @@ import { Suspense, lazy, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRewards } from "../../app/RewardsContext";
 import { AVATAR_PARTS } from "../../data";
+import { avatarEmoji } from "../../data/avatars";
+import { defaultAvatarFor } from "../../data/species";
 import {
   avatarPartName,
   AVATAR_SLOTS,
-  defaultAvatarConfig,
   isLocale,
   isPartUnlocked,
   partsForSlot,
@@ -26,7 +27,14 @@ import "./avatar.css";
 const LazyAvatar3D = lazy(() => import("./Avatar3DScene"));
 
 const SLOT_EMOJI: Readonly<Record<string, Readonly<Record<string, string>>>> = {
-  ears: { round: "🟡", pointy: "🔺", floppy: "🍃", horn: "🌙" },
+  ears: {
+    round: "🟡",
+    pointy: "🔺",
+    floppy: "🍃",
+    horn: "🌙",
+    long: "🐰",
+    none: "🚫",
+  },
   eyes: { dot: "⚫", happy: "😊", sparkle: "✨" },
   accessory: { none: "🚫", hat: "🎩", bow: "🎀", glasses: "👓", crown: "👑" },
 };
@@ -45,7 +53,7 @@ export function AvatarScreen({
   const { t, i18n } = useTranslation();
   const { unlockedIds } = useRewards();
   const [config, setConfig] = useState<AvatarConfig>(() =>
-    defaultAvatarConfig(AVATAR_PARTS),
+    defaultAvatarFor(AVATAR_PARTS, profile.avatarId),
   );
   const locale = isLocale(i18n.language) ? i18n.language : "id";
   const avatar = resolveAvatar(config, AVATAR_PARTS);
@@ -84,11 +92,23 @@ export function AvatarScreen({
       <div className="avatar__body">
         <div className="avatar__stage">
           {supportsWebgl() ? (
-            <Suspense fallback={<div className="avatar__fallback">🐻</div>}>
-              <LazyAvatar3D avatar={avatar} reduceMotion={reduceMotion} />
+            <Suspense
+              fallback={
+                <div className="avatar__fallback">
+                  {avatarEmoji(profile.avatarId)}
+                </div>
+              }
+            >
+              <LazyAvatar3D
+                avatar={avatar}
+                species={profile.avatarId}
+                reduceMotion={reduceMotion}
+              />
             </Suspense>
           ) : (
-            <div className="avatar__fallback">🐻</div>
+            <div className="avatar__fallback">
+              {avatarEmoji(profile.avatarId)}
+            </div>
           )}
         </div>
 

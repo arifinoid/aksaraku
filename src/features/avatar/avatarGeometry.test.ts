@@ -24,8 +24,10 @@ import {
 } from "./avatarGeometry";
 
 const SCENE = join(import.meta.dir, "Avatar3DScene.tsx");
+const MOUTH = join(import.meta.dir, "mouthTube.ts");
 
 const sceneSource = (): string => readFileSync(SCENE, "utf8");
+const mouthSource = (): string => readFileSync(MOUTH, "utf8");
 
 describe("head surface", () => {
   test("is an ellipsoid, not a sphere", () => {
@@ -168,15 +170,19 @@ describe("smile", () => {
     // offset. Building the curve in world space *and* positioning the mesh
     // at the centre applies the offset twice, which throws the mouth off
     // the face: it ends up in front of the head and above the chin.
-    const source = sceneSource();
-    const smile = source.slice(
-      source.indexOf("function Smile("),
-      source.indexOf("function Cheeks("),
-    );
+    // The builder lives in its own module now, so the check follows it there.
+    const source = mouthSource();
     // The curve has to be built from points relative to the origin.
-    expect(smile).toContain(".sub(origin)");
+    expect(source).toContain(".sub(origin)");
     // And the origin has to come from the sampled points.
-    expect(smile).toContain("world[4]");
+    expect(source).toContain("world[4]");
+    // The scene must not rebuild the curve itself.
+    const scene = sceneSource();
+    const smile = scene.slice(
+      scene.indexOf("function Smile("),
+      scene.indexOf("function Cheeks("),
+    );
+    expect(smile).not.toContain("CatmullRomCurve3");
   });
 });
 

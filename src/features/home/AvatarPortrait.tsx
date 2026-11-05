@@ -1,7 +1,7 @@
 import { Suspense, lazy, useEffect, useState } from "react";
 import { AVATAR_PARTS } from "../../data";
+import { defaultAvatarFor } from "../../data/species";
 import {
-  defaultAvatarConfig,
   resolveAvatar,
   type AvatarConfig,
   type ProfileId,
@@ -15,6 +15,8 @@ const LazyAvatar3D = lazy(() => import("../avatar/Avatar3DScene"));
 
 export interface AvatarPortraitProps {
   readonly profileId: ProfileId;
+  /** The child's avatar id: the 3D character takes its species from it. */
+  readonly species: string;
   readonly reduceMotion: boolean;
   /** Shown while the 3D chunk loads or when WebGL is unavailable. */
   readonly fallback: string;
@@ -31,6 +33,7 @@ export interface AvatarPortraitProps {
  */
 export function AvatarPortrait({
   profileId,
+  species,
   reduceMotion,
   fallback,
   label,
@@ -46,14 +49,14 @@ export function AvatarPortrait({
       const config: AvatarConfig =
         result._tag === "Right" && result.right
           ? result.right
-          : defaultAvatarConfig(AVATAR_PARTS);
+          : defaultAvatarFor(AVATAR_PARTS, species);
       setAvatar(resolveAvatar(config, AVATAR_PARTS));
     })();
 
     return () => {
       active = false;
     };
-  }, [profileId]);
+  }, [profileId, species]);
 
   if (!avatar || !supportsWebgl()) {
     return (
@@ -72,7 +75,12 @@ export function AvatarPortrait({
           </span>
         }
       >
-        <LazyAvatar3D avatar={avatar} reduceMotion={reduceMotion} spin={false} />
+        <LazyAvatar3D
+          avatar={avatar}
+          species={species}
+          reduceMotion={reduceMotion}
+          spin={false}
+        />
       </Suspense>
     </span>
   );

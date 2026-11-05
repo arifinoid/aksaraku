@@ -63,13 +63,29 @@ export const MOUTH_OFFSET = 0.008;
  * The corners sit higher than the middle: that is the difference between a
  * smile and a frown.
  */
-export const mouthPoint = (
+export const mouthPointAt = (
   t: number,
+  halfWidth: number,
+  baseY: number,
+  dip: number,
 ): readonly [x: number, y: number, z: number] => {
-  const x = t * MOUTH_HALF_WIDTH;
-  const y = MOUTH_BASE_Y - (1 - t * t) * MOUTH_DIP;
+  const x = t * halfWidth;
+  const y = baseY - (1 - t * t) * dip;
   return [x, y, headSurfaceZ(x, y) + MOUTH_OFFSET];
 };
+
+export const mouthPoint = (
+  t: number,
+): readonly [x: number, y: number, z: number] =>
+  mouthPointAt(t, MOUTH_HALF_WIDTH, MOUTH_BASE_Y, MOUTH_DIP);
+
+/**
+ * A frog's mouth: wider and flatter than the smile, which is what makes the
+ * face read as a frog instead of a green ball.
+ */
+export const WIDE_MOUTH_HALF_WIDTH = 0.2;
+export const WIDE_MOUTH_BASE_Y = HEAD_Y - 0.18;
+export const WIDE_MOUTH_DIP = 0.02;
 
 /**
  * Where a face piece sits, in world space.
@@ -126,3 +142,42 @@ export const glassesBridgePosition = (): FacePoint => [
   EYE_Y,
   headSurfaceZ(0, EYE_Y) + 0.03,
 ];
+
+/** The body sits below the head and is the same radius. */
+export const BODY_Y = -0.42;
+export const BODY_RADIUS = 0.5;
+
+/**
+ * The muzzle: a sphere that pokes a few millimetres out of the head, so the
+ * lighter patch reads as a snout instead of a sticker. Its centre is pushed
+ * back by one radius, which puts the front exactly `MUZZLE_LIFT` above the
+ * surface.
+ */
+export const MUZZLE_Y = HEAD_Y - 0.1;
+export const MUZZLE_RADIUS = 0.17;
+export const MUZZLE_LIFT = 0.006;
+
+export const muzzlePosition = (): FacePoint => [
+  0,
+  MUZZLE_Y,
+  headSurfaceZ(0, MUZZLE_Y) + MUZZLE_LIFT - MUZZLE_RADIUS,
+];
+
+/** The nose sits near the top of the muzzle, not in the middle of it. */
+export const NOSE_Y = MUZZLE_Y + 0.05;
+export const NOSE_RADIUS = 0.038;
+
+/**
+ * The nose centre. With a muzzle it rides on the muzzle sphere; without one
+ * it falls back to the head surface, which is the frog case.
+ */
+export const nosePosition = (onMuzzle: boolean): FacePoint => {
+  const front = onMuzzle
+    ? muzzlePosition()[2] +
+      Math.sqrt(Math.max(0, MUZZLE_RADIUS ** 2 - (NOSE_Y - MUZZLE_Y) ** 2))
+    : headSurfaceZ(0, NOSE_Y);
+  return [0, NOSE_Y, front + 0.004];
+};
+
+/** The tail hangs behind the body, clear of it. */
+export const TAIL_Z = -(BODY_RADIUS - 0.02);

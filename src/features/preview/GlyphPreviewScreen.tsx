@@ -1,56 +1,27 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Info, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { GLYPH_CATEGORIES, itemPhoneme } from "../../data";
 import { useActiveLocale } from "../../i18n";
-import type { ModuleItem, Vec2 } from "../../domain";
+import type { ModuleKind } from "../../domain";
 import { Icon } from "../../ui";
 import "./preview.css";
 
-const toPolylinePoints = (points: readonly Vec2[]): string =>
-  points.map((point) => `${point.x},${point.y}`).join(" ");
-
-const STROKE_COLORS = ["#ff7a45", "#4cb8e8", "#4cc38a", "#f7ce5b", "#ef476f"];
-
-function GlyphSvg({ item }: { readonly item: ModuleItem }) {
-  return (
-    <svg
-      className="preview__svg"
-      viewBox="-6 -6 112 112"
-      role="img"
-      aria-label={item.glyph}
-    >
-      {item.strokes.map((stroke, index) => (
-        <polyline
-          key={`line-${index}`}
-          points={toPolylinePoints(stroke.points)}
-          fill="none"
-          stroke={STROKE_COLORS[index % STROKE_COLORS.length]}
-          strokeWidth={2.6}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      ))}
-      {item.strokes.map((stroke, index) => {
-        const start = stroke.points[0];
-        if (!start) return null;
-        return (
-          <circle
-            key={`dot-${index}`}
-            cx={start.x}
-            cy={start.y}
-            r={3}
-            fill="#3d2b1f"
-          />
-        );
-      })}
-    </svg>
-  );
-}
+/** Per-category unit for the section counter, e.g. "26 huruf". */
+const COUNT_KEY = {
+  "letter-upper": "preview.countLetters",
+  "letter-lower": "preview.countLetters",
+  digit: "preview.countNumbers",
+  shape: "preview.countShapes",
+} as const satisfies Record<ModuleKind, string>;
 
 export interface GlyphPreviewScreenProps {
   readonly onBack: () => void;
 }
 
+/**
+ * Pen.dev "23 · Pratinjau Konten": one card per category, a counter and a row
+ * of glyph chips. Read-only, so the screen offers a single way out.
+ */
 export function GlyphPreviewScreen({ onBack }: GlyphPreviewScreenProps) {
   const { t } = useTranslation();
   const locale = useActiveLocale();
@@ -59,30 +30,51 @@ export function GlyphPreviewScreen({ onBack }: GlyphPreviewScreenProps) {
     <div className="preview">
       <header className="preview__top">
         <button type="button" className="preview__back" onClick={onBack}>
-          <Icon glyph={ArrowLeft} size={16} />
+          <Icon glyph={ArrowLeft} size={14} />
           <span>{t("common.back")}</span>
         </button>
-        <div className="preview__titles">
-          <h1 className="preview__title">{t("preview.title")}</h1>
-          <p className="preview__sub">{t("preview.hint")}</p>
-        </div>
-        <div className="preview__meta" />
+        <h1 className="preview__title">{t("preview.title")}</h1>
       </header>
-      {GLYPH_CATEGORIES.map((category) => (
-        <section key={category.kind} className="preview__section">
-          <h2 className="preview__section-title">{t(category.labelKey)}</h2>
-          <div className="preview__grid">
-            {category.items.map((item) => (
-              <figure key={item.id} className="preview__cell">
-                <GlyphSvg item={item} />
-                <figcaption className="preview__caption">
-                  {item.glyph} · {itemPhoneme(item, locale)}
-                </figcaption>
-              </figure>
-            ))}
-          </div>
-        </section>
-      ))}
+
+      <div className="preview__content">
+        <p className="preview__lead">{t("preview.hint")}</p>
+
+        {GLYPH_CATEGORIES.map((category) => (
+          <section key={category.kind} className="preview__section">
+            <div className="preview__head">
+              <h2 className="preview__section-title">
+                {t(category.labelKey)}
+              </h2>
+              <span className="preview__count">
+                {t(COUNT_KEY[category.kind], {
+                  count: category.items.length,
+                })}
+              </span>
+            </div>
+
+            <ul className="preview__row">
+              {category.items.map((item) => (
+                <li key={item.id} className="preview__chip">
+                  <span aria-hidden="true">{item.glyph}</span>
+                  <span className="visually-hidden">
+                    {itemPhoneme(item, locale)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+
+        <p className="preview__note">
+          <Icon glyph={Info} size={14} />
+          <span>{t("preview.note")}</span>
+        </p>
+
+        <button type="button" className="preview__close" onClick={onBack}>
+          <Icon glyph={X} size={15} />
+          <span>{t("preview.close")}</span>
+        </button>
+      </div>
     </div>
   );
 }

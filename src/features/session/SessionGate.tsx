@@ -60,6 +60,7 @@ export function SessionGate({ children }: SessionGateProps) {
 
           {unlocking ? (
             <ParentGate
+              compact
               onUnlock={() => {
                 setUnlocking(false);
                 restart();

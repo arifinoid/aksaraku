@@ -252,6 +252,7 @@ export function HomeScreen({
         <div className="hero__mascot">
           <AvatarPortrait
             profileId={profile.id}
+            species={profile.avatarId}
             reduceMotion={reduceMotion}
             fallback={avatarEmoji(profile.avatarId)}
             label={profile.name}

@@ -16,6 +16,7 @@ import {
   profileErrorMessageKey,
 } from "../../domain";
 import { LOCALE_OPTIONS, useActiveLocale } from "../../i18n";
+import { trackEvent } from "../../platform/analytics";
 import { newId } from "../../platform/ids";
 import { Icon } from "../../ui";
 import "./profiles.css";
@@ -61,6 +62,7 @@ export function ProfileScreen({
 
     setErrorKey(null);
     setName("");
+    trackEvent("profile-created");
     onCreate(result.right);
   };
 

@@ -8,8 +8,8 @@
 ## Overview
 
 Aksaraku is a PWA (Progressive Web App) for toddler education (tracing, games,
-gamification). It is hosted on **Cloudflare Pages** (free tier) and deployed via
-GitHub Actions CI/CD from the `main` branch.
+gamification). It is deployed to the owner's VPS (served as static files by
+nginx) and mirrored to **Cloudflare Pages** (free tier) for previews.
 
 ```
 ┌──────────────────────────────────────────────────────┐
@@ -38,10 +38,12 @@ GitHub Actions CI/CD from the `main` branch.
 
 | Resource            | Value / Location                  | Notes                             |
 |---------------------|------------------------------------|-----------------------------------|
-| Hosting             | Cloudflare Pages                   | Free tier                          |
+| Hosting             | VPS (production) + Cloudflare Pages (preview) | Static files, no server runtime |
+| Production URL      | `https://aksaraku.arifinoid.web.id` | nginx release dir + `current` symlink |
+| Pages URL           | `https://aksaraku.pages.dev`       | Preview/fallback target |
+| Analytics           | `https://stats.arifinoid.web.id`   | Self-hosted GoatCounter, cookieless |
 | Project name        | `aksaraku`                         | In `wrangler.toml` & `deploy.sh`   |
-| Production URL      | `https://aksaraku.pages.dev`       | Auto-assigned `*.pages.dev` subdomain |
-| Production branch   | `main`                             | Deploys to production subdomain     |
+| Production branch   | `main`                             | Deploys to both targets            |
 | Preview branches   | any non-`main` branch              | Auto-generated preview URLs         |
 | Build output        | `./dist`                           | `pages_build_output_dir` in `wrangler.toml` |
 | Runtime             | Bun (build) → static files (serve) | No server-side runtime — pure static |

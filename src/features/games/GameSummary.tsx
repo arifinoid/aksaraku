@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type { StarCount } from "../../domain";
+import { trackEvent } from "../../platform/analytics";
 import { Button, StarRow } from "../../ui";
 import "../play/play.css";
 
@@ -21,6 +23,13 @@ export function GameSummary({
   onBack,
 }: GameSummaryProps) {
   const { t } = useTranslation();
+
+  // Matching, balloon and coloring mount this screen when a round finishes,
+  // so one event here covers all three. Tracing reports per-item completion
+  // from TracingScreen instead.
+  useEffect(() => {
+    trackEvent("game-complete");
+  }, []);
 
   return (
     <div className="play__overlay">

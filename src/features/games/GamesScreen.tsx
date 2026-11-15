@@ -1,7 +1,17 @@
-import { ArrowRight, Flame, Paintbrush, Puzzle, Sparkles, Star } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowLeftRight,
+  ArrowRight,
+  Flame,
+  PartyPopper,
+  Palette,
+  Sparkles,
+  Star,
+} from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRewards } from "../../app/RewardsContext";
+import { useSession } from "../../app/SessionContext";
 import { avatarEmoji, GLYPH_ITEMS } from "../../data";
 import {
   pickOne,
@@ -28,35 +38,48 @@ type GamesView = "hub" | "matching" | "balloon" | "coloring";
 interface GameCard {
   readonly key: "matching" | "balloon" | "coloring";
   readonly tone: "coral" | "sky" | "mango";
-  readonly icon: string;
+  readonly glyph: typeof ArrowLeftRight;
   readonly titleKey: string;
   readonly subKey: string;
+  /** Real content counts, used for the desktop badge chip. */
+  readonly badgeCount: number;
+  readonly badgeKey: string;
   readonly view: Exclude<GamesView, "hub">;
 }
+
+const MATCHING_MODES = 2;
+const BALLOON_COUNT = 4;
+const COLORING_PAGES = 8;
 
 const GAMES: readonly GameCard[] = [
   {
     key: "matching",
     tone: "coral",
-    icon: "🧩",
+    glyph: ArrowLeftRight,
     titleKey: "games.matching",
     subKey: "games.matchingSub",
+    badgeCount: MATCHING_MODES,
+    badgeKey: "games.badgeModes",
     view: "matching",
   },
   {
     key: "balloon",
     tone: "sky",
-    icon: "🎈",
+    glyph: PartyPopper,
     titleKey: "games.balloon",
     subKey: "games.balloonSub",
+    badgeCount: BALLOON_COUNT,
+    badgeKey: "games.badgeBalloons",
     view: "balloon",
   },
   {
     key: "coloring",
     tone: "mango",
-    icon: "🎨",
+    glyph: Palette,
     titleKey: "games.coloring",
     subKey: "games.coloringSub",
+    badgeCount: COLORING_PAGES,
+    badgeKey: "games.badgePages",
     view: "coloring",
   },
 ];
@@ -65,6 +88,7 @@ export function GamesScreen({ profile, settings, onBack }: GamesScreenProps) {
   const { t } = useTranslation();
   const locale = useActiveLocale();
   const { stats, mastery } = useRewards();
+  const { session } = useSession();
   const [view, setView] = useState<GamesView>("hub");
   const [coloringItem, setColoringItem] = useState<ModuleItem | null>(null);
 
@@ -103,22 +127,24 @@ export function GamesScreen({ profile, settings, onBack }: GamesScreenProps) {
   };
 
   const streak = currentStreak(mastery.map((entry) => entry.lastSeenAt));
-  const nextRewardProgress = Math.min(
-    100,
-    Math.round((stats.starsEarned % 3) / 3 * 100),
-  );
+  // The three-star sticker meter rolls over every 3 stars earned.
+  const nextRewardCurrent = stats.starsEarned % 3;
+  const nextRewardProgress = Math.min(100, Math.round((nextRewardCurrent / 3) * 100));
 
   return (
     <div className="games">
       <header className="games__top">
-        <button type="button" className="games__back" onClick={onBack}>
-          <Icon glyph={ArrowRight} size={16} className="games__back-icon" />
+        <button type="button" className="back-pill" onClick={onBack}>
+          <Icon glyph={ArrowLeft} size={16} />
           <span>{t("common.back")}</span>
         </button>
 
         <div className="games__titles">
           <h1 className="games__title">{t("games.title")}</h1>
-          <p className="games__sub">{t("games.pick")}</p>
+          <p className="games__sub games__sub--mobile">{t("games.pick")}</p>
+          <p className="games__sub games__sub--desktop">
+            {t("games.pickDesktop")}
+          </p>
         </div>
 
         <div className="games__meta">
@@ -148,50 +174,72 @@ export function GamesScreen({ profile, settings, onBack }: GamesScreenProps) {
                 : setView(game.view)
             }
           >
-            <span className="game-card__icon" aria-hidden="true">
-              {game.icon}
+            <span className="game-card__head">
+              <span className="game-card__icon" aria-hidden="true">
+                <Icon glyph={game.glyph} size={30} />
+              </span>
+              <span className="game-card__badge-chip">
+                {t(game.badgeKey, { count: game.badgeCount })}
+              </span>
             </span>
+
             <span className="game-card__copy">
               <span className="game-card__title">{t(game.titleKey)}</span>
               <span className="game-card__sub">{t(game.subKey)}</span>
             </span>
-            <span className="game-card__play">
-              {t("games.play")}
-              <Icon glyph={ArrowRight} size={14} />
+
+            <span className="game-card__cta">
+              {t("games.launch")}
+              <Icon glyph={ArrowRight} size={15} />
+            </span>
+
+            <span className="game-card__go" aria-hidden="true">
+              <Icon glyph={ArrowRight} size={20} />
             </span>
           </button>
         ))}
       </div>
 
       <div className="games__footer">
-        <span className="games__footer-icon" aria-hidden="true">
-          <Icon glyph={Sparkles} size={15} />
-        </span>
-        <span className="games__footer-text">{t("games.footer")}</span>
+        <Icon glyph={Sparkles} size={15} className="games__footer-icon" />
+        <span>{t("games.footer")}</span>
       </div>
 
       <div className="games__bottom">
         <section className="games__score-card">
           <h2 className="games__score-title">{t("games.progressTitle")}</h2>
-          <div className="games__score-stats">
-            <span className="games__score-stat">
-              <Icon glyph={Star} size={16} className="games__score-stat-icon" />
-              {t("games.starsEarned", { count: stats.starsEarned })}
-            </span>
-            <span className="games__score-stat">
-              <Icon glyph={Puzzle} size={16} className="games__score-stat-icon" />
-              {t("games.played", { count: stats.totalAttempts })}
-            </span>
+          <div className="games__stat-row">
+            <div className="games__stat-tile">
+              <span className="games__stat-value games__stat-value--sky">
+                {stats.totalAttempts}
+              </span>
+              <span className="games__stat-label">{t("games.statGames")}</span>
+            </div>
+            <div className="games__stat-tile">
+              <span className="games__stat-value games__stat-value--mango">
+                {stats.starsEarned}
+              </span>
+              <span className="games__stat-label">{t("games.statStarsLabel")}</span>
+            </div>
+            <div className="games__stat-tile">
+              <span className="games__stat-value games__stat-value--grape">
+                {session?.spentMinutes ?? 0}
+              </span>
+              <span className="games__stat-label">{t("games.statMinutes")}</span>
+            </div>
           </div>
           <p className="games__score-sub">{t("games.progressSub")}</p>
         </section>
 
         <section className="games__reward-card">
           <div className="games__reward-head">
-            <span className="games__reward-icon" aria-hidden="true">
-              <Icon glyph={Sparkles} size={18} />
-            </span>
             <h2 className="games__reward-title">{t("games.nextReward")}</h2>
+            <span className="games__reward-chip">
+              {t("home.reward.count", {
+                current: nextRewardCurrent,
+                target: 3,
+              })}
+            </span>
           </div>
           <p className="games__reward-sub">{t("games.nextRewardSub")}</p>
           <div
@@ -199,7 +247,7 @@ export function GamesScreen({ profile, settings, onBack }: GamesScreenProps) {
             role="progressbar"
             aria-valuemin={0}
             aria-valuemax={3}
-            aria-valuenow={stats.starsEarned % 3}
+            aria-valuenow={nextRewardCurrent}
           >
             <span
               className="games__reward-fill"

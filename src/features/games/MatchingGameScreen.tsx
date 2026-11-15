@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Check, Flame, Star, Volume2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Flame, Star, Volume2, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRewards } from "../../app/RewardsContext";
@@ -76,8 +76,6 @@ export function MatchingGameScreen({
     return "";
   };
 
-  const streak = 0;
-
   return (
     <div className="match">
       <header className="match__top">
@@ -100,6 +98,29 @@ export function MatchingGameScreen({
           </span>
         </div>
       </header>
+
+      <div className="match__progress">
+        <span className="match__progress-label">
+          {t("games.questionIndex", {
+            current: game.session.index + 1,
+            total: ROUNDS,
+          })}
+        </span>
+        <span className="match__progress-stars" aria-hidden="true">
+          {[1, 2, 3].map((star) => (
+            <Icon
+              key={star}
+              glyph={Star}
+              size={15}
+              className={
+                star <= game.correct
+                  ? "match__progress-star match__progress-star--on"
+                  : "match__progress-star"
+              }
+            />
+          ))}
+        </span>
+      </div>
 
       <div className="match__modes">
         <button
@@ -145,6 +166,7 @@ export function MatchingGameScreen({
         </div>
       ) : game.feedback === "wrong" ? (
         <div className="match__feedback match__feedback--bad">
+          <Icon glyph={X} size={16} />
           <span>{t("games.wrong")}</span>
         </div>
       ) : null}

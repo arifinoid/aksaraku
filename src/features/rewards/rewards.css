@@ -1,180 +1,121 @@
-.rewards__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
-  gap: var(--space-3);
-}
-
-.reward-card {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: var(--space-2);
-  border: 3px dashed var(--c-bg-2);
-  border-radius: var(--radius-md);
-  background: var(--c-bg);
-  text-align: center;
-}
-
-.reward-card--unlocked {
-  border: 3px solid var(--c-success);
-  background: var(--c-surface);
-  box-shadow: var(--shadow-soft);
-  /* The card is the positioning context for the expanding ring, so the
-     ring is allowed to spill outside the card. */
-  position: relative;
-  overflow: visible;
-}
-
-.reward-card__emoji {
-  font-size: 2.2rem;
-  line-height: 1.1;
-  filter: grayscale(1);
-  opacity: 0.55;
-}
-
-.reward-card--unlocked .reward-card__emoji {
-  filter: none;
-  opacity: 1;
-}
-
-.reward-card__name {
-  font-size: 0.85rem;
-  font-weight: 800;
-}
-
-.reward-card__progress {
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--c-muted);
-}
-
-.reward-card__requirement {
-  font-size: 0.7rem;
-  color: var(--c-muted);
-}
-
-.rewards__celebration {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-  justify-content: center;
-  max-width: 520px;
-}
-
 /*
- * The celebration emoji. Its own class rather than the star row's: the
- * stars are sized for a row of glyphs, this is a single character.
- */
-.rewards__burst {
-  font-size: clamp(3rem, 14vw, 5rem);
-  line-height: 1;
-}
-
-/*
- * The celebration overlay. The confetti is a separate layer behind the
- * content so it falls past the reward card instead of over the text.
- */
-.rewards__celebrate {
-  position: fixed;
-  overflow: hidden;
-}
-
-.rewards__confetti {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.rewards__celebrate > *:not(.rewards__confetti) {
-  position: relative;
-  z-index: 1;
-}
-
-/*
- * The unlocked card carries an expanding ring so the child's eye goes
- * straight to the thing they just earned.
+ * Koleksi Hadiah — rebuilt to pen.dev frame 11 (mobile) and d5 (desktop).
+ * A three-counter summary, tab pills, one card per reward, and a desktop
+ * "next reward" meter.
  */
 
-/* Phase 4 revamp — collection wrapper */
 .collection {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: calc(10px + env(safe-area-inset-top, 0px)) 20px calc(24px + env(safe-area-inset-bottom, 0px));
+  gap: 16px;
+  width: 100%;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 20px
+    calc(24px + env(safe-area-inset-bottom, 0px));
 }
 
 .collection__top {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 36px;
+  gap: 14px;
+  min-height: 34px;
 }
-
-.collection__back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 30px;
-  padding-inline: 10px 13px;
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: var(--c-surface);
-  color: var(--c-ink);
-  font-size: 10.5px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.collection__titles { min-width: 0; text-align: center; }
 
 .collection__title {
   font-family: var(--font-display);
-  font-size: 21px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.collection__sub--desktop {
+  display: none;
+  color: var(--c-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Summary ----------------------------------------------------------- */
+
+/* Mobile: one white card, three counters split by hairlines. */
+.collection__summary {
+  display: flex;
+  align-items: stretch;
+  padding: 14px 8px;
+  border-radius: 18px;
+  background: var(--c-surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.collection-counter {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 12px;
+}
+
+.collection-counter + .collection-counter {
+  border-inline-start: 1px solid var(--c-line);
+}
+
+.collection-counter__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.collection-counter__value {
+  font-family: var(--font-display);
+  font-size: 17px;
   font-weight: 700;
   line-height: 1.1;
 }
 
-.collection__sub { display: none; }
-
-.collection__meta { display: none; }
-
-.collection__summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 14px;
-  border-radius: 18px;
-  background: var(--c-surface);
-  box-shadow: var(--shadow-soft);
-  font-size: 12px;
-  font-weight: 800;
+.collection-counter__label {
+  color: var(--c-muted);
+  font-size: 11px;
+  font-weight: 700;
 }
 
-.collection__summary-icon { color: var(--c-mango); }
+.collection-counter__icon {
+  display: none;
+  color: inherit;
+}
 
-.collection__summary-text { color: var(--c-ink); }
+.collection-counter--grape { color: var(--c-grape); }
+.collection-counter--mango { color: var(--c-mango-ink); }
+.collection-counter--leaf { color: var(--c-leaf-ink); }
+
+/* Tabs ---------------------------------------------------------------- */
+
+.collection__tabrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
 
 .collection__tabs {
   display: flex;
-  gap: 7px;
+  flex: 1;
+  gap: 8px;
 }
 
 .collection__tab {
   flex: 1;
-  height: 32px;
-  display: grid;
-  place-items: center;
+  min-height: 42px;
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--c-surface);
   color: var(--c-muted);
-  font-size: 10.5px;
+  font-size: 13px;
   font-weight: 800;
   cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition:
+    background-color var(--motion-fast) var(--motion-out),
+    color var(--motion-fast) var(--motion-out);
 }
 
 .collection__tab--active {
@@ -182,32 +123,301 @@
   color: #fff;
 }
 
-.collection__section { display: flex; flex-direction: column; gap: 8px; }
-
-.collection__section-title {
-  font-family: var(--font-display);
-  font-size: 16px;
+.collection__opennote {
+  display: none;
+  color: var(--c-muted);
+  font-size: 12px;
   font-weight: 700;
+}
+
+/* Reward grid ---------------------------------------------------------- */
+
+.rewards__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.reward-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 20px 16px 18px;
+  border-radius: 22px;
+  background: var(--c-surface);
+  box-shadow: var(--shadow-soft);
+  text-align: center;
+}
+
+.reward-card__lock {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--c-surface);
+  color: var(--c-muted);
+  box-shadow: var(--shadow-soft);
+}
+
+.reward-card__medal {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--c-bg-2);
+  color: var(--c-muted);
+}
+
+.reward-card__name {
+  font-size: 13.5px;
+  font-weight: 800;
+}
+
+/* Unlocked cards carry the brand tint behind the emblem. */
+.reward-card--unlocked.reward-card--mango { background: var(--c-mango-soft); }
+.reward-card--unlocked.reward-card--coral { background: #fde3e4; }
+.reward-card--unlocked.reward-card--sky { background: var(--c-sky-soft); }
+.reward-card--unlocked.reward-card--leaf { background: var(--c-leaf-soft); }
+.reward-card--unlocked.reward-card--grape { background: var(--c-grape-soft); }
+
+.reward-card--unlocked .reward-card__medal {
+  background: var(--c-surface);
+  color: var(--c-ink);
+}
+
+.reward-card--unlocked.reward-card--mango .reward-card__medal { color: var(--c-mango-ink); }
+.reward-card--unlocked.reward-card--coral .reward-card__medal { color: var(--c-coral); }
+.reward-card--unlocked.reward-card--sky .reward-card__medal { color: var(--c-sky-ink); }
+.reward-card--unlocked.reward-card--leaf .reward-card__medal { color: var(--c-leaf-ink); }
+.reward-card--unlocked.reward-card--grape .reward-card__medal { color: var(--c-grape); }
+
+.reward-card__open {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 24px;
+  padding-inline: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--c-leaf-soft);
+  color: var(--c-leaf-ink);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* Locked cards track requirement progress. */
+.reward-card__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.reward-card__requirement {
+  color: var(--c-muted);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.reward-card__track {
+  display: block;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: var(--c-bg-2);
+  overflow: hidden;
+}
+
+.reward-card__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--c-coral);
+}
+
+.reward-card__count {
+  color: var(--c-muted);
+  font-variant-numeric: tabular-nums;
+  font-size: 10.5px;
+  font-weight: 800;
+}
+
+/* Next reward (desktop only) ------------------------------------------- */
+
+.collection__next {
+  display: none;
 }
 
 .collection__footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  color: var(--c-label);
-  font-size: 10.5px;
+  color: var(--c-muted);
+  font-size: 12px;
   font-weight: 700;
+  text-align: center;
 }
 
+/* Desktop ------------------------------------------------------------- */
+
 @media (min-width: 900px) {
-  .collection { gap: 18px; padding: 28px var(--shell-gutter) 36px; }
-  .collection__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
-  .collection__back { display: none; }
-  .collection__titles { text-align: start; }
-  .collection__title { font-size: 31px; }
-  .collection__sub { display: block; margin-block-start: 4px; color: var(--c-muted); font-size: 12.5px; font-weight: 600; }
-  .collection__meta { display: flex; flex: 0 0 auto; align-items: center; gap: 10px; }
-  .collection__pill { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding-inline: 13px; border-radius: var(--radius-pill); background: var(--c-surface); font-size: 11.5px; font-weight: 800; }
-  .collection__pill-icon { color: #e0a008; }
+  .collection {
+    gap: 18px;
+    padding: 28px var(--shell-gutter) 36px;
+  }
+
+  /* Desktop drops the back pill: the sidebar is the way back. */
+  .collection__top .back-pill {
+    display: none;
+  }
+
+  .collection__title {
+    font-size: 31px;
+  }
+
+  .collection__sub--desktop {
+    display: block;
+  }
+
+  /* The summary fans out into three tinted counter cards. */
+  .collection__summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .collection-counter {
+    align-items: center;
+    padding: 18px 20px;
+    border-radius: 18px;
+  }
+
+  .collection-counter + .collection-counter {
+    border-inline-start: 0;
+  }
+
+  .collection-counter--grape { background: var(--c-grape-soft); }
+  .collection-counter--mango { background: var(--c-mango-soft); }
+  .collection-counter--leaf { background: var(--c-leaf-soft); }
+
+  .collection-counter__value {
+    font-size: 21px;
+  }
+
+  .collection-counter__label {
+    font-size: 12px;
+  }
+
+  .collection-counter__icon {
+    display: block;
+  }
+
+  .collection__tabrow {
+    justify-content: flex-start;
+  }
+
+  .collection__tabs {
+    flex: 0 0 auto;
+  }
+
+  .collection__tab {
+    flex: 0 0 auto;
+    min-height: 38px;
+    padding-inline: 18px;
+  }
+
+  .collection__opennote {
+    display: inline;
+  }
+
+  .rewards__grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+  }
+
+  .reward-card {
+    padding: 22px 16px 16px;
+  }
+
+  .reward-card__medal {
+    width: 60px;
+    height: 60px;
+  }
+
+  .collection__next {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-block-start: 4px;
+    padding: 18px 22px;
+    border-radius: 20px;
+    background: var(--c-grape-soft);
+  }
+
+  .collection__next-icon {
+    display: grid;
+    flex: 0 0 52px;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--c-surface);
+    color: var(--c-grape);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .collection__next-copy {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .collection__next-title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .collection__next-sub {
+    color: var(--c-grape-ink);
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .collection__next-track {
+    flex: 0 0 200px;
+    display: block;
+    height: 7px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.6);
+    overflow: hidden;
+  }
+
+  .collection__next-fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--c-grape);
+  }
+
+  .collection__next-count {
+    flex: 0 0 auto;
+    color: var(--c-grape);
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .collection__footer {
+    display: none;
+  }
 }

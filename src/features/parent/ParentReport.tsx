@@ -1,3 +1,10 @@
+import {
+  ArrowLeft,
+  Target,
+  RefreshCw,
+  Star,
+  Zap,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -14,7 +21,7 @@ import {
 } from "../../domain";
 import { runTask } from "../../platform/task";
 import { listAttempts, listMastery } from "../../storage";
-import { Button, Screen } from "../../ui";
+import { Icon } from "../../ui";
 import "./parent.css";
 
 const KIND_BY_ITEM = new Map<string, ModuleKind>(
@@ -56,6 +63,10 @@ export interface ParentReportProps {
   readonly onBack: () => void;
 }
 
+/*
+ * Rebuilt to pen.dev frame 15: the summary tiles carry an icon, and the
+ * header is the shared back-pill row.
+ */
 export function ParentReport({ profile, onBack }: ParentReportProps) {
   const { t, i18n } = useTranslation();
   const [report, setReport] = useState<ProgressReport | null>(null);
@@ -89,47 +100,85 @@ export function ParentReport({ profile, onBack }: ParentReportProps) {
     };
   }, [profile.id]);
 
+  const header = (
+    <header className="parent__top">
+      <button type="button" className="back-pill" onClick={onBack}>
+        <Icon glyph={ArrowLeft} size={16} />
+        <span>{t("common.back")}</span>
+      </button>
+      <h1 className="parent__title">{t("parent.report")}</h1>
+    </header>
+  );
+
   if (failed) {
     return (
-      <Screen title={t("parent.report")} onBack={onBack}>
-        <p role="alert">{t("error.storage")}</p>
-      </Screen>
+      <div className="parent">
+        {header}
+        <section className="parent-card">
+          <p role="alert">{t("error.storage")}</p>
+        </section>
+      </div>
     );
   }
 
   if (!report) {
     return (
-      <Screen title={t("parent.report")} onBack={onBack}>
-        <p>{t("common.loading")}</p>
-      </Screen>
+      <div className="parent">
+        {header}
+        <section className="parent-card">
+          <p>{t("common.loading")}</p>
+        </section>
+      </div>
     );
   }
 
   return (
-    <Screen title={t("parent.report")} onBack={onBack}>
-      <section className="panel">
-        <h2 className="panel__title">{t("parent.summary")}</h2>
-        <div className="report__grid">
-          <div className="report__stat">
-            <span className="report__value">
-              {report.mastered}/{report.totalItems}
+    <div className="parent">
+      {header}
+
+      <section className="parent-card">
+        <h2 className="parent-card__heading">{t("parent.summary")}</h2>
+        <div className="report-grid">
+          <div className="report-stat">
+            <span className="report-stat__icon report-stat__icon--coral" aria-hidden="true">
+              <Icon glyph={Target} size={17} />
             </span>
-            <span className="report__label">{t("parent.statMastered")}</span>
+            <span className="report-stat__copy">
+              <span className="report-stat__value">
+                {report.mastered}/{report.totalItems}
+              </span>
+              <span className="report-stat__label">{t("parent.statMastered")}</span>
+            </span>
           </div>
-          <div className="report__stat">
-            <span className="report__value">{report.attempted}</span>
-            <span className="report__label">{t("parent.statAttempted")}</span>
+          <div className="report-stat">
+            <span className="report-stat__icon report-stat__icon--sky" aria-hidden="true">
+              <Icon glyph={RefreshCw} size={16} />
+            </span>
+            <span className="report-stat__copy">
+              <span className="report-stat__value">{report.attempted}</span>
+              <span className="report-stat__label">{t("parent.statAttempted")}</span>
+            </span>
           </div>
-          <div className="report__stat">
-            <span className="report__value">⭐ {report.stars}</span>
-            <span className="report__label">{t("parent.statStars")}</span>
+          <div className="report-stat">
+            <span className="report-stat__icon report-stat__icon--mango" aria-hidden="true">
+              <Icon glyph={Star} size={16} />
+            </span>
+            <span className="report-stat__copy">
+              <span className="report-stat__value">{report.stars}</span>
+              <span className="report-stat__label">{t("parent.statStars")}</span>
+            </span>
           </div>
-          <div className="report__stat">
-            <span className="report__value">{report.totalAttempts}</span>
-            <span className="report__label">{t("parent.statAttempts")}</span>
+          <div className="report-stat">
+            <span className="report-stat__icon report-stat__icon--grape" aria-hidden="true">
+              <Icon glyph={Zap} size={16} />
+            </span>
+            <span className="report-stat__copy">
+              <span className="report-stat__value">{report.totalAttempts}</span>
+              <span className="report-stat__label">{t("parent.statAttempts")}</span>
+            </span>
           </div>
         </div>
-        <p className="panel__hint">
+        <p className="parent-card__note">
           {report.lastPlayedAt === null
             ? t("parent.neverPlayed")
             : t("parent.lastPlayed", {
@@ -138,8 +187,8 @@ export function ParentReport({ profile, onBack }: ParentReportProps) {
         </p>
       </section>
 
-      <section className="panel">
-        <h2 className="panel__title">{t("parent.levels")}</h2>
+      <section className="parent-card">
+        <h2 className="parent-card__heading">{t("parent.levels")}</h2>
         <ul className="report__levels">
           {LEVELS.map((level) => (
             <li key={level} className="report__level">
@@ -153,8 +202,8 @@ export function ParentReport({ profile, onBack }: ParentReportProps) {
         </ul>
       </section>
 
-      <section className="panel">
-        <h2 className="panel__title">{t("parent.byCategory")}</h2>
+      <section className="parent-card">
+        <h2 className="parent-card__heading">{t("parent.byCategory")}</h2>
         <ul className="report__levels">
           {report.byKind.map((row) => (
             <li key={row.kind} className="report__bar">
@@ -175,10 +224,10 @@ export function ParentReport({ profile, onBack }: ParentReportProps) {
         </ul>
       </section>
 
-      <section className="panel">
-        <h2 className="panel__title">{t("parent.needsPractice")}</h2>
+      <section className="parent-card">
+        <h2 className="parent-card__heading">{t("parent.needsPractice")}</h2>
         {report.weakest.length === 0 ? (
-          <p className="panel__hint">{t("parent.noWeak")}</p>
+          <p className="parent-card__note">{t("parent.noWeak")}</p>
         ) : (
           <ul className="report__items">
             {report.weakest.map((item) => (
@@ -197,7 +246,7 @@ export function ParentReport({ profile, onBack }: ParentReportProps) {
                     })}
                   </span>
                 </span>
-                <span className="report__stars">
+                <span className="report__stars" aria-hidden="true">
                   {"★".repeat(item.stars)}
                   {"☆".repeat(3 - item.stars)}
                 </span>
@@ -207,10 +256,10 @@ export function ParentReport({ profile, onBack }: ParentReportProps) {
         )}
       </section>
 
-      <section className="panel">
-        <h2 className="panel__title">{t("parent.tracingQuality")}</h2>
+      <section className="parent-card">
+        <h2 className="parent-card__heading">{t("parent.tracingQuality")}</h2>
         {report.averageAccuracy === null ? (
-          <p className="panel__hint">{t("parent.noTracing")}</p>
+          <p className="parent-card__note">{t("parent.noTracing")}</p>
         ) : (
           <ul className="report__levels">
             <li className="report__level">
@@ -230,8 +279,6 @@ export function ParentReport({ profile, onBack }: ParentReportProps) {
           </ul>
         )}
       </section>
-
-      <Button label={t("common.back")} variant="ghost" onClick={onBack} />
-    </Screen>
+    </div>
   );
 }

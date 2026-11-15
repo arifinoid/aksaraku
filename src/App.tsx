@@ -321,6 +321,7 @@ export function App() {
           onSelectProfile={handleSelectProfile}
           onDeleteProfile={handleDeleteProfile}
           onChangeProfileLocale={handleChangeProfileLocale}
+          onAddProfile={() => setRoute({ name: "profiles" })}
           onClose={() => setRoute({ name: "home" })}
           onPreview={() => setRoute({ name: "preview" })}
         />

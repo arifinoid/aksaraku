@@ -1,160 +1,364 @@
-.avatar__body {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
+/*
+ * Karakterku — rebuilt to pen.dev frame 12 (mobile) and d6 (desktop).
+ * A soft-gradient stage with the 3D character, then one compact card per
+ * slot; the colour slot is a row of plain swatch circles.
+ */
 
-.avatar__sections {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.avatar__stage {
-  width: 100%;
-  max-width: 260px;
-  aspect-ratio: 1 / 1;
-  margin: 0 auto;
-  border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, #eaf7ff, #fff7e6);
-  box-shadow: var(--shadow-pop);
-  overflow: hidden;
-  touch-action: none;
-}
-
-.avatar__fallback {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  font-size: 6rem;
-}
-
-.avatar__options {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: var(--space-2);
-  overflow-x: auto;
-  padding-bottom: 4px;
-  scrollbar-width: none;
-}
-
-.avatar__options::-webkit-scrollbar { display: none; }
-
-.avatar__option {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 4px;
-  min-width: 72px;
-  padding: 6px;
-  border: 3px solid var(--c-bg-2);
-  border-radius: var(--radius-md);
-  background: var(--c-surface);
-  cursor: pointer;
-  touch-action: manipulation;
-}
-
-.avatar__option--active {
-  border-color: var(--c-primary);
-  background: #fff2ea;
-}
-
-.avatar__option--locked {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.avatar__swatch {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--c-bg-2);
-  font-size: 1.4rem;
-}
-
-.avatar__option-name {
-  font-size: 0.78rem;
-  font-weight: 800;
-  text-align: center;
-}
-
-/* Phase 4 revamp — avatar wrapper */
 .avatar {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: calc(8px + env(safe-area-inset-top, 0px)) 20px calc(16px + env(safe-area-inset-bottom, 0px));
+  gap: 16px;
+  width: 100%;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 20px
+    calc(24px + env(safe-area-inset-bottom, 0px));
 }
 
 .avatar__top {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 36px;
+  gap: 14px;
+  min-height: 34px;
 }
 
-.avatar__back {
+.avatar__title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.avatar__layout {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Stage ------------------------------------------------------------------ */
+
+.avatar__stage-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar__stage {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 180px;
+  padding: 24px 0;
+  border-radius: 24px;
+  background: linear-gradient(170deg, #fbdce2 0%, #efe3f6 60%, #e5e9f8 100%);
+  touch-action: none;
+}
+
+/* The white disc keeps the 3D canvas concentric with the stage. */
+.avatar__disc,
+.avatar__fallback {
+  display: grid;
+  place-items: center;
+  width: 132px;
+  height: 132px;
+  border-radius: 50%;
+  background: var(--c-surface);
+  box-shadow:
+    0 0 0 6px rgba(255, 255, 255, 0.55),
+    var(--shadow-soft);
+  font-size: 56px;
+  line-height: 1;
+  overflow: hidden;
+}
+
+.avatar__species {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   height: 30px;
-  padding-inline: 10px 13px;
-  border: 0;
+  margin-block-start: -12px;
+  padding-inline: 14px 12px;
   border-radius: var(--radius-pill);
   background: var(--c-surface);
-  color: var(--c-ink);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 800;
-  cursor: pointer;
+  box-shadow: var(--shadow-soft);
 }
 
-.avatar__titles { min-width: 0; text-align: center; }
-
-.avatar__title {
-  font-family: var(--font-display);
-  font-size: 21px;
-  font-weight: 700;
-  line-height: 1.1;
+.avatar__species-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--c-coral);
 }
 
-.avatar__sub { display: none; }
-
-.avatar__meta { display: none; }
-
-.avatar__section { display: flex; flex-direction: column; gap: 8px; }
-
-.avatar__section-title {
-  font-family: var(--font-display);
-  font-size: 16px;
+.avatar__stage-caption {
+  display: none;
+  color: var(--c-muted);
+  font-size: 11.5px;
   font-weight: 700;
 }
 
-.avatar__footer {
+/* Auto-save note + save button live on the desktop stage column. */
+.avatar-info {
+  display: none;
+}
+
+.avatar-save {
+  display: none;
+}
+
+/* Slot cards -------------------------------------------------------------- */
+
+.avatar__sections {
   display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.avatar-slot__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-block-end: 10px;
+}
+
+.avatar-slot__title {
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.avatar-slot__value {
+  color: var(--c-muted);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+/* Colour swatches are bare 44px circles; the active one gains an ink ring
+   and a white check drawn over the fill. */
+.avatar-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.swatch-circle {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 3px solid transparent;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+  transition:
+    transform var(--motion-fast) var(--motion-out),
+    border-color var(--motion-fast) var(--motion-out);
+}
+
+@media (hover: hover) {
+  .swatch-circle:hover:not(:disabled) {
+    transform: scale(1.06);
+  }
+}
+
+.swatch-circle:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.swatch-circle--active {
+  border-color: var(--c-ink);
+}
+
+.swatch-circle:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* Part cards: icon on top, label below, mango highlight when active. */
+.avatar-opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.avatar-opt {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  color: var(--c-label);
-  font-size: 10.5px;
+  gap: 5px;
+  min-width: 76px;
+  min-height: 76px;
+  padding: 10px 8px;
+  border: 2px solid var(--c-line);
+  border-radius: 16px;
+  background: var(--c-surface);
+  color: var(--c-ink);
+  cursor: pointer;
+  transition:
+    border-color var(--motion-fast) var(--motion-out),
+    background-color var(--motion-fast) var(--motion-out);
+}
+
+.avatar-opt__icon {
+  color: #8d7d99;
+  transition: color var(--motion-fast) var(--motion-out);
+}
+
+.avatar-opt__label {
+  color: var(--c-muted);
+  font-size: 11px;
   font-weight: 700;
 }
 
-@media (min-width: 900px) {
-  .avatar { gap: 18px; padding: 28px var(--shell-gutter) 36px; }
-  .avatar__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
-  .avatar__back { display: none; }
-  .avatar__titles { text-align: start; }
-  .avatar__title { font-size: 31px; }
-  .avatar__sub { display: block; margin-block-start: 4px; color: var(--c-muted); font-size: 12.5px; font-weight: 600; }
-  .avatar__meta { display: flex; flex: 0 0 auto; align-items: center; gap: 10px; }
-  .avatar__stage { max-width: 420px; }
-  .avatar__body { flex-direction: row; align-items: flex-start; gap: 24px; }
-  .avatar__stage { flex: 0 0 420px; max-width: 420px; }
-  .avatar__sections { flex: 1; }
+@media (hover: hover) {
+  .avatar-opt:hover:not(:disabled):not(.avatar-opt--active) {
+    border-color: #e5d8c8;
+    background: var(--c-bg-2);
+  }
 }
+
+.avatar-opt--active {
+  border-color: var(--c-mango);
+  background: var(--c-mango-soft);
+}
+
+.avatar-opt--active .avatar-opt__icon {
+  color: var(--c-mango-ink);
+}
+
+.avatar-opt--active .avatar-opt__label {
+  color: var(--c-mango-ink);
+}
+
+.avatar-opt:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.avatar-opt:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Desktop ------------------------------------------------------------- */
+
+@media (min-width: 900px) {
+  .avatar {
+    gap: 18px;
+    padding: 28px var(--shell-gutter) 36px;
+  }
+
+  .avatar__top {
+    align-items: flex-start;
+  }
+
+  /* Desktop drops the back pill: the sidebar is the way back. */
+  .avatar__top .back-pill {
+    display: none;
+  }
+
+  .avatar__title {
+    font-size: 31px;
+  }
+
+  .avatar__layout {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  .avatar__stage-col {
+    position: sticky;
+    top: 24px;
+    gap: 14px;
+  }
+
+  .avatar__stage {
+    min-height: 420px;
+    padding: 40px 0 56px;
+    border-radius: 28px;
+  }
+
+  .avatar__disc,
+  .avatar__fallback {
+    width: 220px;
+    height: 220px;
+    font-size: 96px;
+  }
+
+  .avatar__species {
+    height: 34px;
+    margin-block-start: -20px;
+    font-size: 13px;
+  }
+
+  .avatar__stage-caption {
+    display: block;
+    font-size: 12.5px;
+  }
+
+  .avatar-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+    padding: 18px;
+    border-radius: 18px;
+    background: var(--c-surface);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .avatar-info__title {
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .avatar-info__body {
+    color: var(--c-muted);
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .avatar-save {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 52px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--c-coral);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 14.5px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: var(--shadow-soft);
+    transition: transform var(--motion-fast) var(--motion-out);
+  }
+
+  .avatar-save:active:not(:disabled) {
+    transform: scale(0.96);
+  }
+
+  .avatar__sections {
+    gap: 20px;
+  }
+
+  .avatar-opts {
+    gap: 12px;
+  }
+
+  .avatar-opt {
+    min-height: 88px;
+  }
+}
+
+/* RTL: nothing directional in the swatch rows, but the check stays put. */

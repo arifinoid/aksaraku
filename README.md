@@ -9,7 +9,8 @@ Aplikasi edukasi interaktif PWA offline-first untuk balita (3+) yang berfokus pa
 - **State & Domain**: `fp-ts` (Either/TaskEither), `ts-pattern` (state machines)
 - **Storage**: IndexedDB via Dexie (Offline-first)
 - **i18n**: `i18next` + `react-i18next` (Indonesian, English, Arabic RTL)
-- **Hosting**: Cloudflare Pages (`aksaraku.pages.dev`)
+- **Hosting**: VPS (`aksaraku.arifinoid.web.id`) + Cloudflare Pages (preview)
+- **Analytics**: self-hosted GoatCounter (`stats.arifinoid.web.id`), cookieless
 
 ## 🚀 Quick Start
 
@@ -44,6 +45,13 @@ bun start
 ```bash
 bash deploy.sh
 ```
+
+### Deploy to the VPS
+Pushes to `main` deploy to `/var/www/aksaraku` when the repository variable
+`VPS_DEPLOY_ENABLED=true` is set and the `VPS_HOST` / `VPS_SSH_KEY` secrets
+exist. nginx serves the release from `https://aksaraku.arifinoid.web.id`;
+the three newest releases are kept for rollback. See
+[docs/specs/vps-deploy-analytics.md](./docs/specs/vps-deploy-analytics.md).
 
 ## 📄 Documentation
 

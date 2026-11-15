@@ -29,6 +29,7 @@ import {
 } from "../../domain";
 import { TracingCanvas } from "../../game";
 import { useActiveLocale } from "../../i18n";
+import { trackEvent } from "../../platform/analytics";
 import { newId } from "../../platform/ids";
 import { speakPhoneme } from "../../platform/speech";
 import { runTask } from "../../platform/task";
@@ -143,6 +144,7 @@ export function TracingScreen({
           setScore(result);
           setStrokeIndex(totalStrokes);
           setOffTrack(false);
+          trackEvent("tracing-item-complete");
           void runTask(
             saveAttempt({
               id: newId(),

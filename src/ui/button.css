@@ -1,3 +1,29 @@
+/*
+ * The shared back pill used by every sub-screen rebuilt to the pen.dev
+ * frames: white capsule, soft shadow, pressed at 0.96.
+ */
+.back-pill {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding-inline: 12px 15px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--c-surface);
+  color: var(--c-ink);
+  font-size: 12.5px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform var(--motion-fast) var(--motion-out);
+}
+
+.back-pill:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -26,7 +52,7 @@
  * tapping a 64px target needs clear feedback that the tap registered.
  */
 .btn:active:not(:disabled) {
-  transform: translateY(3px) scale(0.95);
+  transform: translateY(3px) scale(0.96);
   box-shadow: none;
 }
 
@@ -53,14 +79,11 @@
   color: #fff;
 }
 
-.btn--primary:hover:not(:disabled) {
-  filter: brightness(1.05);
-}
-
 .btn--secondary {
   background: var(--c-surface);
   color: var(--c-ink);
-  border: 3px solid var(--c-accent);
+  /* Border sits on shadow rings only so forced-colors mode still draws an edge. */
+  border: 1px solid transparent;
 }
 
 .btn--ghost {

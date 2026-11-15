@@ -66,8 +66,8 @@
   touch-action: manipulation;
 }
 
-.option-card:active {
-  transform: translateY(3px) scale(0.95);
+.option-card:active:not(:disabled) {
+  transform: translateY(2px) scale(0.96);
   box-shadow: none;
 }
 
@@ -194,8 +194,8 @@
     border-color var(--motion-fast) var(--motion-out);
 }
 
-.swatch:active {
-  transform: scale(0.92);
+.swatch:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
 .swatch--active {
@@ -244,8 +244,8 @@
  * The balloon is the biggest target in the game, so it gets the loudest
  * feedback: it squashes on press and tips over when it pops.
  */
-.balloon:active {
-  transform: translateY(4px) scale(0.94);
+.balloon:active:not(:disabled) {
+  transform: translateY(4px) scale(0.96);
 }
 
 .balloon--pop {
@@ -260,46 +260,64 @@
 .games {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
   padding: calc(10px + env(safe-area-inset-top, 0px)) 20px calc(24px + env(safe-area-inset-bottom, 0px));
 }
 
 .games__top, .match__top, .balloon-game__top, .coloring-game__top {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 36px;
+  gap: 14px;
+  min-height: 34px;
 }
 
 .games__back, .match__back, .balloon-game__back, .coloring-game__back {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 30px;
-  padding-inline: 10px 13px;
+  height: 34px;
+  padding-inline: 12px 15px;
   border: 0;
   border-radius: var(--radius-pill);
   background: var(--c-surface);
   color: var(--c-ink);
-  font-size: 10.5px;
+  font-size: 12.5px;
   font-weight: 800;
   cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform var(--motion-fast) var(--motion-out);
+}
+
+.games__back:active, .match__back:active, .balloon-game__back:active, .coloring-game__back:active {
+  transform: scale(0.96);
 }
 
 .games__titles, .match__titles, .balloon-game__titles, .coloring-game__titles {
   min-width: 0;
-  text-align: center;
 }
 
 .games__title, .match__title, .balloon-game__title, .coloring-game__title {
+  flex: 0 1 auto;
   font-family: var(--font-display);
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.15;
 }
 
 .games__sub, .match__sub, .balloon-game__sub, .coloring-game__sub {
+  display: none;
+}
+
+/* The hub subtitle: shorter copy on mobile, longer on desktop. */
+.games__sub--mobile {
+  display: block;
+  margin-block-start: 3px;
+  color: var(--c-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.games__sub--desktop {
   display: none;
 }
 
@@ -310,89 +328,116 @@
 .games__hub {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 22px;
 }
 
 .game-card {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px;
-  min-height: 150px;
+  gap: 16px;
+  min-height: 148px;
+  padding: 20px;
   border: 0;
-  border-radius: 30px;
+  border-radius: 28px;
   text-align: start;
   cursor: pointer;
   touch-action: manipulation;
   transition: transform var(--motion-fast) var(--motion-out);
 }
 
-.game-card:active { transform: translateY(2px) scale(0.98); }
+.game-card:active:not(:disabled) { transform: translateY(2px) scale(0.96); }
 
-.game-card--coral { background: var(--c-coral); color: #fff; }
-.game-card--sky { background: var(--c-sky); color: #fff; }
-.game-card--mango { background: var(--c-mango); color: var(--c-ink); }
-
-.game-card__icon {
-  display: grid;
-  flex: 0 0 62px;
-  place-items: center;
-  width: 62px;
-  height: 62px;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.28);
-  font-size: 30px;
-  line-height: 1;
-}
-
-.game-card--mango .game-card__icon { background: rgba(255, 255, 255, 0.45); }
+.game-card--coral { background: var(--c-coral); }
+.game-card--sky { background: var(--c-sky); }
+.game-card--mango { background: var(--c-mango); }
 
 .game-card__copy {
   display: flex;
   flex: 1;
-  flex-direction: column;
-  gap: 2px;
   min-width: 0;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Titles and labels stay plum on every card; the design samples them at
+   #2b1e3a across all three tones. */
+.game-card__copy,
+.game-card__title {
+  color: var(--c-ink);
 }
 
 .game-card__title {
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 700;
-  line-height: 1.1;
+  line-height: 1.12;
 }
 
 .game-card__sub {
-  font-size: 11.5px;
-  font-weight: 600;
-  opacity: 0.92;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.92);
 }
 
-.game-card__play {
-  display: inline-flex;
+.game-card--mango .game-card__sub {
+  color: rgba(43, 30, 58, 0.62);
+}
+
+.game-card__head {
+  display: flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: 6px;
-  height: 38px;
-  padding-inline: 14px;
-  border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.92);
-  color: var(--c-ink);
-  font-size: 11.5px;
-  font-weight: 800;
+  gap: 12px;
+}
+
+.game-card__icon {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 24px;
+}
+
+.game-card--coral .game-card__icon { background: var(--c-coral-soft); color: var(--c-primary-dark); }
+.game-card--sky .game-card__icon { background: var(--c-sky-soft); color: var(--c-sky-ink); }
+.game-card--mango .game-card__icon { background: var(--c-mango-soft); color: var(--c-mango-ink); }
+
+.game-card__badge-chip {
+  display: none;
+}
+
+.game-card__cta {
+  display: none;
+}
+
+.game-card__go {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.game-card--mango .game-card__go {
+  color: rgba(43, 30, 58, 0.45);
 }
 
 .games__footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-pill);
+  background: var(--c-surface);
   color: var(--c-label);
-  font-size: 10.5px;
+  font-size: 12px;
   font-weight: 700;
+  box-shadow: var(--shadow-soft);
 }
 
-.games__footer-icon { color: var(--c-mango); }
+.games__footer-icon { color: var(--c-coral); }
 
 .games__bottom { display: none; }
 
@@ -419,6 +464,34 @@
 }
 
 .match__mode.is-active { background: var(--c-coral); color: #fff; }
+
+/* Round progress: "Soal 1 dari 5" with three star outlines on the right. */
+.match__progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.match__progress-label {
+  flex: 1;
+  color: var(--c-muted);
+  font-size: 12.5px;
+  font-weight: 800;
+}
+
+.match__progress-stars {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.match__progress-star {
+  color: #d9cfe2;
+}
+
+.match__progress-star--on {
+  color: var(--c-mango-ink);
+}
 
 .match__prompt {
   display: flex;
@@ -563,35 +636,76 @@
 @media (min-width: 900px) {
   .games { gap: 18px; padding: 28px var(--shell-gutter) 36px; }
   .games__top { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; }
-  .games__back { display: none; }
+  .games__top .back-pill { display: none; }
   .games__titles { text-align: start; }
   .games__title { font-size: 31px; }
-  .games__sub { display: block; margin-block-start: 4px; color: var(--c-muted); font-size: 12.5px; font-weight: 600; }
+  .games__sub--mobile { display: none; }
+  .games__sub--desktop { display: block; margin-block-start: 4px; color: var(--c-muted); font-size: 12.5px; font-weight: 600; }
   .games__meta { display: flex; flex: 0 0 auto; align-items: center; gap: 10px; }
   .games__pill { display: inline-flex; align-items: center; gap: 6px; height: 32px; padding-inline: 13px; border-radius: var(--radius-pill); background: var(--c-surface); font-size: 11.5px; font-weight: 800; }
   .games__pill-icon { color: var(--c-primary); }
   .games__pill-icon--star { color: #e0a008; }
   .games__avatar { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--c-mango-soft); font-size: 22px; line-height: 1; }
+
+  /* Hub cards stack vertically on desktop, with a badge chip by the icon
+     and a full-width "Mainkan" pill at the bottom. */
   .games__hub { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
-  .game-card { flex-direction: column; align-items: flex-start; justify-content: space-between; min-height: 400px; padding: 24px; border-radius: 30px; }
-  .game-card__icon { width: 60px; height: 60px; border-radius: 22px; font-size: 28px; }
+  .game-card { flex-direction: column; align-items: stretch; justify-content: space-between; min-height: 400px; padding: 24px; border-radius: 30px; }
+  .game-card__copy { gap: 4px; }
+  .game-card__head { align-items: center; justify-content: space-between; }
+  .game-card__icon { width: 60px; height: 60px; border-radius: 18px; }
+  .game-card__badge-chip {
+    display: inline-flex;
+    align-items: center;
+    height: 26px;
+    padding-inline: 11px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.38);
+    color: var(--c-ink);
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+  .game-card--mango .game-card__badge-chip { background: rgba(255, 255, 255, 0.55); }
   .game-card__title { font-size: 24px; }
   .game-card__sub { font-size: 12.5px; }
-  .game-card__play { height: 38px; font-size: 12px; }
+  .game-card__go { display: none; }
+  .game-card__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    align-self: flex-start;
+    min-width: 128px;
+    height: 42px;
+    padding-inline: 20px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--c-surface);
+    color: var(--c-ink);
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 800;
+  }
   .games__footer { display: none; }
+
+  /* Bottom cards: three stat tiles + the next-reward meter. */
   .games__bottom { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-  .games__score-card, .games__reward-card { display: flex; flex-direction: column; gap: 12px; padding: 20px; border-radius: 24px; background: var(--c-surface); }
+  .games__score-card, .games__reward-card { display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: 24px; background: var(--c-surface); box-shadow: var(--shadow-soft); }
   .games__score-title, .games__reward-title { font-family: var(--font-display); font-size: 16px; font-weight: 700; }
-  .games__score-stats { display: flex; gap: 12px; }
-  .games__score-stat { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; }
-  .games__score-stat-icon { color: var(--c-mango); }
+  .games__stat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .games__stat-tile { display: flex; flex-direction: column; gap: 4px; padding: 12px; border-radius: 14px; background: var(--c-bg-2); }
+  .games__stat-value { font-family: var(--font-display); font-size: 20px; font-weight: 700; line-height: 1; }
+  .games__stat-value--sky { color: var(--c-secondary); }
+  .games__stat-value--mango { color: var(--c-mango-ink); }
+  .games__stat-value--grape { color: var(--c-grape); }
+  .games__stat-label { color: var(--c-muted); font-size: 11px; font-weight: 700; }
   .games__score-sub { color: var(--c-muted); font-size: 10.5px; font-weight: 700; }
   .games__reward-card { background: var(--c-grape-soft); }
-  .games__reward-head { display: flex; align-items: center; gap: 8px; }
-  .games__reward-icon { color: var(--c-grape); }
-  .games__reward-title { color: var(--c-grape-ink); }
+  .games__reward-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .games__reward-chip { display: inline-flex; align-items: center; height: 26px; padding-inline: 11px; border-radius: var(--radius-pill); background: var(--c-surface); color: var(--c-grape); font-variant-numeric: tabular-nums; font-size: 11.5px; font-weight: 800; }
   .games__reward-sub { color: var(--c-grape-ink); font-size: 10.5px; font-weight: 700; }
-  .games__reward-track { height: 7px; border-radius: var(--radius-pill); background: rgba(255,255,255,0.6); overflow: hidden; }
+  .games__reward-track { height: 7px; border-radius: var(--radius-pill); background: rgba(255, 255, 255, 0.6); overflow: hidden; }
   .games__reward-fill { display: block; height: 100%; border-radius: var(--radius-pill); background: var(--c-grape); }
 
   .match { gap: 16px; padding: 28px var(--shell-gutter) 36px; }

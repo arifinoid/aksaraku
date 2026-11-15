@@ -32,6 +32,7 @@ const LANGUAGE_NEUTRAL = new Set([
   "landing.languages.id",
   "landing.languages.en",
   "landing.languages.ar",
+  "avatar.species.panda",
 ]);
 
 describe("locale dictionaries", () => {

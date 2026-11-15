@@ -1,9 +1,10 @@
+import { ArrowLeft, CircleCheck, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { avatarEmoji } from "../../data/avatars";
 import type { Locale, Profile } from "../../domain";
 import { LOCALE_OPTIONS } from "../../i18n";
-import { Button, Screen } from "../../ui";
+import { Icon } from "../../ui";
 import "./parent.css";
 
 export interface ParentChildrenProps {
@@ -12,15 +13,21 @@ export interface ParentChildrenProps {
   readonly onSelect: (profile: Profile) => void;
   readonly onDelete: (profile: Profile) => void;
   readonly onChangeLocale: (profile: Profile, locale: Locale) => void;
+  readonly onAdd: () => void;
   readonly onBack: () => void;
 }
 
+/*
+ * Rebuilt to pen.dev frame 16: one centered card per child (avatar, name,
+ * language, delete), then the add-child card and the hint line.
+ */
 export function ParentChildren({
   profiles,
   current,
   onSelect,
   onDelete,
   onChangeLocale,
+  onAdd,
   onBack,
 }: ParentChildrenProps) {
   const { t } = useTranslation();
@@ -28,23 +35,34 @@ export function ParentChildren({
   const canDelete = profiles.length > 1;
 
   return (
-    <Screen title={t("parent.manageChildren")} onBack={onBack}>
-      <ul className="child-list">
-        {profiles.map((profile) => (
-          <li key={profile.id} className="child-row panel">
-            <span className="child-row__avatar" aria-hidden="true">
+    <div className="children">
+      <header className="parent__top">
+        <button type="button" className="back-pill" onClick={onBack}>
+          <Icon glyph={ArrowLeft} size={16} />
+          <span>{t("common.back")}</span>
+        </button>
+        <h1 className="parent__title">{t("parent.manageChildren")}</h1>
+      </header>
+
+      {profiles.map((profile) => {
+        const active = profile.id === current.id;
+        return (
+          <section key={profile.id} className="parent-card child-card">
+            <span className="child-card__avatar" aria-hidden="true">
               {avatarEmoji(profile.avatarId)}
             </span>
-            <span className="child-row__name">
-              {profile.name}
-              {profile.id === current.id ? (
-                <span className="child-row__badge">
+
+            <div className="child-card__namerow">
+              <span className="child-card__name">{profile.name}</span>
+              {active ? (
+                <span className="child-card__badge">
+                  <Icon glyph={CircleCheck} size={13} />
                   {t("parent.activeChild")}
                 </span>
               ) : null}
-            </span>
+            </div>
 
-            <label className="child-row__locale">
+            <label className="child-card__locale field">
               <span className="visually-hidden">
                 {t("parent.childLanguage", { name: profile.name })}
               </span>
@@ -52,10 +70,7 @@ export function ParentChildren({
                 className="field__select"
                 value={profile.locale}
                 onChange={(event) =>
-                  onChangeLocale(
-                    profile,
-                    event.currentTarget.value as Locale,
-                  )
+                  onChangeLocale(profile, event.currentTarget.value as Locale)
                 }
               >
                 {LOCALE_OPTIONS.map((option) => (
@@ -67,51 +82,52 @@ export function ParentChildren({
             </label>
 
             {confirming === profile.id ? (
-              <span className="child-row__actions">
-                <Button
-                  label={t("parent.deleteConfirm")}
-                  variant="ghost"
-                  size="sm"
+              <div className="child-confirm">
+                <button
+                  type="button"
+                  className="child-card__delete"
                   onClick={() => {
                     setConfirming(null);
-                    onDelete(profile);
+                    if (canDelete) onDelete(profile);
                   }}
-                />
-                <Button
-                  label={t("parent.cancel")}
-                  variant="secondary"
-                  size="sm"
+                >
+                  {t("parent.deleteConfirm")}
+                </button>
+                <button
+                  type="button"
+                  className="child-card__delete child-card__delete--cancel"
                   onClick={() => setConfirming(null)}
-                />
-              </span>
+                >
+                  {t("parent.cancel")}
+                </button>
+              </div>
             ) : (
-              <span className="child-row__actions">
-                {profile.id === current.id ? null : (
-                  <Button
-                    label={t("parent.switchTo")}
-                    variant="secondary"
-                    size="sm"
-                    onClick={() => onSelect(profile)}
-                  />
-                )}
-                <Button
-                  label={t("parent.delete")}
-                  variant="ghost"
-                  size="sm"
-                  disabled={!canDelete}
-                  onClick={() => setConfirming(profile.id)}
-                />
-              </span>
+              <button
+                type="button"
+                className="child-card__delete"
+                disabled={!canDelete}
+                onClick={() => setConfirming(profile.id)}
+              >
+                <Icon glyph={Trash2} size={14} />
+                <span>{t("parent.delete")}</span>
+              </button>
             )}
-          </li>
-        ))}
-      </ul>
+          </section>
+        );
+      })}
 
-      {canDelete ? (
-        <p className="panel__hint">{t("parent.deleteHint")}</p>
-      ) : (
-        <p className="panel__hint">{t("parent.lastChildHint")}</p>
-      )}
-    </Screen>
+      <section className="parent-card child-add">
+        <button type="button" className="child-add__btn" onClick={onAdd}>
+          <Icon glyph={Plus} size={16} className="child-add__icon" />
+          <span>{t("profiles.add")}</span>
+        </button>
+      </section>
+
+      <p className="children__hint">
+        {canDelete
+          ? t("parent.deleteHint")
+          : t("parent.lastChildHint")}
+      </p>
+    </div>
   );
 }

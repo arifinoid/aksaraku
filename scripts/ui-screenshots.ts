@@ -58,6 +58,9 @@ async function back(page: Page) {
   const btn = page.locator('button:has-text("Kembali")').first();
   if (await btn.isVisible().catch(() => false)) {
     await btn.click();
+  } else if (await visible(page, '.sidebar__nav:has-text("Orang Tua")')) {
+    // Desktop hides the back pill inside the parent area.
+    await page.locator('.sidebar__nav:has-text("Orang Tua")').first().click();
   } else {
     await ensureHome(page);
   }
@@ -155,16 +158,16 @@ async function capture(page: Page, dir: string) {
     ? page.locator(".home__parent")
     : page.locator('.sidebar__nav:has-text("Area Orang Tua")');
   await parentButton.first().click();
-  await page.locator(".gate__question").waitFor({ timeout: 15000 });
+  await page.locator(".pgate__question").waitFor({ timeout: 15000 });
   await shot(page, dir, "13-parent-gate");
 
   const question = (await page
-    .locator(".gate__question")
+    .locator(".pgate__question")
     .innerText()).replace(/\s+/g, " ");
   const nums = question.match(/(\d+)\s*\+\s*(\d+)/);
   if (!nums) throw new Error("Cannot parse gate question: " + question);
   const answer = String(Number(nums[1]) + Number(nums[2]));
-  await page.locator(".gate__input").fill(answer);
+  await page.locator(".pgate__input").fill(answer);
   await page
     .locator('button[type="submit"]')
     .filter({ hasText: /Masuk/i })
@@ -174,12 +177,12 @@ async function capture(page: Page, dir: string) {
   await shot(page, dir, "14-parent-menu");
 
   await page.locator('button:has-text("Laporan Perkembangan")').click();
-  await page.locator(".report__grid").waitFor({ timeout: 15000 });
+  await page.locator(".report-grid").waitFor({ timeout: 15000 });
   await shot(page, dir, "15-parent-report");
   await back(page);
 
   await page.locator('button:has-text("Kelola Anak")').first().click();
-  await page.locator(".child-list").waitFor({ timeout: 15000 });
+  await page.locator(".child-card").first().waitFor({ timeout: 15000 });
   await shot(page, dir, "16-parent-children");
   await back(page);
 

@@ -118,11 +118,15 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  min-height: var(--touch-min);
+  min-height: 48px;
   padding: var(--space-2) var(--space-3);
-  background: var(--c-surface);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-soft);
+}
+
+/* The parent-facing row: a flat label beside an iOS-style toggle. */
+.switch--flat {
+  padding: 0;
+  min-height: 44px;
 }
 
 .switch__label {
@@ -131,10 +135,42 @@
 }
 
 .switch__input {
-  width: 44px;
-  height: 44px;
-  accent-color: var(--c-primary);
+  appearance: none;
+  width: 46px;
+  height: 28px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 999px;
+  background: var(--c-line);
+  position: relative;
   cursor: pointer;
+  transition: background-color var(--motion-fast) var(--motion-out);
+}
+
+.switch__input::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(43, 30, 58, 0.25);
+  transition: translate var(--motion-fast) var(--motion-out);
+}
+
+.switch__input:checked {
+  background: var(--c-coral);
+}
+
+.switch__input:checked::before {
+  translate: 18px 0;
+}
+
+.switch__input:focus-visible {
+  outline: 4px solid var(--c-secondary);
+  outline-offset: 3px;
 }
 
 .field {
@@ -150,16 +186,20 @@
 
 .field__input,
 .field__select {
-  min-height: var(--touch-min);
-  padding: 0 var(--space-3);
-  border-radius: var(--radius-md);
-  border: 3px solid var(--c-bg-2);
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 14px;
+  /* Form controls need a real boundary, not a decorative hairline: keep the
+     border dark enough to hold 3:1 against the white surface. */
+  border: 2px solid #c4b39e;
   background: var(--c-surface);
+  font-size: 15px;
+  font-weight: 700;
 }
 
 .field__input:focus,
 .field__select:focus {
-  border-color: var(--c-primary);
+  border-color: var(--c-coral);
   outline: none;
 }
 

@@ -1,43 +1,30 @@
-/* Pen.dev "23 · Pratinjau Konten": category cards with a counter and a row
-   of glyph chips. */
+/*
+ * Pratinjau Konten — rebuilt to pen.dev frame 23: one white card per
+ * category with a head row, a capped chip row, an info pill and a close
+ * card at the bottom.
+ */
+
 .preview {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 8px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+  width: 100%;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) 20px
+    calc(24px + env(safe-area-inset-bottom, 0px));
 }
 
 .preview__top {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 36px;
-}
-
-.preview__back {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  height: 30px;
-  padding-inline: 10px 13px;
-  border: 1px solid var(--c-line);
-  border-radius: var(--radius-pill);
-  background: var(--c-surface);
-  color: var(--c-ink);
-  font-family: var(--font-sans);
-  font-size: 10.5px;
-  font-weight: 800;
-  cursor: pointer;
+  gap: 14px;
+  min-height: 34px;
 }
 
 .preview__title {
-  grid-column: 2;
   font-family: var(--font-display);
   font-size: 20px;
   font-weight: 700;
-  line-height: 1.1;
-  text-align: center;
+  line-height: 1.15;
 }
 
 .preview__content {
@@ -48,44 +35,39 @@
 
 .preview__lead {
   color: var(--c-muted);
-  font-size: 11.5px;
-  font-weight: 600;
-  line-height: 1.45;
-  text-wrap: pretty;
+  font-size: 12.5px;
+  font-weight: 700;
 }
 
-.preview__section {
+.preview-card {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px;
-  border: 1px solid var(--c-line);
-  border-radius: 22px;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
   background: var(--c-surface);
+  box-shadow: var(--shadow-soft);
 }
 
-.preview__head {
+.preview-card__head {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
   gap: 10px;
 }
 
-.preview__section-title {
-  font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.2;
+.preview-card__title {
+  font-size: 14.5px;
+  font-weight: 800;
 }
 
-.preview__count {
+.preview-card__count {
   color: var(--c-muted);
-  font-size: 10px;
+  font-size: 11.5px;
   font-weight: 700;
-  white-space: nowrap;
 }
 
-.preview__row {
+.preview-card__row {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -97,50 +79,67 @@
 .preview__chip {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
-  border: 1px solid #f1e5d5;
-  border-radius: 10px;
-  background: #fffcf6;
-  color: var(--c-ink);
+  width: 32px;
+  height: 32px;
+  border-radius: 11px;
+  background: var(--c-surface);
+  box-shadow: var(--shadow-soft);
   font-family: var(--font-display);
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--c-ink);
 }
 
-.preview__note {
+/* Shape chips pick up their category colour. */
+.preview__chip--circle svg { color: var(--c-sky-ink); }
+.preview__chip--oval svg { color: var(--c-leaf-ink); }
+.preview__chip--square svg { color: var(--c-coral); }
+.preview__chip--rectangle svg { color: var(--c-sky-ink); }
+.preview__chip--triangle svg { color: var(--c-grape); }
+.preview__chip--star svg { color: var(--c-mango-ink); }
+.preview__chip--heart svg { color: var(--c-coral); }
+.preview__chip--line svg { color: var(--c-muted); }
+
+.preview-note {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 11px 13px;
+  gap: 10px;
+  padding: 14px 16px;
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.5);
+  background: var(--c-surface);
   color: var(--c-muted);
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
-  line-height: 1.4;
+  box-shadow: var(--shadow-soft);
 }
 
-.preview__close {
+.preview-note svg {
+  flex: 0 0 auto;
+  color: var(--c-muted);
+}
+
+.preview-close {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  height: 52px;
-  border: 1px solid var(--c-line);
-  border-radius: 18px;
+  gap: 10px;
+  min-height: 54px;
+  border: 0;
+  border-radius: 16px;
   background: var(--c-surface);
   color: var(--c-ink);
-  font-family: var(--font-sans);
-  font-size: 12.5px;
+  font-size: 14px;
   font-weight: 800;
   cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform var(--motion-fast) var(--motion-out);
 }
 
-.preview__close:active {
-  transform: scale(0.99);
+.preview-close:active:not(:disabled) {
+  transform: scale(0.96);
 }
+
+/* Desktop ------------------------------------------------------------- */
 
 @media (min-width: 900px) {
   .preview {
@@ -148,30 +147,34 @@
     padding: 28px var(--shell-gutter) 36px;
   }
 
-  .preview__top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-
-  .preview__back {
+  /* Desktop drops the back pill: the sidebar is the way back. */
+  .preview__top .back-pill {
     display: none;
   }
 
   .preview__title {
     font-size: 31px;
-    text-align: start;
   }
 
-  .preview__content {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+  .preview__lead {
+    font-size: 13px;
   }
 
-  .preview__lead,
-  .preview__note,
-  .preview__close {
-    grid-column: 1 / -1;
+  .preview-card {
+    padding: 20px;
+    border-radius: 20px;
+  }
+
+  .preview-card__title {
+    font-size: 15.5px;
+  }
+
+  .preview-card__row {
+    gap: 10px;
+  }
+
+  .preview__chip {
+    width: 40px;
+    height: 40px;
   }
 }
